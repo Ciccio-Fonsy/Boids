@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 #include <vector>
 
 class predator : public boid
@@ -30,15 +31,18 @@ class predator : public boid
 
     set_position(vec3(x, y, z));
 
-    double vx =
-        ((std::rand() % static_cast<int>(2 * attack_speed / std::sqrt(3)))
-         - (attack_speed / std::sqrt(3)));
-    double vy =
-        ((std::rand() % static_cast<int>(2 * attack_speed / std::sqrt(3)))
-         - (attack_speed / std::sqrt(3)));
-    double vz =
-        ((std::rand() % static_cast<int>(2 * attack_speed / std::sqrt(3)))
-         - (attack_speed / std::sqrt(3)));
+    // Initialize random number generator
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 gen(rd()); // Seed the generator
+    std::uniform_real_distribution<> dis(-1.0, 1.0); // Define the range
+
+    // Calculate the maximum deviation
+    double max_deviation = attack_speed / std::sqrt(3);
+
+    // Generate random velocities within the desired range
+    double vx = dis(gen) * 2 * max_deviation;
+    double vy = dis(gen) * 2 * max_deviation;
+    double vz = dis(gen) * 2 * max_deviation;
 
     set_velocity(vec3(vx, vy, vz));
 
@@ -47,28 +51,20 @@ class predator : public boid
     };
   }
 
-  boid* find_prey(swarm& boids)
+  const boid* find_prey(const swarm& boids)
   {
-    boid* nearest_prey      = nullptr;
-    double nearest_distance = screen.norm();
+    const boid* nearest_prey = nullptr;
+    double nearest_distance  = screen.norm();
 
-    if (!toroidal) {
-      for (int i = 0; i < boids.get_size(); i++) {
-        double dist =
-            distance(boids.get_boids()[i].get_position(), get_position());
-        if (dist < nearest_distance && dist <= get_attack_range()) {
-          nearest_distance = dist;
-          nearest_prey     = &boids.get_boids()[i];
-        }
-      }
-    } else {
-      for (int i = 0; i < boids.get_size(); i++) {
-        double dist = toroidal_distance(boids.get_boids()[i].get_position(),
-                                        get_position(), screen);
-        if (dist < nearest_distance && dist <= get_attack_range()) {
-          nearest_distance = dist;
-          nearest_prey     = &boids.get_boids()[i];
-        }
+    for (std::vector<boid>::size_type i = 0; i < boids.get_size(); i++) {
+      const boid& current_boid = boids[i];
+      double dist              = toroidal
+                                   ? toroidal_distance(current_boid.get_position(),
+                                                       get_position(), screen)
+                                   : distance(current_boid.get_position(), get_position());
+      if (dist < nearest_distance && dist <= get_attack_range()) {
+        nearest_distance = dist;
+        nearest_prey     = &current_boid;
       }
     }
     return nearest_prey;
@@ -76,15 +72,15 @@ class predator : public boid
 
   void attack(swarm& boids)
   {
-    boid* prey = find_prey(boids);
-    if (prey != nullptr) {
+    const boid* prey = find_prey(boids);
+    if (prey) {
+      vec3 prey_position = prey->get_position();
       if (!toroidal) {
-        vec3 direction_to_prey =
-            (prey->get_position() - get_position()).normalize();
+        vec3 direction_to_prey = (prey_position - get_position()).normalize();
         set_velocity(direction_to_prey * get_attack_speed());
       } else {
         vec3 direction_to_prey =
-            toroidal_vec_dist(prey->get_position(), get_position(), screen)
+            toroidal_vec_dist(prey_position, get_position(), screen)
                 .normalize();
         set_velocity(direction_to_prey * get_attack_speed());
       }
@@ -96,17 +92,17 @@ class predator : public boid
       : boid()
       , attack_range(0)
       , attack_speed(0)
-      , screen(vec3(500, 500, 500))
+      , screen(vec3(600, 300, 300))
       , toroidal(0)
       , prefered_height(screen.z / 3)
       , wind(vec3(0, 0, 0))
   {}
 
-  predator(vec3 position = vec3(0, 0, 0), vec3 velocity = vec3(0, 0, 0),
+  predator(vec3 position_ = vec3(0, 0, 0), vec3 velocity_ = vec3(0, 0, 0),
            double attack_range_ = 50, double attack_speed_ = 70,
            vec3 screen_ = vec3(500, 500, 500), bool toroidal_ = 0,
            vec3 wind_ = vec3(0, 0, 0))
-      : boid(position, velocity)
+      : boid(position_, velocity_)
       , attack_range(attack_range_)
       , attack_speed(attack_speed_)
       , screen(screen_)
@@ -123,12 +119,20 @@ class predator : public boid
     initialize_predator();
   }
 
+  // copy constructor
+  predator(const predator& other)
+      : boid(other)
+      , attack_range(other.attack_range)
+      , attack_speed(other.attack_speed)
+      , screen(other.screen)
+  {}
+
   void update_predator(swarm& boids)
   {
     if (boids.get_cooldown() >= 1000) {
       attack(boids);
     } else {
-      update_boid_velocity(keep_height(*this, prefered_height, 100),
+      update_boid_velocity(boids.keep_height(*this, prefered_height, 100),
                            attack_speed * 0.6);
     }
     update_boid_velocity(vec3(), attack_speed);
@@ -138,26 +142,18 @@ class predator : public boid
     boids.border(*this);
   }
 
-  double get_attack_range()
+  const double& get_attack_range() const
   {
     return attack_range;
   }
-  double get_attack_speed()
+  const double& get_attack_speed() const
   {
     return attack_speed;
   }
-  vec3 get_screen()
+  const vec3& get_screen() const
   {
     return screen;
   }
-
-  // copy constructor
-  predator(const predator& other)
-      : boid(other)
-      , attack_range(other.attack_range)
-      , attack_speed(other.attack_speed)
-      , screen(other.screen)
-  {}
 
   predator& operator=(const predator& other)
   {

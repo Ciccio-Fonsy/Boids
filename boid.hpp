@@ -62,7 +62,7 @@ class boid
       velocity = velocity.normalize() * max_speed;
     }
 
-    position += velocity * 3;
+    position += velocity;
   }
 
   // Copy constructor

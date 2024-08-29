@@ -19,34 +19,34 @@
 
 int main()
 {
-  draw_windows();
+  // finestre usate nella funzione draw e nel main
+  sf::RenderWindow windowXY;
+  sf::RenderWindow windowXZ;
 
-  int size        = 100;
-  double wingspan = 2, max_speed = 1, min_distance = 30, sight_distance = 150;
-  double separation_factor = 50, cohesion_factor = 50, alignment_factor = 50,
-         fear_factor = 100;
-  vec3 screen(600, 300, 300), wind(0, 0, 0);
-  bool toroidalbool = false, windbool = false, manually = false, attack = true;
+  draw_windows(windowXY, windowXZ);
 
+  std::vector<boid>::size_type size = 100;
+  int wingspan = 2, t = 0;
+  double max_speed = 1, min_distance = 30, sight_distance = 150;
+  double separation_factor = 0.05, cohesion_factor = 0.00005,
+         alignment_factor = 0.005, fear_factor = 0.05;
+  const vec3 screen(600, 300, 300);
+  vec3 wind(0, 0, 0);
+  bool toroidal_bool = false, manually = false;
   double attack_range = 300, attack_speed = 1.1;
-  if (!attack) {
-    attack_range = 0;
-    attack_speed = 0;
-  }
 
   initialize_parameters(manually, size, wingspan, max_speed, min_distance,
                         separation_factor, cohesion_factor, alignment_factor,
-                        fear_factor, sight_distance, screen, toroidalbool,
-                        windbool, wind, attack_speed, attack_range);
+                        fear_factor, sight_distance, toroidal_bool, wind,
+                        attack_speed, attack_range);
 
   predator yautja(vec3(0, 0, 0), vec3(0, 0, 0), attack_range, attack_speed,
-                  screen, toroidalbool, wind);
+                  screen, toroidal_bool, wind);
 
   swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
               separation_factor, cohesion_factor, alignment_factor, fear_factor,
-              yautja, screen, toroidalbool, wind);
+              yautja, screen, toroidal_bool, wind);
 
-  int t = 0;
   while (windowXY.isOpen() && windowXZ.isOpen() && boids.get_size() > 1) {
     handle_events(windowXY);
     handle_events(windowXZ);

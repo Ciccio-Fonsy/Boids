@@ -6,37 +6,39 @@
 
 class vec3
 { // vettore tridimensionale
-public:
+ public:
   double x, y, z;
   vec3()
-      : x(0), y(0), z(0)
-  {
-  } // costruttore vuoto
-  vec3(double x, double y, double z)
-      : x(x), y(y), z(z)
-  {
-  } // costruttore
-    
+      : x(0)
+      , y(0)
+      , z(0)
+  {} // costruttore vuoto
+  vec3(double x_, double y_, double z_)
+      : x(x_)
+      , y(y_)
+      , z(z_)
+  {} // costruttore
+
   // uguaglianza
-  bool operator==(const vec3 &other) const
+  bool operator==(const vec3& other) const
   {
     return x == other.x && y == other.y && z == other.z;
   }
 
   // disuguaglianza
-  bool operator!=(const vec3 &other) const
+  bool operator!=(const vec3& other) const
   {
     return !(*this == other);
   }
 
   // somma
-  vec3 operator+(const vec3 &other) const
+  vec3 operator+(const vec3& other) const
   {
     return vec3(x + other.x, y + other.y, z + other.z);
   }
 
   // somma e assegna
-  vec3 operator+=(const vec3 &other)
+  vec3 operator+=(const vec3& other)
   {
     x += other.x;
     y += other.y;
@@ -45,13 +47,13 @@ public:
   }
 
   // differenza
-  vec3 operator-(const vec3 &other) const
+  vec3 operator-(const vec3& other) const
   {
     return vec3(x - other.x, y - other.y, z - other.z);
   }
 
   // differenza e assegna
-  vec3 operator-=(const vec3 &other)
+  vec3 operator-=(const vec3& other)
   {
     x -= other.x;
     y -= other.y;
@@ -99,31 +101,28 @@ public:
   vec3 normalize() const
   {
     double n = norm();
-    if (n != 0)
-    {
+    if (n != 0) {
       return vec3(x / n, y / n, z / n);
-    }
-    else
-    {
+    } else {
       return *this;
     }
   }
 
   // prodotto scalare
-  double dot(const vec3 &other) const
+  double dot(const vec3& other) const
   {
     return x * other.x + y * other.y + z * other.z;
   }
 
   // prodotto vettoriale
-  vec3 cross(const vec3 &other) const
+  vec3 cross(const vec3& other) const
   {
     return vec3(y * other.z - z * other.y, z * other.x - x * other.z,
                 x * other.y - y * other.x);
   }
 
   // accesso agli elementi
-  double &operator[](int i)
+  double& operator[](int i)
   {
     if (i == 0)
       return x;
@@ -135,7 +134,7 @@ public:
   }
 
   // accesso agli elementi costante
-  const double &operator[](int i) const
+  const double& operator[](int i) const
   {
     if (i == 0)
       return x;
