@@ -6,8 +6,6 @@
 #include "vec3.hpp"
 
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <random>
 #include <vector>
 
@@ -34,30 +32,30 @@ class swarm
 
   void initialize_positions()
   {
-    std::srand(static_cast<unsigned>(
-        std::time(0))); // Inizializza il seme per i numeri casuali
+    // Initialize random number generator
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 gen(rd()); // Seed the generator
 
     for (auto& b : boids) {
-      double x = std::rand() % static_cast<int>(screen.x);
-      double y = std::rand() % static_cast<int>(screen.y);
-      double z = std::rand() % static_cast<int>(screen.z);
+      std::uniform_real_distribution<> ds(0, 1.0); // Define the range
+
+      double x = ds(gen) * screen.x;
+      double y = ds(gen) * screen.y;
+      double z = ds(gen) * screen.z;
 
       // Imposta la posizione del boid
       b.set_position(vec3(x, y, z));
 
       //  genera velocità casuali
-      // Initialize random number generator
-      std::random_device rd;  // Obtain a random number from hardware
-      std::mt19937 gen(rd()); // Seed the generator
-      std::uniform_real_distribution<> dis(-1.0, 1.0); // Define the range
+      std::uniform_real_distribution<> dv(-1.0, 1.0); // Define the range
 
       // Calculate the maximum deviation
       double max_deviation = max_speed / std::sqrt(3);
 
       // Generate random velocities within the desired range
-      double vx = dis(gen) * 2 * max_deviation;
-      double vy = dis(gen) * 2 * max_deviation;
-      double vz = dis(gen) * 2 * max_deviation;
+      double vx = dv(gen) * max_deviation;
+      double vy = dv(gen) * max_deviation;
+      double vz = dv(gen) * max_deviation;
 
       b.set_velocity(vec3(vx, vy, vz));
 

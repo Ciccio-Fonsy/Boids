@@ -7,8 +7,6 @@
 #include "vec3.hpp"
 
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <random>
 #include <vector>
 
@@ -23,18 +21,19 @@ class predator : public boid
 
   void initialize_predator()
   {
-    std::srand(static_cast<unsigned>(std::time(0)));
-
-    double x = std::rand() % static_cast<int>(screen.x);
-    double y = std::rand() % static_cast<int>(screen.y);
-    double z = std::rand() % static_cast<int>(screen.z);
-
-    set_position(vec3(x, y, z));
-
     // Initialize random number generator
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 gen(rd()); // Seed the generator
     std::uniform_real_distribution<> dis(-1.0, 1.0); // Define the range
+
+    std::uniform_real_distribution<> ds(0, 1.0); // Define the range
+
+    double x = ds(gen) * screen.x;
+    double y = ds(gen) * screen.y;
+    double z = ds(gen) * screen.z;
+
+    // Imposta la posizione del boid
+    set_position(vec3(x, y, z));
 
     // Calculate the maximum deviation
     double max_deviation = attack_speed / std::sqrt(3);
