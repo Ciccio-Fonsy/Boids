@@ -10,14 +10,14 @@
 #include <random>
 #include <vector>
 
-class predator : public boid
+class Predator : public Boid
 {
   double attack_range;
   double attack_speed;
-  vec3 screen;
+  Vec3 screen;
   bool toroidal;
   double prefered_height;
-  vec3 wind;
+  Vec3 wind;
 
   void initialize_predator()
   {
@@ -33,7 +33,7 @@ class predator : public boid
     double z = ds(gen) * screen.z;
 
     // Imposta la posizione del boid
-    set_position(vec3(x, y, z));
+    set_position(Vec3(x, y, z));
 
     // Calculate the maximum deviation
     double max_deviation = attack_speed / std::sqrt(3);
@@ -43,25 +43,25 @@ class predator : public boid
     double vy = dis(gen) * 2 * max_deviation;
     double vz = dis(gen) * 2 * max_deviation;
 
-    set_velocity(vec3(vx, vy, vz));
+    set_velocity(Vec3(vx, vy, vz));
 
     if (get_velocity().norm() > attack_speed) {
       set_velocity(get_velocity().normalize() * attack_speed);
     };
   }
 
-  const boid* find_prey(const swarm& boids)
+  const Boid* find_prey(const Swarm& boids)
   {
-    const boid* nearest_prey = nullptr;
+    const Boid* nearest_prey = nullptr;
     double nearest_distance  = screen.norm();
 
-    for (std::vector<boid>::size_type i = 0; i < boids.get_size(); i++) {
-      const boid& current_boid = boids[i];
+    for (std::vector<Boid>::size_type i = 0; i < boids.get_size(); ++i) {
+      const Boid& current_boid = boids[i];
       double dist              = toroidal
                                    ? toroidal_distance(current_boid.get_position(),
                                                        get_position(), screen)
                                    : distance(current_boid.get_position(), get_position());
-      if (dist < nearest_distance && dist <= get_attack_range()) {
+      if (dist < nearest_distance && dist <= attack_range) {
         nearest_distance = dist;
         nearest_prey     = &current_boid;
       }
@@ -69,39 +69,37 @@ class predator : public boid
     return nearest_prey;
   }
 
-  void attack(swarm& boids)
+  void attack(Swarm& boids)
   {
-    const boid* prey = find_prey(boids);
+    const Boid* prey = find_prey(boids);
     if (prey) {
-      vec3 prey_position = prey->get_position();
+      Vec3 prey_position = prey->get_position();
       if (!toroidal) {
-        vec3 direction_to_prey = (prey_position - get_position()).normalize();
-        set_velocity(direction_to_prey * get_attack_speed());
+        Vec3 direction_to_prey = (prey_position - get_position()).normalize();
+        set_velocity(direction_to_prey * attack_speed);
       } else {
-        vec3 direction_to_prey =
+        Vec3 direction_to_prey =
             toroidal_vec_dist(prey_position, get_position(), screen)
                 .normalize();
-        set_velocity(direction_to_prey * get_attack_speed());
+        set_velocity(direction_to_prey * attack_speed);
       }
     }
   }
 
  public:
-  predator()
-      : boid()
+  Predator()
+      : Boid()
       , attack_range(0)
       , attack_speed(0)
-      , screen(vec3(600, 300, 300))
+      , screen(Vec3(600, 300, 300))
       , toroidal(0)
       , prefered_height(screen.z / 3)
-      , wind(vec3(0, 0, 0))
+      , wind(Vec3(0, 0, 0))
   {}
 
-  predator(vec3 position_ = vec3(0, 0, 0), vec3 velocity_ = vec3(0, 0, 0),
-           double attack_range_ = 50, double attack_speed_ = 70,
-           vec3 screen_ = vec3(500, 500, 500), bool toroidal_ = 0,
-           vec3 wind_ = vec3(0, 0, 0))
-      : boid(position_, velocity_)
+  Predator(double attack_range_, double attack_speed_, Vec3 screen_,
+           bool toroidal_, Vec3 wind_)
+      : Boid(Vec3(0, 0, 0), Vec3(0, 0, 0))
       , attack_range(attack_range_)
       , attack_speed(attack_speed_)
       , screen(screen_)
@@ -119,14 +117,14 @@ class predator : public boid
   }
 
   // copy constructor
-  predator(const predator& other)
-      : boid(other)
+  Predator(const Predator& other)
+      : Boid(other)
       , attack_range(other.attack_range)
       , attack_speed(other.attack_speed)
       , screen(other.screen)
   {}
 
-  void update_predator(swarm& boids)
+  void update_predator(Swarm& boids)
   {
     if (boids.get_cooldown() >= 1000) {
       attack(boids);
@@ -134,7 +132,7 @@ class predator : public boid
       update_boid_velocity(boids.keep_height(*this, prefered_height, 100),
                            attack_speed * 0.6);
     }
-    update_boid_velocity(vec3(), attack_speed);
+    update_boid_velocity(Vec3(), attack_speed);
     update_boid(wind,
                 wind.norm() + attack_speed); // il vento ha la precedenza sulle
                                              // intenzioni del predator
@@ -149,12 +147,12 @@ class predator : public boid
   {
     return attack_speed;
   }
-  const vec3& get_screen() const
+  const Vec3& get_screen() const
   {
     return screen;
   }
 
-  predator& operator=(const predator& other)
+  Predator& operator=(const Predator& other)
   {
     if (this != &other) {
       set_position(other.get_position());

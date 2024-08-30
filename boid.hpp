@@ -3,46 +3,52 @@
 
 #include "vec3.hpp"
 
-class boid
+class Boid
 {
-  vec3 position;
-  vec3 velocity;
+  Vec3 position;
+  Vec3 velocity;
 
  public:
-  boid()
-      : position(vec3(0, 0, 0))
-      , velocity(vec3(0, 0, 0))
+  Boid()
+      : position(Vec3(0, 0, 0))
+      , velocity(Vec3(0, 0, 0))
   {}
-  boid(vec3 position_, vec3 velocity_)
+  Boid(Vec3 position_, Vec3 velocity_)
       : position(position_)
       , velocity(velocity_)
   {}
 
+    // Copy constructor
+  Boid(const Boid& other)
+      : position(other.position)
+      , velocity(other.velocity)
+  {}
+
   // restituisce la posizione del boid
-  vec3 get_position() const
+  Vec3 get_position() const
   {
     return position;
   }
 
   // restituisce la velocità del boid
-  vec3 get_velocity() const
+  Vec3 get_velocity() const
   {
     return velocity;
   }
 
   // imposta la posizione del boid
-  void set_position(const vec3& new_position)
+  void set_position(const Vec3& new_position)
   {
     position = new_position;
   }
 
   // imposta la velocità del boid
-  void set_velocity(const vec3& new_velocity)
+  void set_velocity(const Vec3& new_velocity)
   {
     velocity = new_velocity;
   }
 
-  void update_boid_velocity(vec3 delta_v, double max_speed)
+  void update_boid_velocity(Vec3 delta_v, double max_speed)
   {
     velocity += delta_v;
 
@@ -53,7 +59,7 @@ class boid
   }
 
   // aggiorna la posizione del boid
-  void update_boid(vec3 delta_v, double max_speed)
+  void update_boid(Vec3 delta_v, double max_speed)
   {
     velocity += delta_v;
 
@@ -65,26 +71,20 @@ class boid
     position += velocity;
   }
 
-  // Copy constructor
-  boid(const boid& other)
-      : position(other.position)
-      , velocity(other.velocity)
-  {}
-
   // uguaglianza
-  bool operator==(const boid& other) const
+  bool operator==(const Boid& other) const
   {
     return position == other.position && velocity == other.velocity;
   }
 
   // disuguaglianza
-  bool operator!=(const boid& other) const
+  bool operator!=(const Boid& other) const
   {
     return !(*this == other);
   }
 
   // assegna
-  boid operator=(const boid& other)
+  Boid operator=(const Boid& other)
   {
     if (this != &other) {
       position = other.position;

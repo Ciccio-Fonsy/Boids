@@ -8,7 +8,7 @@
 #include <vector>
 
 // vettore distanza toroidale da da b ad a
-const vec3 toroidal_vec_dist(const vec3& a, const vec3& b, const vec3& width)
+const Vec3 toroidal_vec_dist(const Vec3& a, const Vec3& b, const Vec3& width)
 {
   double dx = a.x - b.x;
   double dy = a.y - b.y;
@@ -29,24 +29,27 @@ const vec3 toroidal_vec_dist(const vec3& a, const vec3& b, const vec3& width)
     }
   }
 
-  vec3 dist(dx, dy, dz);
+  Vec3 dist(dx, dy, dz);
 
   return dist;
 }
 
 // norma del precedente
-double toroidal_distance(const vec3& a, const vec3& b, const vec3& width)
+double toroidal_distance(const Vec3& a, const Vec3& b, const Vec3& width)
 {
   return toroidal_vec_dist(a, b, width).norm();
 }
 
-double distance(const vec3& a, const vec3& b)
+double distance(const Vec3& a, const Vec3& b)
 {
   return (a - b).norm();
 }
 
 double mean(std::vector<double> const& v)
 {
+  if (v.size() == 0) {
+    throw std::runtime_error("No boids");
+  }
   return std::accumulate(v.begin(), v.end(), 0.0)
        / static_cast<double>(v.size());
 }

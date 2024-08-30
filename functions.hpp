@@ -12,69 +12,83 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
 // Funzione per la generazione casuale dei parametri
-void casual_parameters(double& wingspan, double& max_speed, double& min_distance, double& separation_factor, double& cohesion_factor, double& alignment_factor, double& fear_factor, double& sight_distance, double& attack_speed, double& attack_range) {
-    // Set casual values for the parameters
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 gen(rd()); // Seed the generator
-    std::cout << "Casual parameters generation:\n";
-    std::uniform_real_distribution<> dis(0.2, 5); // Define the range
-    wingspan = dis(gen);
-    std::cout << "Wingspan: " << wingspan << std::endl;
+void casual_parameters(double& wingspan, double& max_speed,
+                       double& min_distance, double& separation_factor,
+                       double& cohesion_factor, double& alignment_factor,
+                       double& fear_factor, double& sight_distance,
+                       double& attack_speed, double& attack_range)
+{
+  // Set casual values for the parameters
+  std::random_device rd;  // Obtain a random number from hardware
+  std::mt19937 gen(rd()); // Seed the generator
+  std::cout << "Casual parameters generation:\n";
+  std::uniform_real_distribution<> dis(0.2, 5); // Define the range
+  wingspan = dis(gen);
+  std::cout << "Wingspan: " << wingspan << std::endl;
 
-    std::uniform_real_distribution<> dis1(0.001, 2); // Define the range
-    max_speed = dis1(gen);
-    std::cout << "Max speed: " << max_speed*100 << std::endl;
+  std::uniform_real_distribution<> dis1(0.001, 2); // Define the range
+  max_speed = dis1(gen);
+  std::cout << "Max speed: " << max_speed * 100 << std::endl;
 
-    std::uniform_real_distribution<> dis2(wingspan, 100); // Define the range
-    min_distance = dis2(gen);
-    std::cout << "Min distance: " << min_distance << std::endl;
+  std::uniform_real_distribution<> dis2(wingspan, 100); // Define the range
+  min_distance = dis2(gen);
+  std::cout << "Min distance: " << min_distance << std::endl;
 
-    std::uniform_real_distribution<> dis3(0.001, 100); // Define the range
-    separation_factor = dis3(gen) / 1000;
-    std::cout << "Separation factor: " << separation_factor*1000 << std::endl;
+  std::uniform_real_distribution<> dis3(0.001, 100); // Define the range
+  separation_factor = dis3(gen) / 1000;
+  std::cout << "Separation factor: " << separation_factor * 1000 << std::endl;
 
-    std::uniform_real_distribution<> dis4(0.001, 100); // Define the range
-    cohesion_factor = dis4(gen) / 1000000;
-    std::cout << "Cohesion factor: " << cohesion_factor*1000000 << std::endl;
+  std::uniform_real_distribution<> dis4(0.001, 100); // Define the range
+  cohesion_factor = dis4(gen) / 1000000;
+  std::cout << "Cohesion factor: " << cohesion_factor * 1000000 << std::endl;
 
-    std::uniform_real_distribution<> dis5(0.001, 100); // Define the range
-    alignment_factor = dis5(gen) / 10000;
-    std::cout << "Alignment factor: " << alignment_factor*10000 << std::endl;
+  std::uniform_real_distribution<> dis5(0.001, 100); // Define the range
+  alignment_factor = dis5(gen) / 10000;
+  std::cout << "Alignment factor: " << alignment_factor * 10000 << std::endl;
 
-    std::uniform_real_distribution<> dis6(0.001, 100); // Define the range
-    fear_factor = dis6(gen) / 1000;
-    std::cout << "Fear factor: " << fear_factor*1000 << std::endl;
+  std::uniform_real_distribution<> dis6(0.001, 100); // Define the range
+  fear_factor = dis6(gen) / 1000;
+  std::cout << "Fear factor: " << fear_factor * 1000 << std::endl;
 
-    std::uniform_real_distribution<> dis7(wingspan, 500); // Define the range
-    sight_distance = dis7(gen);
-    std::cout << "Sight distance: " << sight_distance << std::endl; 
+  std::uniform_real_distribution<> dis7(wingspan, 500); // Define the range
+  sight_distance = dis7(gen);
+  std::cout << "Sight distance: " << sight_distance << std::endl;
 
-    std::uniform_real_distribution<> dis8(0.001, 200); // Define the range
-    attack_speed = dis8(gen) / 100;
-    std::cout << "Attack speed: " << attack_speed*100 << std::endl;
+  std::uniform_real_distribution<> dis8(0.001, 200); // Define the range
+  attack_speed = dis8(gen) / 100;
+  std::cout << "Attack speed: " << attack_speed * 100 << std::endl;
 
-    std::uniform_real_distribution<> dis9(0.001, 500); // Define the range
-    attack_range = dis9(gen);
-    std::cout << "Attack range: " << attack_range << std::endl;
+  std::uniform_real_distribution<> dis9(0.001, 500); // Define the range
+  attack_range = dis9(gen);
+  std::cout << "Attack range: " << attack_range << std::endl;
 }
 
 // Funzione per inizializzare i parametri basandosi sull'input dell'utente
-void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
+void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
                            double& wingspan, double& max_speed,
                            double& min_distance, double& separation_factor,
                            double& cohesion_factor, double& alignment_factor,
                            double& fear_factor, double& sight_distance,
-                           bool& toroidalbool, vec3& wind, double& attack_speed,
+                           bool& toroidalbool, Vec3& wind, double& attack_speed,
                            double& attack_range)
 {
   std::string input;
   bool windbool;
   double windspeed{0.02};
+
+  std::cout << "Enter swarm size: ";
+  std::vector<Boid>::size_type size_;
+  std::cin >> size_;
+  if (size_ <= 1) {
+    std::cout << "This value is not accetable, setted to default value\n";
+  } else {
+    size = size_;
+  }
 
   std::cout << "Enable wind? [y/N]: ";
   std::cin >> input;
@@ -90,18 +104,10 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
   manually = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
 
   if (manually) {
-    std::cout << "Enter swarm size: ";
-    std::vector<boid>::size_type size_;
-    std::cin >> size_;
-    if (size_ <= 1 || !(std::cin >> size_)) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      size = size_;
-    }
     std::cout << "Enter wingspan(0 ~ 5): ";
     double wingspan_;
     std::cin >> wingspan_;
-    if (wingspan_ <= 0 || wingspan_ > 5 || !(std::cin >> wingspan_)) {
+    if (wingspan_ <= 0 || wingspan_ > 5) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       wingspan = wingspan_;
@@ -109,7 +115,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter maximum speed(0 ~ 200): ";
     double max_speed_;
     std::cin >> max_speed_;
-    if (max_speed_ <= 0 || max_speed_ > 200 || !(std::cin >> max_speed_)) {
+    if (max_speed_ <= 0 || max_speed_ > 200) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       max_speed = max_speed_ / 100;
@@ -117,8 +123,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter minimum distance(0 ~ 100): ";
     double min_distance_;
     std::cin >> min_distance_;
-    if (min_distance_ <= 0 || min_distance_ > 100
-        || !(std::cin >> min_distance_)) {
+    if (min_distance_ <= 0 || min_distance_ > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       min_distance = min_distance_;
@@ -126,8 +131,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter separation factor (0 ~ 100): ";
     double separation_factor_;
     std::cin >> separation_factor_;
-    if (separation_factor_ <= 0 || separation_factor_ > 100
-        || !(std::cin >> separation_factor_)) {
+    if (separation_factor_ <= 0 || separation_factor_ > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       separation_factor = separation_factor_ / 1000;
@@ -135,8 +139,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter cohesion factor (0 ~ 100): ";
     double cohesion_factor_;
     std::cin >> cohesion_factor_;
-    if (cohesion_factor_ <= 0 || cohesion_factor_ > 100
-        || !(std::cin >> cohesion_factor_)) {
+    if (cohesion_factor_ <= 0 || cohesion_factor_ > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       cohesion_factor = cohesion_factor_ / 1000000;
@@ -144,8 +147,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter alignment factor (0 ~ 100): ";
     double alignment_factor_;
     std::cin >> alignment_factor_;
-    if (alignment_factor_ <= 0 || alignment_factor_ > 100
-        || !(std::cin >> alignment_factor_)) {
+    if (alignment_factor_ <= 0 || alignment_factor_ > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       alignment_factor = alignment_factor_ / 10000;
@@ -153,8 +155,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter fear factor (0 ~ 100): ";
     double fear_factor_;
     std::cin >> fear_factor_;
-    if (fear_factor_ <= 0 || fear_factor_ > 100
-        || !(std::cin >> fear_factor_)) {
+    if (fear_factor_ <= 0 || fear_factor_ > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       fear_factor = fear_factor_ / 1000;
@@ -162,8 +163,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter sight distance(0 ~ 500): ";
     double sight_distance_;
     std::cin >> sight_distance_;
-    if (sight_distance_ <= 0 || sight_distance_ > 500
-        || !(std::cin >> sight_distance_)) {
+    if (sight_distance_ <= 0 || sight_distance_ > 500) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       sight_distance = sight_distance_;
@@ -171,8 +171,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter predator attack speed (0 ~ 200): ";
     double attack_speed_;
     std::cin >> attack_speed_;
-    if (attack_speed_ <= 0 || attack_speed_ > 200
-        || !(std::cin >> attack_speed_)) {
+    if (attack_speed_ <= 0 || attack_speed_ > 200) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       attack_speed = attack_speed_ / 100;
@@ -180,8 +179,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter predator attack range(0 ~ 500): ";
     double attack_range_;
     std::cin >> attack_range_;
-    if (attack_range_ <= 0 || attack_range_ > 500
-        || !(std::cin >> attack_range_)) {
+    if (attack_range_ <= 0 || attack_range_ > 500) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       attack_range = attack_range_;
@@ -190,122 +188,121 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
       std::cout << "Enter wind speed(0 ~ 20): ";
       double windspeed_;
       std::cin >> windspeed_;
-      if (windspeed_ <= 0 || windspeed_ > 20 || !(std::cin >> windspeed_)) {
+      if (windspeed_ <= 0 || windspeed_ > 20) {
         std::cout << "This value is not accetable, setted to default value\n";
       } else {
         windspeed = windspeed_ / 100;
       }
     }
-  }else{ //casual parameters
-  bool casual;
-  std::cout << "Enter swarm size: ";
-  std::cin >> size;
-  if (size <= 1 || !(std::cin >> size)) {
-    std::cout << "This value is not accetable, setted to default value\n";
-    size=100;
-  }
-  std::cout << "casual parameters geneation? [y/n]\n";
-  std::cin >> casual;
-  if (casual) casual_parameters(wingspan, max_speed, min_distance, separation_factor, cohesion_factor, alignment_factor, fear_factor, sight_distance, attack_speed, attack_range);
+  } else { // casual parameters
+    bool casual;
+    std::cout << "casual parameters geneation? [y/N]: ";
+    std::cin >> input;
+    casual = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+    if (casual) {
+      casual_parameters(wingspan, max_speed, min_distance, separation_factor,
+                        cohesion_factor, alignment_factor, fear_factor,
+                        sight_distance, attack_speed, attack_range);
+    }
   }
 
   if (windbool) {
     std::srand(static_cast<unsigned>(std::time(0)));
-    wind = vec3((std::rand() % 100) - 50, (std::rand() % 100) - 50,
+    wind = Vec3((std::rand() % 100) - 50, (std::rand() % 100) - 50,
                 (std::rand() % 20) - 10)
                .normalize()
          * windspeed;
   }
 }
 
-
 // disegna le finestre
 void draw_windows(sf::RenderWindow& windowXY_, sf::RenderWindow& windowXZ_)
 {
   // Get the desktop resolution
-  const sf::VideoMode& desktopMode = sf::VideoMode::getDesktopMode();
-  unsigned int screenWidth         = desktopMode.width;
-  unsigned int screenHeight        = desktopMode.height;
+  const sf::VideoMode& desktop_mode = sf::VideoMode::getDesktopMode();
+  unsigned int screen_width         = desktop_mode.width;
+  unsigned int screen_height        = desktop_mode.height;
 
   // Define padding and application bar height (adjust as needed)
   unsigned int padding = 12;
-  unsigned int appBarHeight =
+  unsigned int app_bar_height =
       35; // Assume the application bar is 35 pixels high
 
   // Calculate the size for each window, slightly smaller than the quarter
   // screen
-  unsigned int windowWidth  = (screenWidth / 2) - padding;
-  unsigned int windowHeight = (screenHeight / 2) - 2 * padding - appBarHeight;
+  unsigned int window_width = (screen_width / 2) - padding;
+  unsigned int window_height =
+      (screen_height / 2) - 2 * padding - app_bar_height;
 
   // Create the windows with the calculated sizes
-  windowXY_.create(sf::VideoMode(windowWidth, windowHeight), "XY Plane");
-  windowXZ_.create(sf::VideoMode(windowWidth, windowHeight), "XZ Plane");
+  windowXY_.create(sf::VideoMode(window_width, window_height), "XY Plane");
+  windowXZ_.create(sf::VideoMode(window_width, window_height), "XZ Plane");
 
   // Set the position of the windows, with offset to account for padding and app
   // bar
   windowXY_.setPosition(sf::Vector2i(
-      0, static_cast<int>(windowHeight + 3 * padding))); // Bottom-left corner
-  windowXZ_.setPosition(sf::Vector2i(0, 0));             // Upper-left corner
+      0, static_cast<int>(window_height + 3 * padding))); // Bottom-left corner
+  windowXZ_.setPosition(sf::Vector2i(0, 0));              // Upper-left corner
 }
 
-void initialize_shapes(float boidWingspan, sf::CircleShape& boidShape,
-                       sf::CircleShape& predatorShape)
+void initialize_shapes(float wingspan_, sf::CircleShape& boid_shape_,
+                       sf::CircleShape& predator_shape_)
 {
-  boidShape.setRadius(boidWingspan);
-  boidShape.setFillColor(sf::Color::White);
+  boid_shape_.setRadius(wingspan_);
+  boid_shape_.setFillColor(sf::Color::White);
 
-  predatorShape.setRadius(boidWingspan * 2);
-  predatorShape.setFillColor(sf::Color::Red);
+  predator_shape_.setRadius(wingspan_ * 2);
+  predator_shape_.setFillColor(sf::Color::Red);
 }
 
 // disegna i boids nella finestra
-void draw_boids_on_plane(const swarm& boids, const predator& yautja,
+void draw_boids_on_plane(const Swarm& boids_, const Predator& yautja_,
                          sf::RenderWindow& window, const int plane,
-                         sf::CircleShape& boidShape,
-                         sf::CircleShape& predatorShape)
+                         sf::CircleShape& boid_shape_,
+                         sf::CircleShape& predator_shape_)
 {
   if (plane > 1) {
     throw std::out_of_range("index out of range");
   }
 
-  const vec3& screen = boids.get_screen();
+  const Vec3& screen = boids_.get_screen();
   double width       = window.getSize().x;
   double height      = window.getSize().y;
 
   // Disegno dei boids
-  for (std::vector<boid>::size_type i = 0; i < boids.get_size(); i++) {
+  for (std::vector<Boid>::size_type i = 0; i < boids_.get_size(); ++i) {
     sf::Vector2<double> position;
 
     switch (plane) {
     case 0:
-      position.x = boids[i].get_position().x / screen.x * width;
-      position.y = boids[i].get_position().y / screen.y * height;
+      position.x = boids_[i].get_position().x / screen.x * width;
+      position.y = boids_[i].get_position().y / screen.y * height;
       break;
     case 1:
-      position.x = boids[i].get_position().x / screen.x * width;
-      position.y = boids[i].get_position().z / screen.z * height;
+      position.x = boids_[i].get_position().x / screen.x * width;
+      position.y = boids_[i].get_position().z / screen.z * height;
       break;
     }
 
-    boidShape.setPosition(sf::Vector2f(position));
-    window.draw(boidShape);
+    boid_shape_.setPosition(sf::Vector2f(position));
+    window.draw(boid_shape_);
   }
 
   // Disegno del predator
-  sf::Vector2<double> predatorPosition;
+  sf::Vector2<double> predator_position;
   switch (plane) {
   case 0:
-    predatorPosition.x = yautja.get_position().x / screen.x * width;
-    predatorPosition.y = yautja.get_position().y / screen.y * height;
+    predator_position.x = yautja_.get_position().x / screen.x * width;
+    predator_position.y = yautja_.get_position().y / screen.y * height;
     break;
   case 1:
-    predatorPosition.x = yautja.get_position().x / screen.x * width;
-    predatorPosition.y = yautja.get_position().z / screen.z * height;
+    predator_position.x = yautja_.get_position().x / screen.x * width;
+    predator_position.y = yautja_.get_position().z / screen.z * height;
     break;
   }
 
-  predatorShape.setPosition(sf::Vector2f(predatorPosition));
-  window.draw(predatorShape);
+  predator_shape_.setPosition(sf::Vector2f(predator_position));
+  window.draw(predator_shape_);
 }
 
 // interruzione del programma alla chiusura di una finestra
@@ -320,12 +317,12 @@ void handle_events(sf::RenderWindow& window)
 }
 
 // stampa a schermo delle statistiche
-void print_statistics(swarm& boids_, int t_)
+void print_statistics(Swarm& boids_, int t_)
 {
   std::vector<double> distances, velocities;
-  for (std::vector<boid>::size_type i = 0; i < boids_.get_size(); ++i) {
-    velocities.push_back(boids_[i].get_velocity().norm()*100);
-    for (std::vector<boid>::size_type j = i + 1; j < boids_.get_size(); ++j) {
+  for (std::vector<Boid>::size_type i = 0; i < boids_.get_size(); ++i) {
+    velocities.push_back(boids_[i].get_velocity().norm() * 100);
+    for (std::vector<Boid>::size_type j = i + 1; j < boids_.get_size(); ++j) {
       distances.push_back(
           boids_.is_toroidal()
               ? toroidal_distance(boids_[i].get_position(),
@@ -343,7 +340,7 @@ void print_statistics(swarm& boids_, int t_)
 
 // update del predator e dei boids e stampa delle statistiche a intervalli
 // regolari
-void update_simulation(predator& yautja_, swarm& boids_, int& t_)
+void update_simulation(Predator& yautja_, Swarm& boids_, int& t_)
 {
   yautja_.update_predator(boids_);
   boids_.update_swarm(yautja_);

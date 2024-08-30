@@ -9,11 +9,11 @@
 #include <random>
 #include <vector>
 
-class swarm
+class Swarm
 {
-  std::vector<boid> boids;
+  std::vector<Boid> boids;
 
-  std::vector<boid>::size_type size;
+  std::vector<Boid>::size_type size;
   double wingspan;
   double max_speed;
   double min_distance;
@@ -23,11 +23,11 @@ class swarm
   double alignment_factor;
   double fear_factor;
   bool predator;
-  boid yautja;
-  vec3 screen;
+  Boid yautja;
+  Vec3 screen;
   bool toroidal;
   double prefered_height;
-  vec3 wind;
+  Vec3 wind;
   int cooldown;
 
   void initialize_positions()
@@ -44,7 +44,7 @@ class swarm
       double z = ds(gen) * screen.z;
 
       // Imposta la posizione del boid
-      b.set_position(vec3(x, y, z));
+      b.set_position(Vec3(x, y, z));
 
       //  genera velocità casuali
       std::uniform_real_distribution<> dv(-1.0, 1.0); // Define the range
@@ -57,7 +57,7 @@ class swarm
       double vy = dv(gen) * max_deviation;
       double vz = dv(gen) * max_deviation;
 
-      b.set_velocity(vec3(vx, vy, vz));
+      b.set_velocity(Vec3(vx, vy, vz));
 
       if (b.get_velocity().norm() > max_speed) {
         b.set_velocity(b.get_velocity().normalize() * max_speed);
@@ -67,7 +67,7 @@ class swarm
 
   // REGOLE DI VOLO
 
-  bool is_within_range(const boid& b1, const boid& b2, const double range)
+  bool is_within_range(const Boid& b1, const Boid& b2, const double range)
   {
     if (!toroidal) {
       return distance(b1.get_position(), b2.get_position()) <= range;
@@ -77,13 +77,13 @@ class swarm
     }
   }
 
-  const vec3
-  rule1(const boid& b) // tutti i boid tendono al centro di massa dello stormo
+  const Vec3
+  rule1(const Boid& b) // tutti i boid tendono al centro di massa dello stormo
   {
-    vec3 perceived_center(0, 0, 0);
+    Vec3 perceived_center(0, 0, 0);
     int count{};
     if (!toroidal) { // bordo
-      for (std::vector<boid>::size_type i = 0; i < size; i++) {
+      for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
         if (boids[i] != b && is_within_range(b, boids[i], sight_distance)) {
           // non considero i boid troppo lontani
           perceived_center += boids[i].get_position();
@@ -91,14 +91,14 @@ class swarm
         }
       }
       if (count == 0) {
-        return vec3(0, 0, 0);
+        return Vec3(0, 0, 0);
       }
       perceived_center /= count;
       return ((perceived_center - b.get_position())) * cohesion_factor;
     } else { // toroidale
       for (int j = 0; j < 3; ++j) {
         count = 0;
-        for (std::vector<boid>::size_type i = 0; i < size; ++i) {
+        for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
           if (boids[i] != b && is_within_range(b, boids[i], sight_distance)) {
             if (std::abs(boids[i].get_position()[j] - perceived_center[j])
                 < screen[j] / 2) {
@@ -122,17 +122,17 @@ class swarm
     }
   }
 
-  const vec3
-  rule2(boid& b) // tutti i boid si tengono a distanza minima tra loro,
+  const Vec3
+  rule2(Boid& b) // tutti i boid si tengono a distanza minima tra loro,
   {
-    vec3 c(0, 0, 0);
+    Vec3 c(0, 0, 0);
     if (!toroidal) { // bordo
-      for (std::vector<boid>::size_type i = 0; i < size; i++) {
+      for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
         if (boids[i] != b && is_within_range(boids[i], b, min_distance)) {
           if (distance(boids[i].get_position(), b.get_position()) == 0) {
-            b.set_position(boids[i].get_position() + vec3(2 * wingspan, 0, 0));
+            b.set_position(boids[i].get_position() + Vec3(2 * wingspan, 0, 0));
           } else if (is_within_range(boids[i], b, 2 * wingspan)) {
-            vec3 newposition =
+            Vec3 newposition =
                 boids[i].get_position()
                 + (b.get_position() - boids[i].get_position()).normalize()
                       * wingspan * 2;
@@ -143,12 +143,12 @@ class swarm
         }
       }
     } else { // toroidale
-      for (std::vector<boid>::size_type i = 0; i < size; i++) {
+      for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
         if (boids[i] != b && is_within_range(boids[i], b, min_distance)) {
           if (distance(boids[i].get_position(), b.get_position()) == 0) {
-            b.set_position(boids[i].get_position() + vec3(2 * wingspan, 0, 0));
+            b.set_position(boids[i].get_position() + Vec3(2 * wingspan, 0, 0));
           } else if (is_within_range(boids[i], b, 2 * wingspan)) {
-            vec3 newposition =
+            Vec3 newposition =
                 boids[i].get_position()
                 + (b.get_position() - boids[i].get_position()).normalize()
                       * wingspan * 2;
@@ -165,13 +165,13 @@ class swarm
     return c * separation_factor;
   }
 
-  const vec3
-  rule3(const boid& b) // tutti i boid tendono a muoversi nella stessa direzione
+  const Vec3
+  rule3(const Boid& b) // tutti i boid tendono a muoversi nella stessa direzione
   {
-    vec3 pv(0, 0, 0);
+    Vec3 pv(0, 0, 0);
     int count = 0;
     if (!toroidal) {
-      for (std::vector<boid>::size_type i = 0; i < size; i++) {
+      for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
         if (boids[i] != b && is_within_range(boids[i], b, min_distance)) {
           pv += boids[i].get_velocity();
           ++count;
@@ -179,7 +179,7 @@ class swarm
       }
     }
     if (toroidal) {
-      for (std::vector<boid>::size_type i = 0; i < size; i++) {
+      for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
         if (boids[i] != b && is_within_range(boids[i], b, min_distance)) {
           pv += boids[i].get_velocity();
           ++count;
@@ -187,16 +187,16 @@ class swarm
       }
     }
     if (count == 0) {
-      return vec3(0, 0, 0);
+      return Vec3(0, 0, 0);
     }
     pv /= count;
     return (pv - b.get_velocity()) * alignment_factor;
   }
 
-  const vec3 avoid_predator(const boid& b) // evita il predatore
+  const Vec3 avoid_predator(const Boid& b) // evita il predatore
   {
-    vec3 evade_vector(0, 0, 0);
-    vec3 distance_to_predator(0, 0, 0);
+    Vec3 evade_vector(0, 0, 0);
+    Vec3 distance_to_predator(0, 0, 0);
     if (!toroidal) {
       distance_to_predator = b.get_position() - yautja.get_position();
     } else {
@@ -207,18 +207,18 @@ class swarm
     if (distance_norm == 0) {
       evade_vector = b.get_velocity() * max_speed;
     } else if (distance_norm <= sight_distance) {
-      vec3 flee_direction  = distance_to_predator.normalize();
+      Vec3 flee_direction  = distance_to_predator.normalize();
       double bounce_factor = (sight_distance - distance_norm) / sight_distance;
       evade_vector         = flee_direction * max_speed * bounce_factor;
     }
     return evade_vector * fear_factor;
   }
 
-  void bounce(boid& b) // rimbalzo
+  void bounce(Boid& b) // rimbalzo
   {
-    vec3 bounce       = b.get_velocity();
-    vec3 new_position = b.get_position();
-    for (int j = 0; j < 3; j++) {
+    Vec3 bounce       = b.get_velocity();
+    Vec3 new_position = b.get_position();
+    for (int j = 0; j < 3; ++j) {
       if (b.get_position()[j] < 0 && b.get_velocity()[j] < 0) {
         bounce[j] *= -0.9;
       } else if (b.get_position()[j] > screen[j] && b.get_velocity()[j] > 0) {
@@ -234,10 +234,10 @@ class swarm
     b.set_position(new_position);
   }
 
-  void teleport(boid& b) // teletrasporto spazio toroidale
+  void teleport(Boid& b) // teletrasporto spazio toroidale
   {
-    vec3 bounce       = b.get_velocity();
-    vec3 new_position = b.get_position();
+    Vec3 bounce       = b.get_velocity();
+    Vec3 new_position = b.get_position();
 
     for (int j = 0; j < 2; ++j) {
       if (new_position[j] > screen[j]) {
@@ -261,14 +261,14 @@ class swarm
   }
 
  public:
-  swarm(std::vector<boid>::size_type size_ = 100, double wingspan_ = 2,
+  Swarm(std::vector<Boid>::size_type size_ = 100, double wingspan_ = 2,
         double max_speed_ = 1, double min_distance_ = 30,
         double sight_distance_ = 150, double separation_factor_ = 50,
         double cohesion_factor_ = 50, double alignment_factor_ = 50,
         double fear_factor_ = 50,
-        boid yautja_        = boid(vec3(0, 0, 0), vec3(0, 0, 0)),
-        vec3 screen_ = vec3(600, 300, 300), bool toroidal_ = 0,
-        vec3 wind_ = vec3(0, 0, 0))
+        Boid yautja_        = Boid(Vec3(0, 0, 0), Vec3(0, 0, 0)),
+        Vec3 screen_ = Vec3(600, 300, 300), bool toroidal_ = 0,
+        Vec3 wind_ = Vec3(0, 0, 0))
       : size(size_)
       , wingspan(wingspan_)
       , max_speed(max_speed_)
@@ -318,25 +318,26 @@ class swarm
           "Fear factor must be greater than 0 and smaller than 100");
     }
 
-    for (std::vector<boid>::size_type i = 0; i < size; i++) {
-      boids.push_back(boid(
-          vec3(0, 0, 0),
-          vec3(0, 0, 0))); // Inizialmente posiziona tutti i boids su (0, 0, 0)
+    for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
+      boids.push_back(Boid(
+          Vec3(0, 0, 0),
+          Vec3(0, 0, 0))); // Inizialmente posiziona tutti i boids su (0, 0, 0)
     }
-    cohesion_factor/=1000000;
-    separation_factor/=1000;
-    alignment_factor/=10000;
-    fear_factor/=1000;
-    
+
     initialize_positions(); // Chiama il metodo per inizializzare le posizioni
   }
 
-  const boid& operator[](std::vector<boid>::size_type i) const
+  Boid& operator[](std::vector<Boid>::size_type i)
   {
     return boids[i];
   }
 
-  void border(boid& b) // comportamento al bordo
+  const Boid& operator[](std::vector<Boid>::size_type i) const
+  {
+    return boids[i];
+  }
+
+  void border(Boid& b) // comportamento al bordo
   {
     if (toroidal) {
       teleport(b);
@@ -345,9 +346,9 @@ class swarm
     }
   }
 
-  const vec3 keep_height(boid& b, double height, double division_factor)
+  const Vec3 keep_height(Boid& b, double height, double division_factor)
   {
-    vec3 comeback(0, 0, 0);
+    Vec3 comeback(0, 0, 0);
     if (std::abs(b.get_position().z - height) != 0
         && (b.get_position().z - height) * b.get_velocity().z > 0) {
       comeback.z = height - b.get_position().z;
@@ -356,17 +357,17 @@ class swarm
   }
 
   // Metodo per aggiornare la posizione di tutti i boid nello stormo
-  void update_swarm(boid& yautja_)
+  void update_swarm(Boid& yautja_)
   {
     ++cooldown;
     yautja = yautja_;
-    vec3 v1, v2, v3, v4;
+    Vec3 v1, v2, v3, v4;
 
     std::vector<long unsigned int> boids_to_remove;
 
     // Update velocities and positions for each boid
-    for (std::vector<boid>::size_type i = 0; i < size; ++i) {
-      boid& current_boid = boids[i];
+    for (std::vector<Boid>::size_type i = 0; i < size; ++i) {
+      Boid& current_boid = boids[i];
 
       if (is_within_range(yautja, current_boid, wingspan)) {
         boids_to_remove.push_back(i); // Check if yautja has reached this boid
@@ -395,12 +396,12 @@ class swarm
     }
   }
 
-  const std::vector<boid>::size_type& get_size() const
+  const std::vector<Boid>::size_type& get_size() const
   {
     return size;
   }
 
-  const vec3& get_screen() const
+  const Vec3& get_screen() const
   {
     return screen;
   }
@@ -435,7 +436,7 @@ class swarm
     return fear_factor;
   }
 
-  const vec3& get_wind() const
+  const Vec3& get_wind() const
   {
     return wind;
   }

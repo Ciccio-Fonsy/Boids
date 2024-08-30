@@ -6,6 +6,7 @@
 #include "vec3.hpp"
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
 #include <SFML/Window.hpp>
 
 #include <cmath>
@@ -23,14 +24,14 @@ int main()
   sf::CircleShape boid_shape;
   sf::CircleShape predator_shape;
 
-  std::vector<boid>::size_type size = 100;
-  double wingspan = 2; 
-  int t = 0;
+  std::vector<Boid>::size_type size = 100;
+  double wingspan                   = 2;
+  int t                             = 0;
   double max_speed = 1, min_distance = 30, sight_distance = 150;
   double separation_factor = 0.05, cohesion_factor = 0.00005,
          alignment_factor = 0.005, fear_factor = 0.05;
-  const vec3 screen(600, 300, 300);
-  vec3 wind(0, 0, 0);
+  const Vec3 screen(600, 300, 300);
+  Vec3 wind(0, 0, 0);
   bool toroidal_bool = false, manually = false;
   double attack_range = 300, attack_speed = 1.1;
 
@@ -39,18 +40,22 @@ int main()
                         fear_factor, sight_distance, toroidal_bool, wind,
                         attack_speed, attack_range);
 
-  predator yautja(vec3(0, 0, 0), vec3(0, 0, 0), attack_range, attack_speed,
-                  screen, toroidal_bool, wind);
+  Predator yautja(attack_range, attack_speed, screen, toroidal_bool, wind);
 
-  swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
+  Swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
               separation_factor, cohesion_factor, alignment_factor, fear_factor,
               yautja, screen, toroidal_bool, wind);
-              
+
   draw_windows(windowXY, windowXZ);
 
   initialize_shapes(static_cast<float>(wingspan), boid_shape, predator_shape);
 
+  const float target_frame_time =
+      1.0f / 180.0f; // per una durata costante dei cicli
+
   while (windowXY.isOpen() && windowXZ.isOpen() && boids.get_size() > 1) {
+    sf::Clock clock; // Start the clock to measure the time of the current frame
+
     handle_events(windowXY);
     handle_events(windowXZ);
 
@@ -63,6 +68,16 @@ int main()
     windowXZ.display();
 
     update_simulation(yautja, boids, t);
+
+    float frame_time =
+        clock.getElapsedTime()
+            .asSeconds(); // Get the time taken by the current frame
+
+    if (frame_time < target_frame_time) {
+      sf::sleep(
+          sf::seconds(target_frame_time
+                      - frame_time)); // Wait to match the target frame time
+    }
   }
 
   return 0;

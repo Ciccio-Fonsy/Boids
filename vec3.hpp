@@ -4,41 +4,41 @@
 #include <cmath>
 #include <stdexcept>
 
-class vec3
+class Vec3
 { // vettore tridimensionale
  public:
   double x, y, z;
-  vec3()
+  Vec3()
       : x(0)
       , y(0)
       , z(0)
   {} // costruttore vuoto
-  vec3(double x_, double y_, double z_)
+  Vec3(double x_, double y_, double z_)
       : x(x_)
       , y(y_)
       , z(z_)
   {} // costruttore
 
   // uguaglianza
-  bool operator==(const vec3& other) const
+  bool operator==(const Vec3& other) const
   {
     return x == other.x && y == other.y && z == other.z;
   }
 
   // disuguaglianza
-  bool operator!=(const vec3& other) const
+  bool operator!=(const Vec3& other) const
   {
     return !(*this == other);
   }
 
   // somma
-  vec3 operator+(const vec3& other) const
+  Vec3 operator+(const Vec3& other) const
   {
-    return vec3(x + other.x, y + other.y, z + other.z);
+    return Vec3(x + other.x, y + other.y, z + other.z);
   }
 
   // somma e assegna
-  vec3 operator+=(const vec3& other)
+  Vec3 operator+=(const Vec3& other)
   {
     x += other.x;
     y += other.y;
@@ -47,13 +47,13 @@ class vec3
   }
 
   // differenza
-  vec3 operator-(const vec3& other) const
+  Vec3 operator-(const Vec3& other) const
   {
-    return vec3(x - other.x, y - other.y, z - other.z);
+    return Vec3(x - other.x, y - other.y, z - other.z);
   }
 
   // differenza e assegna
-  vec3 operator-=(const vec3& other)
+  Vec3 operator-=(const Vec3& other)
   {
     x -= other.x;
     y -= other.y;
@@ -62,13 +62,13 @@ class vec3
   }
 
   // prodotto per uno scalare
-  vec3 operator*(double scalar) const
+  Vec3 operator*(double scalar) const
   {
-    return vec3(x * scalar, y * scalar, z * scalar);
+    return Vec3(x * scalar, y * scalar, z * scalar);
   }
 
   // prodotto per uno scalare e assegna
-  vec3 operator*=(double scalar)
+  Vec3 operator*=(double scalar)
   {
     x *= scalar;
     y *= scalar;
@@ -77,13 +77,13 @@ class vec3
   }
 
   // divisione per uno scalare
-  vec3 operator/(double scalar) const
+  Vec3 operator/(double scalar) const
   {
-    return vec3(x / scalar, y / scalar, z / scalar);
+    return Vec3(x / scalar, y / scalar, z / scalar);
   }
 
   // divisione per uno scalare e assegna
-  vec3 operator/=(double scalar)
+  Vec3 operator/=(double scalar)
   {
     x /= scalar;
     y /= scalar;
@@ -98,26 +98,26 @@ class vec3
   }
 
   // normalizza
-  vec3 normalize() const
+  Vec3 normalize() const
   {
     double n = norm();
     if (n != 0) {
-      return vec3(x / n, y / n, z / n);
+      return Vec3(x / n, y / n, z / n);
     } else {
       return *this;
     }
   }
 
   // prodotto scalare
-  double dot(const vec3& other) const
+  double dot(const Vec3& other) const
   {
     return x * other.x + y * other.y + z * other.z;
   }
 
   // prodotto vettoriale
-  vec3 cross(const vec3& other) const
+  Vec3 cross(const Vec3& other) const
   {
-    return vec3(y * other.z - z * other.y, z * other.x - x * other.z,
+    return Vec3(y * other.z - z * other.y, z * other.x - x * other.z,
                 x * other.y - y * other.x);
   }
 
