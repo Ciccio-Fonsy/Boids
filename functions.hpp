@@ -29,43 +29,33 @@ void casual_parameters(double& wingspan, double& max_speed,
   std::cout << "Casual parameters generation:\n";
   std::uniform_real_distribution<> dis(0.2, 5); // Define the range
   wingspan = dis(gen);
-  std::cout << "Wingspan: " << wingspan << std::endl;
 
   std::uniform_real_distribution<> dis1(0.001, 2); // Define the range
   max_speed = dis1(gen);
-  std::cout << "Max speed: " << max_speed * 100 << std::endl;
 
   std::uniform_real_distribution<> dis2(wingspan, 100); // Define the range
   min_distance = dis2(gen);
-  std::cout << "Min distance: " << min_distance << std::endl;
 
   std::uniform_real_distribution<> dis3(0.001, 100); // Define the range
   separation_factor = dis3(gen) / 1000;
-  std::cout << "Separation factor: " << separation_factor * 1000 << std::endl;
 
   std::uniform_real_distribution<> dis4(0.001, 100); // Define the range
   cohesion_factor = dis4(gen) / 1000000;
-  std::cout << "Cohesion factor: " << cohesion_factor * 1000000 << std::endl;
 
   std::uniform_real_distribution<> dis5(0.001, 100); // Define the range
   alignment_factor = dis5(gen) / 10000;
-  std::cout << "Alignment factor: " << alignment_factor * 10000 << std::endl;
 
   std::uniform_real_distribution<> dis6(0.001, 100); // Define the range
   fear_factor = dis6(gen) / 1000;
-  std::cout << "Fear factor: " << fear_factor * 1000 << std::endl;
 
   std::uniform_real_distribution<> dis7(wingspan, 500); // Define the range
   sight_distance = dis7(gen);
-  std::cout << "Sight distance: " << sight_distance << std::endl;
 
   std::uniform_real_distribution<> dis8(0.001, 200); // Define the range
   attack_speed = dis8(gen) / 100;
-  std::cout << "Attack speed: " << attack_speed * 100 << std::endl;
 
   std::uniform_real_distribution<> dis9(0.001, 500); // Define the range
   attack_range = dis9(gen);
-  std::cout << "Attack range: " << attack_range << std::endl;
 }
 
 // Funzione per inizializzare i parametri basandosi sull'input dell'utente
@@ -204,8 +194,18 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
                         cohesion_factor, alignment_factor, fear_factor,
                         sight_distance, attack_speed, attack_range);
     }
+    std::cout << "Parameters setted at values:\n";
+    std::cout << "Wingspan: " << wingspan << std::endl;
+    std::cout << "Max speed: " << max_speed * 100 << std::endl;
+    std::cout << "Min distance: " << min_distance << std::endl;
+    std::cout << "Separation factor: " << separation_factor * 1000 << std::endl;
+    std::cout << "Cohesion factor: " << cohesion_factor * 1000000 << std::endl;
+    std::cout << "Alignment factor: " << alignment_factor * 10000 << std::endl;
+    std::cout << "Fear factor: " << fear_factor * 1000 << std::endl;
+    std::cout << "Sight distance: " << sight_distance << std::endl;
+    std::cout << "Attack speed: " << attack_speed * 100 << std::endl;
+    std::cout << "Attack range: " << attack_range << std::endl;
   }
-
   if (windbool) {
   std::random_device rd;  // Obtain a random number from hardware
   std::mt19937 gen(rd()); // Seed the generator
@@ -213,7 +213,9 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
   std::uniform_real_distribution<> dis_y(-25, 25);
   std::uniform_real_distribution<> dis_z(-10, 10);
   wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
+  std::cout << "Wind: " << wind.to_string() << std::endl;
   }
+  
 }
 
 // disegna le finestre
@@ -332,11 +334,11 @@ void print_statistics(Swarm& boids_, int t_)
     }
   }
   double mean_dist = mean(distances), mean_vel = mean(velocities);
-  std::cout << "t = " << t_ << "; <d> = " << mean_dist
-            << "; sd = " << dev_std(distances, mean_dist)
-            << "; <v> = " << mean_vel
-            << "; sv  = " << dev_std(velocities, mean_vel)
-            << "; n  = " << boids_.get_size() << std::endl;
+  std::cout << "t = " << t_ << "; mean_distance = " << mean_dist
+            << "; distance_std_dev = " << dev_std(distances, mean_dist)
+            << "; mean_velocity = " << mean_vel
+            << "; velocity_std_dev  = " << dev_std(velocities, mean_vel)
+            << "; n_boids  = " << boids_.get_size() << std::endl;
 }
 
 // update del predator e dei boids e stampa delle statistiche a intervalli
