@@ -1,4 +1,3 @@
-
 #include "boid.hpp"
 #include "functions.hpp"
 #include "predator.hpp"
@@ -25,7 +24,8 @@ int main()
   sf::CircleShape predator_shape;
 
   std::vector<boid>::size_type size = 100;
-  int wingspan = 2, t = 0;
+  double wingspan = 2; 
+  int t = 0;
   double max_speed = 1, min_distance = 30, sight_distance = 150;
   double separation_factor = 0.05, cohesion_factor = 0.00005,
          alignment_factor = 0.005, fear_factor = 0.05;
