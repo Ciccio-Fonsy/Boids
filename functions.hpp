@@ -50,10 +50,10 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     } else {
       size = size_;
     }
-    std::cout << "Enter wingspan(0 ~ 7): ";
+    std::cout << "Enter wingspan(0 ~ 5): ";
     int wingspan_;
     std::cin >> wingspan_;
-    if (wingspan_ <= 0 || wingspan_ > 7 || !(std::cin >> wingspan_)) {
+    if (wingspan_ <= 0 || wingspan_ > 5 || !(std::cin >> wingspan_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       wingspan = wingspan_;
@@ -264,7 +264,7 @@ void print_statistics(swarm& boids_, int t_)
 {
   std::vector<double> distances, velocities;
   for (std::vector<boid>::size_type i = 0; i < boids_.get_size(); ++i) {
-    velocities.push_back(boids_[i].get_velocity().norm());
+    velocities.push_back(boids_[i].get_velocity().norm()*100);
     for (std::vector<boid>::size_type j = i + 1; j < boids_.get_size(); ++j) {
       distances.push_back(
           boids_.is_toroidal()
