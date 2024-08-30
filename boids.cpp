@@ -34,12 +34,17 @@ int main()
                         fear_factor, sight_distance, toroidal_bool, wind,
                         attack_speed, attack_range);
 
+  save_statistics_on_file("boids_save.txt", size, wingspan, max_speed,
+                          min_distance, separation_factor, cohesion_factor,
+                          alignment_factor, fear_factor, sight_distance,
+                          attack_speed, attack_range, wind);
+
   Predator yautja(attack_range, attack_speed, screen, toroidal_bool, wind);
 
   Swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
               separation_factor, cohesion_factor, alignment_factor, fear_factor,
               yautja, screen, toroidal_bool, wind);
-  
+
   // finestre usate nella funzione draw e nel main
   sf::RenderWindow windowXY;
   sf::RenderWindow windowXZ;
@@ -67,7 +72,7 @@ int main()
     draw_boids_on_plane(boids, yautja, windowXZ, 1, boid_shape, predator_shape);
     windowXZ.display();
 
-    update_simulation(yautja, boids, t);
+    update_simulation(yautja, boids, t, "boids_save.txt");
 
     float frame_time =
         clock.getElapsedTime()

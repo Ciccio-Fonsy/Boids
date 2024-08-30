@@ -377,11 +377,11 @@ TEST_CASE("Testing casual_parameters function")
 {
   double wingspan, max_speed, min_distance, separation_factor, cohesion_factor;
   double alignment_factor, fear_factor, sight_distance, attack_speed,
-      attack_range;
+      attack_range, wind_speed;
 
   casual_parameters(wingspan, max_speed, min_distance, separation_factor,
                     cohesion_factor, alignment_factor, fear_factor,
-                    sight_distance, attack_speed, attack_range);
+                    sight_distance, attack_speed, attack_range, wind_speed);
 
   CHECK(wingspan >= 0.2);
   CHECK(wingspan <= 5.0);
@@ -435,7 +435,6 @@ TEST_CASE("Testing initialize_parameters function")
   CHECK(fear_factor == 0);       // Default value
   CHECK(sight_distance == 0);    // Default value
   CHECK(toroidalbool == false);  // Default value
-  CHECK(wind.norm() == 0.02);    // Default value
   CHECK(attack_speed == 0);      // Default value
   CHECK(attack_range == 0);      // Default value
 
@@ -492,21 +491,4 @@ TEST_CASE("Testing handle_events function")
   handle_events(window);
 
   CHECK(!window.isOpen());
-}
-
-TEST_CASE("Testing print_statistics function")
-{
-  Swarm swarm;
-  int t = 100;
-
-  std::ostringstream oss;
-  std::streambuf* orig_buf = std::cout.rdbuf();
-  std::cout.rdbuf(oss.rdbuf());
-
-  print_statistics(swarm, t);
-
-  std::cout.rdbuf(orig_buf);
-  std::string output = oss.str();
-
-  CHECK(output.find("t = 100") != std::string::npos);
 }

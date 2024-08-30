@@ -18,7 +18,7 @@ class Boid
       , velocity(velocity_)
   {}
 
-    // Copy constructor
+  // Copy constructor
   Boid(const Boid& other)
       : position(other.position)
       , velocity(other.velocity)
@@ -62,6 +62,7 @@ class Boid
   void update_boid(Vec3 delta_v, double max_speed)
   {
     update_boid_velocity(delta_v, max_speed);
+
     position += velocity;
   }
 
