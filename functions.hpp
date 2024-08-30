@@ -213,7 +213,7 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
   std::uniform_real_distribution<> dis_y(-25, 25);
   std::uniform_real_distribution<> dis_z(-10, 10);
   wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
-  }yy
+  }
 }
 
 // disegna le finestre
