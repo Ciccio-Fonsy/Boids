@@ -18,12 +18,6 @@
 
 int main()
 {
-  // finestre usate nella funzione draw e nel main
-  sf::RenderWindow windowXY;
-  sf::RenderWindow windowXZ;
-  sf::CircleShape boid_shape;
-  sf::CircleShape predator_shape;
-
   std::vector<Boid>::size_type size = 100;
   double wingspan                   = 2;
   int t                             = 0;
@@ -45,6 +39,12 @@ int main()
   Swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
               separation_factor, cohesion_factor, alignment_factor, fear_factor,
               yautja, screen, toroidal_bool, wind);
+  
+  // finestre usate nella funzione draw e nel main
+  sf::RenderWindow windowXY;
+  sf::RenderWindow windowXZ;
+  sf::CircleShape boid_shape;
+  sf::CircleShape predator_shape;
 
   draw_windows(windowXY, windowXZ);
 
