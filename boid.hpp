@@ -61,7 +61,7 @@ class Boid
   // aggiorna la posizione del boid
   void update_boid(Vec3 delta_v, double max_speed)
   {
-    update_boid_velocity(delta_v, max_speed)
+    update_boid_velocity(delta_v, max_speed);
     position += velocity;
   }
 
