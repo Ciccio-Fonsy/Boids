@@ -21,7 +21,7 @@ void casual_parameters(double& wingspan, double& max_speed,
                        double& min_distance, double& separation_factor,
                        double& cohesion_factor, double& alignment_factor,
                        double& fear_factor, double& sight_distance,
-                       double& attack_speed, double& attack_range)
+                       double& attack_speed, double& attack_range, double& windspeed)
 {
   // Set casual values for the parameters
   std::random_device rd;  // Obtain a random number from hardware
@@ -56,6 +56,9 @@ void casual_parameters(double& wingspan, double& max_speed,
 
   std::uniform_real_distribution<> dis9(0.001, 500); // Define the range
   attack_range = dis9(gen);
+
+  std::uniform_real_distribution<> dis10(0.001, 20); // Define the range
+  windspeed = dis10(gen) / 100;
 }
 
 // Funzione per inizializzare i parametri basandosi sull'input dell'utente
@@ -192,7 +195,7 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
     if (casual) {
       casual_parameters(wingspan, max_speed, min_distance, separation_factor,
                         cohesion_factor, alignment_factor, fear_factor,
-                        sight_distance, attack_speed, attack_range);
+                        sight_distance, attack_speed, attack_range, windspeed);
     }
     std::cout << "Parameters setted at values:\n";
     std::cout << "Wingspan: " << wingspan << std::endl;
@@ -213,7 +216,8 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
   std::uniform_real_distribution<> dis_y(-25, 25);
   std::uniform_real_distribution<> dis_z(-10, 10);
   wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
-  std::cout << "Wind: " << wind.to_string() << std::endl;
+  std::cout << "Wind Speed: " << windspeed << std::endl;
+  std::cout << "Wind: " << (wind*100).to_string() << std::endl;
   }
   
 }
