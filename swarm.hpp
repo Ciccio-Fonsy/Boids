@@ -261,11 +261,11 @@ class swarm
   }
 
  public:
-  swarm(std::vector<boid>::size_type size_ = 100, int wingspan_ = 2,
+  swarm(std::vector<boid>::size_type size_ = 100, double wingspan_ = 2,
         double max_speed_ = 1, double min_distance_ = 30,
-        double sight_distance_ = 150, double separation_factor_ = 0.05,
-        double cohesion_factor_ = 0.00005, double alignment_factor_ = 0.005,
-        double fear_factor_ = 0.05,
+        double sight_distance_ = 150, double separation_factor_ = 50,
+        double cohesion_factor_ = 50, double alignment_factor_ = 50,
+        double fear_factor_ = 50,
         boid yautja_        = boid(vec3(0, 0, 0), vec3(0, 0, 0)),
         vec3 screen_ = vec3(600, 300, 300), bool toroidal_ = 0,
         vec3 wind_ = vec3(0, 0, 0))
@@ -323,6 +323,11 @@ class swarm
           vec3(0, 0, 0),
           vec3(0, 0, 0))); // Inizialmente posiziona tutti i boids su (0, 0, 0)
     }
+    cohesion_factor/=1000000;
+    separation_factor/=1000;
+    alignment_factor/=10000;
+    fear_factor/=1000;
+    
     initialize_positions(); // Chiama il metodo per inizializzare le posizioni
   }
 
@@ -435,7 +440,7 @@ class swarm
     return wind;
   }
 
-  const int& get_wingspan() const
+  const double& get_wingspan() const
   {
     return wingspan;
   }

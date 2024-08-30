@@ -14,10 +14,58 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <random>
+
+// Funzione per la generazione casuale dei parametri
+void casual_parameters(double& wingspan, double& max_speed, double& min_distance, double& separation_factor, double& cohesion_factor, double& alignment_factor, double& fear_factor, double& sight_distance, double& attack_speed, double& attack_range) {
+    // Set casual values for the parameters
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 gen(rd()); // Seed the generator
+    std::cout << "Casual parameters generation:\n";
+    std::uniform_real_distribution<> dis(0.2, 5); // Define the range
+    wingspan = dis(gen);
+    std::cout << "Wingspan: " << wingspan << std::endl;
+
+    std::uniform_real_distribution<> dis1(0.001, 2); // Define the range
+    max_speed = dis1(gen);
+    std::cout << "Max speed: " << max_speed*100 << std::endl;
+
+    std::uniform_real_distribution<> dis2(wingspan, 100); // Define the range
+    min_distance = dis2(gen);
+    std::cout << "Min distance: " << min_distance << std::endl;
+
+    std::uniform_real_distribution<> dis3(0.001, 100); // Define the range
+    separation_factor = dis3(gen) / 1000;
+    std::cout << "Separation factor: " << separation_factor*1000 << std::endl;
+
+    std::uniform_real_distribution<> dis4(0.001, 100); // Define the range
+    cohesion_factor = dis4(gen) / 1000000;
+    std::cout << "Cohesion factor: " << cohesion_factor*1000000 << std::endl;
+
+    std::uniform_real_distribution<> dis5(0.001, 100); // Define the range
+    alignment_factor = dis5(gen) / 10000;
+    std::cout << "Alignment factor: " << alignment_factor*10000 << std::endl;
+
+    std::uniform_real_distribution<> dis6(0.001, 100); // Define the range
+    fear_factor = dis6(gen) / 1000;
+    std::cout << "Fear factor: " << fear_factor*1000 << std::endl;
+
+    std::uniform_real_distribution<> dis7(wingspan, 500); // Define the range
+    sight_distance = dis7(gen);
+    std::cout << "Sight distance: " << sight_distance << std::endl; 
+
+    std::uniform_real_distribution<> dis8(0.001, 200); // Define the range
+    attack_speed = dis8(gen) / 100;
+    std::cout << "Attack speed: " << attack_speed*100 << std::endl;
+
+    std::uniform_real_distribution<> dis9(0.001, 500); // Define the range
+    attack_range = dis9(gen);
+    std::cout << "Attack range: " << attack_range << std::endl;
+}
 
 // Funzione per inizializzare i parametri basandosi sull'input dell'utente
 void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
-                           int& wingspan, double& max_speed,
+                           double& wingspan, double& max_speed,
                            double& min_distance, double& separation_factor,
                            double& cohesion_factor, double& alignment_factor,
                            double& fear_factor, double& sight_distance,
@@ -51,7 +99,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
       size = size_;
     }
     std::cout << "Enter wingspan(0 ~ 5): ";
-    int wingspan_;
+    double wingspan_;
     std::cin >> wingspan_;
     if (wingspan_ <= 0 || wingspan_ > 5 || !(std::cin >> wingspan_)) {
       std::cout << "This value is not accetable, setted to default value\n";
@@ -148,6 +196,17 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
         windspeed = windspeed_ / 100;
       }
     }
+  }else{ //casual parameters
+  bool casual;
+  std::cout << "Enter swarm size: ";
+  std::cin >> size;
+  if (size <= 1 || !(std::cin >> size)) {
+    std::cout << "This value is not accetable, setted to default value\n";
+    size=100;
+  }
+  std::cout << "casual parameters geneation? [y/n]\n";
+  std::cin >> casual;
+  if (casual) casual_parameters(wingspan, max_speed, min_distance, separation_factor, cohesion_factor, alignment_factor, fear_factor, sight_distance, attack_speed, attack_range);
   }
 
   if (windbool) {
@@ -158,6 +217,7 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
          * windspeed;
   }
 }
+
 
 // disegna le finestre
 void draw_windows(sf::RenderWindow& windowXY_, sf::RenderWindow& windowXZ_)
