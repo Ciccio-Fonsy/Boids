@@ -29,7 +29,7 @@ void casual_parameters(double& wingspan, double& max_speed,
   // Set casual values for the parameters
   std::random_device rd;  // Obtain a random number from hardware
   std::mt19937 gen(rd()); // Seed the generator
-  std::uniform_real_distribution<> dis0(0.2, 5);
+  std::uniform_real_distribution<> dis0(1, 5);
   wingspan = dis0(gen);
   std::uniform_real_distribution<> dis1(0.001, 2);
   max_speed = dis1(gen);
