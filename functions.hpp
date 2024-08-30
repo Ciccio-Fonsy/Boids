@@ -207,12 +207,13 @@ void initialize_parameters(bool& manually, std::vector<Boid>::size_type& size,
   }
 
   if (windbool) {
-    std::srand(static_cast<unsigned>(std::time(0)));
-    wind = Vec3((std::rand() % 100) - 50, (std::rand() % 100) - 50,
-                (std::rand() % 20) - 10)
-               .normalize()
-         * windspeed;
-  }
+  std::random_device rd;  // Obtain a random number from hardware
+  std::mt19937 gen(rd()); // Seed the generator
+  std::uniform_real_distribution<> dis_x(-50, 50); // Define the range
+  std::uniform_real_distribution<> dis_y(-25, 25);
+  std::uniform_real_distribution<> dis_z(-10, 10);
+  wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
+  }yy
 }
 
 // disegna le finestre
