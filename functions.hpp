@@ -337,16 +337,13 @@ void print_statistics(Swarm& boids_, int t_, const std::string& filename)
             << "; distance_std_dev = " << std::setw(7)
             << dev_std(distances, mean_dist)
             << "; mean_velocity = " << std::setw(7) << mean_vel
-            << "; velocity_std_dev = " << std::setw(9)
+            << "; velocity_std_dev = " << std::setw(11)
             << dev_std(velocities, mean_vel) << "; n_boids = " << std::setw(3)
             << boids_.get_size() << std::endl;
   if (file.is_open()) {
-    file << "t = " << std::setw(6) << t_ << "; mean_distance = " << std::setw(7)
-         << mean_dist << "; distance_std_dev = " << std::setw(7)
-         << dev_std(distances, mean_dist)
-         << "; mean_velocity = " << std::setw(7) << mean_vel
-         << "; velocity_std_dev = " << std::setw(9)
-         << dev_std(velocities, mean_vel) << "; n_boids = " << std::setw(3)
+    file << std::setw(6) << t_ << std::setw(15) << mean_dist << std::setw(18)
+         << dev_std(distances, mean_dist) << std::setw(15) << mean_vel
+         << std::setw(18) << dev_std(velocities, mean_vel) << std::setw(9)
          << boids_.get_size() << std::endl;
     file.close();
   } else {
@@ -378,6 +375,8 @@ void save_statistics_on_file(
          << "\nattack range      = " << attack_range
          << "\nwind speed        = " << wind.norm()
          << "\nwind              = " << wind.to_string() << "\n"
+         << "\n     t  mean_distance  distance_std_dev  mean_velocity  "
+            "velocity_std_dev  n_boids"
          << std::endl;
     file.close();
   }
