@@ -10,12 +10,10 @@
 #include <SFML/Window.hpp>
 
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
-#include <limits>
 
 // Funzione per inizializzare i parametri basandosi sull'input dell'utente
 void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
@@ -71,7 +69,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter minimum distance(0 ~ 100): ";
     double min_distance_;
     std::cin >> min_distance_;
-    if (min_distance_ <= 0 || min_distance_ > 100 || !(std::cin >> min_distance_)) {
+    if (min_distance_ <= 0 || min_distance_ > 100
+        || !(std::cin >> min_distance_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       min_distance = min_distance_;
@@ -79,7 +78,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter separation factor (0 ~ 100): ";
     double separation_factor_;
     std::cin >> separation_factor_;
-    if (separation_factor_ <= 0 || separation_factor_ > 100 || !(std::cin >> separation_factor_)) {
+    if (separation_factor_ <= 0 || separation_factor_ > 100
+        || !(std::cin >> separation_factor_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       separation_factor = separation_factor_ / 1000;
@@ -87,7 +87,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter cohesion factor (0 ~ 100): ";
     double cohesion_factor_;
     std::cin >> cohesion_factor_;
-    if (cohesion_factor_ <= 0 || cohesion_factor_ > 100 || !(std::cin >> cohesion_factor_)) {
+    if (cohesion_factor_ <= 0 || cohesion_factor_ > 100
+        || !(std::cin >> cohesion_factor_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       cohesion_factor = cohesion_factor_ / 1000000;
@@ -95,7 +96,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter alignment factor (0 ~ 100): ";
     double alignment_factor_;
     std::cin >> alignment_factor_;
-    if (alignment_factor_ <= 0 || alignment_factor_ > 100 || !(std::cin >> alignment_factor_)) {
+    if (alignment_factor_ <= 0 || alignment_factor_ > 100
+        || !(std::cin >> alignment_factor_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       alignment_factor = alignment_factor_ / 10000;
@@ -103,7 +105,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter fear factor (0 ~ 100): ";
     double fear_factor_;
     std::cin >> fear_factor_;
-    if (fear_factor_ <= 0 || fear_factor_ > 100 || !(std::cin >> fear_factor_)) {
+    if (fear_factor_ <= 0 || fear_factor_ > 100
+        || !(std::cin >> fear_factor_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       fear_factor = fear_factor_ / 1000;
@@ -111,7 +114,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter sight distance(0 ~ 500): ";
     double sight_distance_;
     std::cin >> sight_distance_;
-    if (sight_distance_ <= 0 || sight_distance_ > 500 || !(std::cin >> sight_distance_)) {
+    if (sight_distance_ <= 0 || sight_distance_ > 500
+        || !(std::cin >> sight_distance_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       sight_distance = sight_distance_;
@@ -119,7 +123,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter predator attack speed (0 ~ 200): ";
     double attack_speed_;
     std::cin >> attack_speed_;
-    if (attack_speed_ <= 0 || attack_speed_ > 200 || !(std::cin >> attack_speed_)) {
+    if (attack_speed_ <= 0 || attack_speed_ > 200
+        || !(std::cin >> attack_speed_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       attack_speed = attack_speed_ / 100;
@@ -127,7 +132,8 @@ void initialize_parameters(bool& manually, std::vector<boid>::size_type& size,
     std::cout << "Enter predator attack range(0 ~ 500): ";
     double attack_range_;
     std::cin >> attack_range_;
-    if (attack_range_ <= 0 || attack_range_ > 500 || !(std::cin >> attack_range_)) {
+    if (attack_range_ <= 0 || attack_range_ > 500
+        || !(std::cin >> attack_range_)) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
       attack_range = attack_range_;
@@ -182,19 +188,25 @@ void draw_windows(sf::RenderWindow& windowXY_, sf::RenderWindow& windowXZ_)
   windowXZ_.setPosition(sf::Vector2i(0, 0));             // Upper-left corner
 }
 
+void initialize_shapes(float boidWingspan, sf::CircleShape& boidShape,
+                       sf::CircleShape& predatorShape)
+{
+  boidShape.setRadius(boidWingspan);
+  boidShape.setFillColor(sf::Color::White);
+
+  predatorShape.setRadius(boidWingspan * 2);
+  predatorShape.setFillColor(sf::Color::Red);
+}
+
 // disegna i boids nella finestra
 void draw_boids_on_plane(const swarm& boids, const predator& yautja,
-                         sf::RenderWindow& window, const int plane)
+                         sf::RenderWindow& window, const int plane,
+                         sf::CircleShape& boidShape,
+                         sf::CircleShape& predatorShape)
 {
   if (plane > 1) {
     throw std::out_of_range("index out of range");
   }
-
-  sf::CircleShape boidShape(static_cast<float>(boids.get_wingspan()));
-  boidShape.setFillColor(sf::Color::White);
-
-  sf::CircleShape predatorShape(static_cast<float>(boids.get_wingspan()) * 2);
-  predatorShape.setFillColor(sf::Color::Red);
 
   const vec3& screen = boids.get_screen();
   double width       = window.getSize().x;

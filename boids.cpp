@@ -10,10 +10,9 @@
 #include <SFML/Window.hpp>
 
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -22,8 +21,8 @@ int main()
   // finestre usate nella funzione draw e nel main
   sf::RenderWindow windowXY;
   sf::RenderWindow windowXZ;
-
-  draw_windows(windowXY, windowXZ);
+  sf::CircleShape boid_shape;
+  sf::CircleShape predator_shape;
 
   std::vector<boid>::size_type size = 100;
   int wingspan = 2, t = 0;
@@ -46,17 +45,21 @@ int main()
   swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
               separation_factor, cohesion_factor, alignment_factor, fear_factor,
               yautja, screen, toroidal_bool, wind);
+              
+  draw_windows(windowXY, windowXZ);
+
+  initialize_shapes(static_cast<float>(wingspan), boid_shape, predator_shape);
 
   while (windowXY.isOpen() && windowXZ.isOpen() && boids.get_size() > 1) {
     handle_events(windowXY);
     handle_events(windowXZ);
 
     windowXY.clear();
-    draw_boids_on_plane(boids, yautja, windowXY, 0);
+    draw_boids_on_plane(boids, yautja, windowXY, 0, boid_shape, predator_shape);
     windowXY.display();
 
     windowXZ.clear();
-    draw_boids_on_plane(boids, yautja, windowXZ, 1);
+    draw_boids_on_plane(boids, yautja, windowXZ, 1, boid_shape, predator_shape);
     windowXZ.display();
 
     update_simulation(yautja, boids, t);
