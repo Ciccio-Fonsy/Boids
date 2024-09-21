@@ -7,21 +7,19 @@
 #include "swarm.hpp"
 #include "vec3.hpp"
 
-TEST_CASE("Testing Vec3 constructors")
-{
+TEST_CASE("Testing Vec3 constructors") {
   Vec3 v1;
-  CHECK(v1.x == 0);
-  CHECK(v1.y == 0);
-  CHECK(v1.z == 0);
+  CHECK(v1.getx() == 0);
+  CHECK(v1.gety() == 0);
+  CHECK(v1.getz() == 0);
 
   Vec3 v2(1, 2, 3);
-  CHECK(v2.x == 1);
-  CHECK(v2.y == 2);
-  CHECK(v2.z == 3);
+  CHECK(v2.getx() == 1);
+  CHECK(v2.gety() == 2);
+  CHECK(v2.getz() == 3);
 }
 
-TEST_CASE("Testing Vec3 equality and inequality operators")
-{
+TEST_CASE("Testing Vec3 equality and inequality operators") {
   Vec3 v1(1, 2, 3);
   Vec3 v2(1, 2, 3);
   Vec3 v3(4, 5, 6);
@@ -30,91 +28,86 @@ TEST_CASE("Testing Vec3 equality and inequality operators")
   CHECK(v1 != v3);
 }
 
-TEST_CASE("Testing Vec3 addition and subtraction")
-{
+TEST_CASE("Testing Vec3 addition and subtraction") {
   Vec3 v1(1, 2, 3);
   Vec3 v2(4, 5, 6);
 
   Vec3 v3 = v1 + v2;
-  CHECK(v3.x == 5);
-  CHECK(v3.y == 7);
-  CHECK(v3.z == 9);
+  CHECK(v3.getx() == 5);
+  CHECK(v3.gety() == 7);
+  CHECK(v3.getz() == 9);
 
   v1 += v2;
-  CHECK(v1.x == 5);
-  CHECK(v1.y == 7);
-  CHECK(v1.z == 9);
+  CHECK(v1.getx() == 5);
+  CHECK(v1.gety() == 7);
+  CHECK(v1.getz() == 9);
 
   Vec3 v4 = v1 - v2;
-  CHECK(v4.x == 1);
-  CHECK(v4.y == 2);
-  CHECK(v4.z == 3);
+  CHECK(v4.gety() == 2);
+  CHECK(v4.getx() == 1);
+  CHECK(v4.getz() == 3);
 
   v1 -= v2;
-  CHECK(v1.x == 1);
-  CHECK(v1.y == 2);
-  CHECK(v1.z == 3);
+  CHECK(v1.getx() == 1);
+  CHECK(v1.gety() == 2);
+  CHECK(v1.getz() == 3);
 }
 
-TEST_CASE("Testing Vec3 scalar multiplication and division")
-{
+TEST_CASE("Testing Vec3 scalar multiplication and division") {
   Vec3 v1(1, 2, 3);
 
   Vec3 v2 = v1 * 2;
-  CHECK(v2.x == 2);
-  CHECK(v2.y == 4);
-  CHECK(v2.z == 6);
+  CHECK(v2.getx() == 2);
+  CHECK(v2.gety() == 4);
+  CHECK(v2.getz() == 6);
 
   v1 *= 2;
-  CHECK(v1.x == 2);
-  CHECK(v1.y == 4);
-  CHECK(v1.z == 6);
+  CHECK(v1.getx() == 2);
+  CHECK(v1.gety() == 4);
+  CHECK(v1.getz() == 6);
 
   Vec3 v3 = v1 / 2;
-  CHECK(v3.x == 1);
-  CHECK(v3.y == 2);
-  CHECK(v3.z == 3);
+  CHECK(v3.getx() == 1);
+  CHECK(v3.gety() == 2);
+  CHECK(v3.getz() == 3);
 
   v1 /= 2;
-  CHECK(v1.x == 1);
-  CHECK(v1.y == 2);
-  CHECK(v1.z == 3);
+  CHECK(v1.getx() == 1);
+  CHECK(v1.gety() == 2);
+  CHECK(v1.getz() == 3);
 }
 
-TEST_CASE("Testing Vec3 norm and normalization")
-{
+TEST_CASE("Testing Vec3 norm and normalization") {
   Vec3 v1(3, 4, 0);
   CHECK(v1.norm() == 5);
 
   Vec3 v2 = v1.normalize();
-  CHECK(v2.x == doctest::Approx(0.6));
-  CHECK(v2.y == doctest::Approx(0.8));
-  CHECK(v2.z == doctest::Approx(0.0));
+  CHECK(v2.getx() == doctest::Approx(0.6));
+  CHECK(v2.gety() == doctest::Approx(0.8));
+  CHECK(v2.getz() == doctest::Approx(0.0));
 
   Vec3 v3(0, 0, 0);
   CHECK(v3.normalize() == v3);
 }
 
-TEST_CASE("Testing Vec3 dot and cross product")
-{
+TEST_CASE("Testing Vec3 dot and cross product") {
   Vec3 v1(1, 0, 0);
   Vec3 v2(0, 1, 0);
 
   CHECK(v1.dot(v2) == 0);
 
   Vec3 v3 = v1.cross(v2);
-  CHECK(v3.x == 0);
-  CHECK(v3.y == 0);
-  CHECK(v3.z == 1);
+  CHECK(v3.getx() == 0);
+  CHECK(v3.gety() == 0);
+  CHECK(v3.getz() == 1);
 
   Vec3 v4 = v2.cross(v1);
-  CHECK(v4.x == 0);
-  CHECK(v4.y == 0);
-  CHECK(v4.z == -1);
+  CHECK(v4.getx() == 0);
+  CHECK(v4.gety() == 0);
+  CHECK(v4.getz() == -1);
 }
 
-TEST_CASE("Testing Vec3 element access")
-{
+TEST_CASE("Testing Vec3 element access") {
   Vec3 v1(1, 2, 3);
 
   CHECK(v1[0] == 1);
@@ -132,15 +125,13 @@ TEST_CASE("Testing Vec3 element access")
   CHECK_THROWS_AS(v1[3], std::out_of_range);
 }
 
-TEST_CASE("Testing Boid default constructor")
-{
+TEST_CASE("Testing Boid default constructor") {
   Boid b;
   CHECK(b.get_position() == Vec3(0, 0, 0));
   CHECK(b.get_velocity() == Vec3(0, 0, 0));
 }
 
-TEST_CASE("Testing Boid parameterized constructor")
-{
+TEST_CASE("Testing Boid parameterized constructor") {
   Vec3 pos(1, 2, 3);
   Vec3 vel(4, 5, 6);
   Boid b(pos, vel);
@@ -148,8 +139,7 @@ TEST_CASE("Testing Boid parameterized constructor")
   CHECK(b.get_velocity() == vel);
 }
 
-TEST_CASE("Testing Boid copy constructor")
-{
+TEST_CASE("Testing Boid copy constructor") {
   Vec3 pos(1, 2, 3);
   Vec3 vel(4, 5, 6);
   Boid b1(pos, vel);
@@ -158,8 +148,7 @@ TEST_CASE("Testing Boid copy constructor")
   CHECK(b2.get_velocity() == vel);
 }
 
-TEST_CASE("Testing Boid assignment operator")
-{
+TEST_CASE("Testing Boid assignment operator") {
   Vec3 pos1(1, 2, 3);
   Vec3 vel1(4, 5, 6);
   Boid b1(pos1, vel1);
@@ -173,8 +162,7 @@ TEST_CASE("Testing Boid assignment operator")
   CHECK(b2.get_velocity() == vel1);
 }
 
-TEST_CASE("Testing Boid position and velocity updates")
-{
+TEST_CASE("Testing Boid position and velocity updates") {
   Vec3 pos(1, 2, 3);
   Vec3 vel(1, 0, 0);
   Boid b(pos, vel);
@@ -188,26 +176,24 @@ TEST_CASE("Testing Boid position and velocity updates")
   CHECK(b.get_velocity() == new_vel);
 }
 
-TEST_CASE("Testing Boid velocity update with max speed")
-{
+TEST_CASE("Testing Boid velocity update with max speed") {
   Vec3 pos(0, 0, 0);
   Vec3 vel(1, 2, 3);
   Boid b(pos, vel);
 
-  Vec3 delta_v(2, 2, 2);
+  Vec3   delta_v(2, 2, 2);
   double max_speed = 5.0;
 
   b.update_boid_velocity(delta_v, max_speed);
   CHECK(b.get_velocity().norm() <= max_speed);
 }
 
-TEST_CASE("Testing Boid position and velocity update with max speed")
-{
+TEST_CASE("Testing Boid position and velocity update with max speed") {
   Vec3 pos(0, 0, 0);
   Vec3 vel(1, 2, 3);
   Boid b(pos, vel);
 
-  Vec3 delta_v(2, 2, 2);
+  Vec3   delta_v(2, 2, 2);
   double max_speed = 5.0;
 
   b.update_boid(delta_v, max_speed);
@@ -215,8 +201,7 @@ TEST_CASE("Testing Boid position and velocity update with max speed")
   CHECK(b.get_position() == pos + b.get_velocity());
 }
 
-TEST_CASE("Testing Boid equality and inequality operators")
-{
+TEST_CASE("Testing Boid equality and inequality operators") {
   Vec3 pos1(1, 2, 3);
   Vec3 vel1(4, 5, 6);
   Boid b1(pos1, vel1);
@@ -233,56 +218,51 @@ TEST_CASE("Testing Boid equality and inequality operators")
   CHECK(b1 != b3);
 }
 
-TEST_CASE("Testing toroidal_vec_dist and toroidal_distance")
-{
+TEST_CASE("Testing toroidal_vec_dist and toroidal_distance") {
   Vec3 width(10.0, 10.0, 10.0);
 
   Vec3 a(2.0, 3.0, 4.0);
   Vec3 b(7.0, 8.0, 9.0);
-  Vec3 dist = toroidal_vec_dist(a, b, width);
+  Vec3 dist = vec_dist(true, a, b, width);
   CHECK(dist == Vec3(-5.0, -5.0, -5.0));
 
-  double toroidal_dist = toroidal_distance(a, b, width);
+  double toroidal_dist = distance(true, a, b, width);
   CHECK(toroidal_dist == doctest::Approx(std::sqrt(75.0)));
 
   Vec3 c(9.0, 9.0, 0.0);
   Vec3 d(1.0, 1.0, 0.0);
-  Vec3 wrapped_dist = toroidal_vec_dist(c, d, width);
+  Vec3 wrapped_dist = vec_dist(true, c, d, width);
   CHECK(wrapped_dist == Vec3(-2.0, -2.0, 0.0));
 
-  double wrapped_toroidal_dist = toroidal_distance(c, d, width);
+  double wrapped_toroidal_dist = distance(true, c, d, width);
   CHECK(wrapped_toroidal_dist == doctest::Approx(std::sqrt(8.0)));
 }
 
-TEST_CASE("Testing distance function")
-{
+TEST_CASE("Testing distance function") {
   Vec3 a(1.0, 2.0, 3.0);
   Vec3 b(4.0, 6.0, 8.0);
 
-  double dist = distance(a, b);
+  double dist = distance(false, a, b, Vec3());
   CHECK(dist == doctest::Approx(std::sqrt(50.0)));
 }
 
-TEST_CASE("Testing mean function")
-{
-  std::vector<double> values = {1.0, 2.0, 3.0, 4.0, 5.0};
-  double calculated_mean     = mean(values);
+TEST_CASE("Testing mean function") {
+  std::vector<double> values          = {1.0, 2.0, 3.0, 4.0, 5.0};
+  double              calculated_mean = mean(values);
   CHECK(calculated_mean == doctest::Approx(3.0));
 
   std::vector<double> empty_values;
   CHECK_THROWS_AS(mean(empty_values), std::runtime_error);
 }
 
-TEST_CASE("Testing dev_std function")
-{
-  std::vector<double> values = {1.0, 2.0, 3.0, 4.0, 5.0};
-  double calculated_mean     = mean(values);
-  double calculated_dev_std  = dev_std(values, calculated_mean);
+TEST_CASE("Testing dev_std function") {
+  std::vector<double> values             = {1.0, 2.0, 3.0, 4.0, 5.0};
+  double              calculated_mean    = mean(values);
+  double              calculated_dev_std = dev_std(values, calculated_mean);
   CHECK(calculated_dev_std == doctest::Approx(std::sqrt(2.0)));
 }
 
-TEST_CASE("Swarm initialization")
-{
+TEST_CASE("Swarm initialization") {
   Swarm swarm;
   CHECK(swarm.get_size() == 100);
   CHECK(swarm.get_wingspan() == 2);
@@ -290,7 +270,7 @@ TEST_CASE("Swarm initialization")
   CHECK(swarm.get_min_distance() == 30);
   CHECK(swarm.get_cooldown() == 0);
 
-  Boid predator(Vec3(10, 10, 10), Vec3(1, 1, 1));
+  Boid  predator(Vec3(10, 10, 10), Vec3(1, 1, 1));
   Swarm custom_swarm(50, 3, 2, 40, 100, 60, 70, 80, 90, predator,
                      Vec3(800, 600, 400), true, Vec3(1, 0, 0));
   CHECK(custom_swarm.get_size() == 50);
@@ -302,10 +282,9 @@ TEST_CASE("Swarm initialization")
   CHECK(custom_swarm.get_wind() == Vec3(1, 0, 0));
 }
 
-TEST_CASE("Boid interactions in the swarm")
-{
+TEST_CASE("Boid interactions in the swarm") {
   Swarm swarm(10, 2, 1, 30, 150, 50, 50, 50, 50);
-  Boid yautja(Vec3(5, 5, 5), Vec3(0, 0, 0));
+  Boid  yautja(Vec3(5, 5, 5), Vec3(0, 0, 0));
 
   CHECK(swarm.get_size() == 10);
 
@@ -314,31 +293,29 @@ TEST_CASE("Boid interactions in the swarm")
   CHECK(swarm.get_size() <= 10);
 }
 
-TEST_CASE("Swarm boundary behavior")
-{
-  Boid predator(Vec3(50, 50, 50), Vec3(0, 0, 0));
+TEST_CASE("Swarm boundary behavior") {
+  Boid  predator(Vec3(50, 50, 50), Vec3(0, 0, 0));
   Swarm swarm(10, 2, 1, 30, 150, 50, 50, 50, 50, predator, Vec3(100, 100, 100),
               false);
 
   Boid& b = const_cast<Boid&>(swarm[0]);
   b.set_position(Vec3(-1, 50, 50));
-  swarm.border(b);
-  CHECK(b.get_position().x == 0);
+  border(b);
+  CHECK(b.get_position().getx() == 0);
 
   b.set_position(Vec3(101, 50, 50));
   swarm.border(b);
-  CHECK(b.get_position().x == 100);
+  CHECK(b.get_position().getx() == 100);
 
   Swarm toroidal_swarm(10, 2, 1, 30, 150, 50, 50, 50, 50, predator,
                        Vec3(100, 100, 100), true);
   Boid& tb = const_cast<Boid&>(toroidal_swarm[0]);
   tb.set_position(Vec3(101, 50, 50));
   toroidal_swarm.border(tb);
-  CHECK(tb.get_position().x == 1);
+  CHECK(tb.get_position().getx() == 1);
 }
 
-TEST_CASE("Predator constructor and initialization")
-{
+TEST_CASE("Predator constructor and initialization") {
   Predator default_predator;
   CHECK(default_predator.get_position() == Vec3(0, 0, 0));
   CHECK(default_predator.get_velocity().norm()
@@ -352,8 +329,7 @@ TEST_CASE("Predator constructor and initialization")
   CHECK(param_predator.get_screen() == Vec3(500, 500, 500));
 }
 
-TEST_CASE("Predator update behavior")
-{
+TEST_CASE("Predator update behavior") {
   Predator predator(50, 1.3, Vec3(500, 500, 500), false, Vec3(0, 0, 0));
 
   Swarm swarm(2, 2.0, 1.0, 30.0, 150.0, 50.0, 50.0, 50.0, 50.0);
@@ -373,8 +349,7 @@ TEST_CASE("Predator update behavior")
   CHECK(predator.get_velocity().normalize() == Vec3(1, 0, 0));
 }
 
-TEST_CASE("Testing casual_parameters function")
-{
+TEST_CASE("Testing casual_parameters function") {
   double wingspan, max_speed, min_distance, separation_factor, cohesion_factor;
   double alignment_factor, fear_factor, sight_distance, attack_speed,
       attack_range, wind_speed;
@@ -405,9 +380,8 @@ TEST_CASE("Testing casual_parameters function")
   CHECK(attack_range <= 500.0);
 }
 
-TEST_CASE("Testing initialize_parameters function")
-{
-  bool manually{};
+TEST_CASE("Testing initialize_parameters function") {
+  bool                         manually{};
   std::vector<Boid>::size_type size{};
   double wingspan{}, max_speed{}, min_distance{}, separation_factor{},
       cohesion_factor{};
@@ -450,8 +424,7 @@ TEST_CASE("Testing initialize_parameters function")
   CHECK(!manually);
 }
 
-TEST_CASE("Testing draw_windows function")
-{
+TEST_CASE("Testing draw_windows function") {
   sf::RenderWindow windowXY, windowXZ;
   draw_windows(windowXY, windowXZ);
 
@@ -467,9 +440,8 @@ TEST_CASE("Testing draw_windows function")
   CHECK(sizeXZ.y > 0);
 }
 
-TEST_CASE("Testing initialize_shapes function")
-{
-  float wingspan = 5.0f;
+TEST_CASE("Testing initialize_shapes function") {
+  float           wingspan = 5.0f;
   sf::CircleShape boid_shape, predator_shape;
   initialize_shapes(wingspan, boid_shape, predator_shape);
 
@@ -480,8 +452,7 @@ TEST_CASE("Testing initialize_shapes function")
   CHECK(predator_shape.getFillColor() == sf::Color::Red);
 }
 
-TEST_CASE("Testing handle_events function")
-{
+TEST_CASE("Testing handle_events function") {
   sf::RenderWindow window(sf::VideoMode(800, 600), "Test Window");
 
   sf::Event event;

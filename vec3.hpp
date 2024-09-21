@@ -1,156 +1,129 @@
-#ifndef VEC3
-#define VEC3
+#ifndef VEC3_H
+#define VEC3_H
 
-#include <cmath>
 #include <stdexcept>
 
-class Vec3
-{ // vettore tridimensionale
+namespace boids {
+class Vec3 {
+ private:
+  double x_;
+  double y_;
+  double z_;
+
  public:
-  double x, y, z;
-  Vec3()
-      : x(0)
-      , y(0)
-      , z(0)
-  {} // costruttore vuoto
-  Vec3(double x_, double y_, double z_)
-      : x(x_)
-      , y(y_)
-      , z(z_)
-  {} // costruttore
+  Vec3();
+  Vec3(const Vec3& other);
+  Vec3(double x, double y, double z);
 
-  // uguaglianza
-  bool operator==(const Vec3& other) const
-  {
-    return x == other.x && y == other.y && z == other.z;
-  }
+  double x() const;
+  double y() const;
+  double z() const;
+  void   set_x(double x);
+  void   set_y(double y);
+  void   set_z(double z);
 
-  // disuguaglianza
-  bool operator!=(const Vec3& other) const
-  {
-    return !(*this == other);
-  }
+  bool    operator==(const Vec3& other) const;
+  bool    operator!=(const Vec3& other) const;
+  Vec3&   operator=(const Vec3& other);
+  Vec3    operator+(const Vec3& other) const;
+  Vec3&   operator+=(const Vec3& other);
+  Vec3    operator-(const Vec3& other) const;
+  Vec3&   operator-=(const Vec3& other);
+  Vec3    operator*(double scalar) const;
+  Vec3&   operator*=(double scalar);
+  Vec3    operator/(double scalar) const;
+  Vec3&   operator/=(double scalar);
+  double  norm() const;
+  Vec3    normalize() const;
+  Vec3&   normalizeAssign();
+  double  dot(const Vec3& other) const;
+  Vec3    cross(const Vec3& other) const;
+  double  operator[](int i) const;
+  double& operator[](int i);
 
-  // somma
-  Vec3 operator+(const Vec3& other) const
-  {
-    return Vec3(x + other.x, y + other.y, z + other.z);
-  }
-
-  // somma e assegna
-  Vec3 operator+=(const Vec3& other)
-  {
-    x += other.x;
-    y += other.y;
-    z += other.z;
-    return *this;
-  }
-
-  // differenza
-  Vec3 operator-(const Vec3& other) const
-  {
-    return Vec3(x - other.x, y - other.y, z - other.z);
-  }
-
-  // differenza e assegna
-  Vec3 operator-=(const Vec3& other)
-  {
-    x -= other.x;
-    y -= other.y;
-    z -= other.z;
-    return *this;
-  }
-
-  // prodotto per uno scalare
-  Vec3 operator*(double scalar) const
-  {
-    return Vec3(x * scalar, y * scalar, z * scalar);
-  }
-
-  // prodotto per uno scalare e assegna
-  Vec3 operator*=(double scalar)
-  {
-    x *= scalar;
-    y *= scalar;
-    z *= scalar;
-    return *this;
-  }
-
-  // divisione per uno scalare
-  Vec3 operator/(double scalar) const
-  {
-    return Vec3(x / scalar, y / scalar, z / scalar);
-  }
-
-  // divisione per uno scalare e assegna
-  Vec3 operator/=(double scalar)
-  {
-    x /= scalar;
-    y /= scalar;
-    z /= scalar;
-    return *this;
-  }
-
-  // norma
-  double norm() const
-  {
-    return std::sqrt(x * x + y * y + z * z);
-  }
-
-  // normalizza
-  Vec3 normalize() const
-  {
-    double n = norm();
-    if (n != 0) {
-      return Vec3(x / n, y / n, z / n);
-    } else {
-      return *this;
-    }
-  }
-
-  // prodotto scalare
-  double dot(const Vec3& other) const
-  {
-    return x * other.x + y * other.y + z * other.z;
-  }
-
-  // prodotto vettoriale
-  Vec3 cross(const Vec3& other) const
-  {
-    return Vec3(y * other.z - z * other.y, z * other.x - x * other.z,
-                x * other.y - y * other.x);
-  }
-
-  // accesso agli elementi
-  double& operator[](int i)
-  {
-    if (i == 0)
-      return x;
-    if (i == 1)
-      return y;
-    if (i == 2)
-      return z;
-    throw std::out_of_range("index out of range");
-  }
-
-  // accesso agli elementi costante
-  const double& operator[](int i) const
-  {
-    if (i == 0)
-      return x;
-    if (i == 1)
-      return y;
-    if (i == 2)
-      return z;
-    throw std::out_of_range("index out of range");
-  }
-
-  // restituisci per stampa
-  std::string to_string() const
-  {
-    return "(" + std::to_string(x) + ", " + std::to_string(y) + ", "
-         + std::to_string(z) + ")";
-  }
+  std::string toString() const;
 };
 
-#endif
+inline double Vec3::x() const { return x_; }
+
+inline double Vec3::y() const { return y_; }
+
+inline double Vec3::z() const { return z_; }
+
+inline void Vec3::set_x(double x) { x_ = x; }
+
+inline void Vec3::set_y(double y) { y_ = y; }
+
+inline void Vec3::set_z(double z) { z_ = z; }
+
+inline bool Vec3::operator==(const Vec3& other) const {
+  return x_ == other.x_ && y_ == other.y_ && z_ == other.z_;
+}
+
+inline bool Vec3::operator!=(const Vec3& other) const {
+  return !(*this == other);
+}
+
+inline Vec3& Vec3::operator=(const Vec3& other) {
+  if (this != &other) {
+    x_ = other.x_;
+    y_ = other.y_;
+    z_ = other.z_;
+  }
+  return *this;
+}
+
+inline Vec3 Vec3::operator+(const Vec3& other) const {
+  return Vec3(x_ + other.x_, y_ + other.y_, z_ + other.z_);
+}
+
+inline Vec3& Vec3::operator+=(const Vec3& other) {
+  *this = *this + other;
+  return *this;
+}
+
+inline Vec3 Vec3::operator-(const Vec3& other) const {
+  return Vec3(x_ - other.x_, y_ - other.y_, z_ - other.z_);
+}
+
+inline Vec3& Vec3::operator-=(const Vec3& other) {
+  *this = *this - other;
+  return *this;
+}
+
+inline Vec3 Vec3::operator*(double scalar) const {
+  return Vec3(x_ * scalar, y_ * scalar, z_ * scalar);
+}
+
+inline Vec3& Vec3::operator*=(double scalar) {
+  *this = *this * scalar;
+  return *this;
+}
+
+inline Vec3 Vec3::operator/(double scalar) const {
+  if (scalar == 0) { throw std::invalid_argument("Division by zero."); }
+  return Vec3(x_ / scalar, y_ / scalar, z_ / scalar);
+}
+
+inline Vec3& Vec3::operator/=(double scalar) {
+  *this = *this / scalar;
+  return *this;
+}
+
+inline double Vec3::operator[](int i) const {
+  if (i < 0 || i > 2) { throw std::out_of_range("Index out of range"); }
+  return (i == 0) ? x_ : (i == 1) ? y_ : z_;
+}
+
+inline double& Vec3::operator[](int i) {
+  if (i < 0 || i > 2) { throw std::out_of_range("Index out of range"); }
+  return (i == 0) ? x_ : (i == 1) ? y_ : z_;
+}
+
+inline std::string Vec3::toString() const {
+  return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ", "
+       + std::to_string(z_) + ")";
+}
+} // namespace boids
+
+#endif // VEC3_H

@@ -3,6 +3,7 @@
 #include "predator.hpp"
 #include "statistics.hpp"
 #include "swarm.hpp"
+#include "variables.hpp"
 #include "vec3.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -16,72 +17,54 @@
 #include <string>
 #include <vector>
 
-int main()
-{
-  std::vector<Boid>::size_type size = 100;
-  double wingspan                   = 2;
-  int t                             = 0;
-  double max_speed = 1, min_distance = 30, sight_distance = 150;
-  double separation_factor = 0.05, cohesion_factor = 0.00005,
-         alignment_factor = 0.005, fear_factor = 0.05;
-  const Vec3 screen(600, 300, 300);
-  Vec3 wind(0, 0, 0);
-  bool toroidal_bool = false, manually = false;
-  double attack_range = 300, attack_speed = 1.1;
+int main() {
+  namespace B = boids;
 
-  initialize_parameters(manually, size, wingspan, max_speed, min_distance,
-                        separation_factor, cohesion_factor, alignment_factor,
-                        fear_factor, sight_distance, toroidal_bool, wind,
-                        attack_speed, attack_range);
+  int                  t = 0;
+  B::GlobalVariables   global_vars;
+  B::PredatorVariables predator_vars;
+  B::SwarmVariables    swarm_vars;
 
-  save_statistics_on_file("boids_save.txt", size, wingspan, max_speed,
-                          min_distance, separation_factor, cohesion_factor,
-                          alignment_factor, fear_factor, sight_distance,
-                          attack_speed, attack_range, wind);
+  B::initializeParameters(global_vars, predator_vars, swarm_vars);
 
-  Predator yautja(attack_range, attack_speed, screen, toroidal_bool, wind);
+  B::saveStatisticsOnFile("boids_save.txt", global_vars, predator_vars,
+                          swarm_vars);
 
-  Swarm boids(size, wingspan, max_speed, min_distance, sight_distance,
-              separation_factor, cohesion_factor, alignment_factor, fear_factor,
-              yautja, screen, toroidal_bool, wind);
+  B::Predator predator(global_vars, predator_vars);
 
-  // finestre usate nella funzione draw e nel main
-  sf::RenderWindow windowXY;
-  sf::RenderWindow windowXZ;
-  sf::CircleShape boid_shape;
-  sf::CircleShape predator_shape;
+  B::Swarm swarm(global_vars, swarm_vars, predator);
 
-  draw_windows(windowXY, windowXZ);
+  sf::RenderWindow window_top;
+  sf::RenderWindow window_side;
+  sf::CircleShape  boid_shape;
+  sf::CircleShape  predator_shape;
 
-  initialize_shapes(static_cast<float>(wingspan), boid_shape, predator_shape);
+  B::drawWindows(window_top, window_side);
 
-  const float target_frame_time =
-      1.0f / 180.0f; // per una durata costante dei cicli
+  B::initializeShapes(static_cast<float>(swarm_vars.wingspan), boid_shape,
+                      predator_shape);
 
-  while (windowXY.isOpen() && windowXZ.isOpen() && boids.get_size() > 1) {
-    sf::Clock clock; // Start the clock to measure the time of the current frame
+  const float target_frame_time = 1.0f / 180.0f;
 
-    handle_events(windowXY);
-    handle_events(windowXZ);
+  while (window_top.isOpen() && window_side.isOpen() && swarm.size() > 1) {
+    sf::Clock clock;
 
-    windowXY.clear();
-    draw_boids_on_plane(boids, yautja, windowXY, 0, boid_shape, predator_shape);
-    windowXY.display();
+    B::handleEvents(window_top);
+    B::handleEvents(window_side);
 
-    windowXZ.clear();
-    draw_boids_on_plane(boids, yautja, windowXZ, 1, boid_shape, predator_shape);
-    windowXZ.display();
+    window_top.clear();
+    B::drawBoids(swarm, predator, window_top, 0, boid_shape, predator_shape);
+    window_top.display();
 
-    update_simulation(yautja, boids, t, "boids_save.txt");
+    window_side.clear();
+    B::drawBoids(swarm, predator, window_side, 1, boid_shape, predator_shape);
+    window_side.display();
 
-    float frame_time =
-        clock.getElapsedTime()
-            .asSeconds(); // Get the time taken by the current frame
+    B::updateSimulation(predator, swarm, t, "boids_save.txt");
 
+    float frame_time = clock.getElapsedTime().asSeconds();
     if (frame_time < target_frame_time) {
-      sf::sleep(
-          sf::seconds(target_frame_time
-                      - frame_time)); // Wait to match the target frame time
+      sf::sleep(sf::seconds(target_frame_time - frame_time));
     }
   }
 

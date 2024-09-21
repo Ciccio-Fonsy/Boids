@@ -1,92 +1,59 @@
-#ifndef BOID
-#define BOID
+#ifndef BOID_H
+#define BOID_H
 
 #include "vec3.hpp"
 
-class Boid
-{
-  Vec3 position;
-  Vec3 velocity;
+namespace boids {
+class Boid {
+ private:
+  Vec3 position_;
+  Vec3 velocity_;
 
  public:
-  Boid()
-      : position(Vec3(0, 0, 0))
-      , velocity(Vec3(0, 0, 0))
-  {}
-  Boid(Vec3 position_, Vec3 velocity_)
-      : position(position_)
-      , velocity(velocity_)
-  {}
+  Boid();
+  Boid(const Boid& other);
+  Boid(Vec3 position, Vec3 velocity);
 
-  // Copy constructor
-  Boid(const Boid& other)
-      : position(other.position)
-      , velocity(other.velocity)
-  {}
+  Vec3 position() const;
+  Vec3 velocity() const;
+  void set_position(const Vec3& new_position);
+  void set_velocity(const Vec3& new_velocity);
 
-  // restituisce la posizione del boid
-  Vec3 get_position() const
-  {
-    return position;
-  }
+  bool  operator==(const Boid& other) const;
+  bool  operator!=(const Boid& other) const;
+  Boid& operator=(const Boid& other);
 
-  // restituisce la velocità del boid
-  Vec3 get_velocity() const
-  {
-    return velocity;
-  }
-
-  // imposta la posizione del boid
-  void set_position(const Vec3& new_position)
-  {
-    position = new_position;
-  }
-
-  // imposta la velocità del boid
-  void set_velocity(const Vec3& new_velocity)
-  {
-    velocity = new_velocity;
-  }
-
-  void update_boid_velocity(Vec3 delta_v, double max_speed)
-  {
-    velocity += delta_v;
-
-    // Limita la velocità massima
-    if (velocity.norm() > max_speed) {
-      velocity = velocity.normalize() * max_speed;
-    }
-  }
-
-  // aggiorna la posizione del boid
-  void update_boid(Vec3 delta_v, double max_speed)
-  {
-    update_boid_velocity(delta_v, max_speed);
-
-    position += velocity;
-  }
-
-  // uguaglianza
-  bool operator==(const Boid& other) const
-  {
-    return position == other.position && velocity == other.velocity;
-  }
-
-  // disuguaglianza
-  bool operator!=(const Boid& other) const
-  {
-    return !(*this == other);
-  }
-
-  // assegna
-  Boid operator=(const Boid& other)
-  {
-    if (this != &other) {
-      position = other.position;
-      velocity = other.velocity;
-    }
-    return *this;
-  }
+  void updateBoidVelocity(Vec3 delta_v, double max_speed);
+  void updateBoid(Vec3 delta_v, double max_speed);
 };
 
-#endif
+inline Vec3 Boid::position() const { return position_; }
+
+inline Vec3 Boid::velocity() const { return velocity_; }
+
+inline void Boid::set_position(const Vec3& new_position) {
+  position_ = new_position;
+}
+
+inline void Boid::set_velocity(const Vec3& new_velocity) {
+  velocity_ = new_velocity;
+}
+
+inline bool Boid::operator==(const Boid& other) const {
+  return position_ == other.position_ && velocity_ == other.velocity_;
+}
+
+inline bool Boid::operator!=(const Boid& other) const {
+  return !(*this == other);
+}
+
+inline Boid& Boid::operator=(const Boid& other) {
+  if (this != &other) {
+    position_ = other.position_;
+    velocity_ = other.velocity_;
+  }
+  return *this;
+}
+} // namespace boids
+
+#endif // BOID_H
