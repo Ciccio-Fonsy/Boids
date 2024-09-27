@@ -5,7 +5,6 @@
 
 namespace boids {
 class Vec3 {
- private:
   double x_;
   double y_;
   double z_;

@@ -4,8 +4,8 @@
 
 namespace boids {
 Boid::Boid()
-    : position_(Vec3(0, 0, 0))
-    , velocity_(Vec3(0, 0, 0)) {}
+    : position_()
+    , velocity_() {}
 
 Boid::Boid(const Boid& other)
     : position_(other.position_)

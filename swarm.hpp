@@ -10,7 +10,6 @@
 
 namespace boids {
 class Swarm {
- private:
   std::vector<Boid> boids_;
   int               size_;
   const double      wingspan_;

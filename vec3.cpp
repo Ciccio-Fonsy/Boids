@@ -4,9 +4,9 @@
 
 namespace boids {
 Vec3::Vec3()
-    : x_(0)
-    , y_(0)
-    , z_(0) {}
+    : x_()
+    , y_()
+    , z_() {}
 
 Vec3::Vec3(const Vec3& other)
     : x_(other.x_)

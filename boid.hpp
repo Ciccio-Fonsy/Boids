@@ -5,7 +5,6 @@
 
 namespace boids {
 class Boid {
- private:
   Vec3 position_;
   Vec3 velocity_;
 

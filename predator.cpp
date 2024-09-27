@@ -67,7 +67,7 @@ Predator::Predator()
     , attack_speed_()
     , preferred_height_(100)
     , screen_(Vec3(600, 300, 300))
-    , wind_(Vec3())
+    , wind_()
     , toroidal_() {}
 
 Predator::Predator(const Predator& other)
@@ -81,7 +81,7 @@ Predator::Predator(const Predator& other)
 
 Predator::Predator(const GlobalVariables&   global_vars,
                    const PredatorVariables& predator_vars)
-    : Boid(Vec3(0, 0, 0), Vec3(0, 0, 0))
+    : Boid()
     , attack_range_(predator_vars.attack_range)
     , attack_speed_(predator_vars.attack_speed)
     , preferred_height_(global_vars.screen.z() / 3)

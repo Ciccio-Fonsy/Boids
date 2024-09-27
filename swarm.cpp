@@ -70,7 +70,7 @@ void Swarm::bounce(Boid& b) {
 }
 
 Vec3 Swarm::separation(const Boid& b) const {
-  Vec3 c(0, 0, 0);
+  Vec3 c;
 
   for (const Boid& other_boid : boids_) {
     if (other_boid != b && isWithinRange(other_boid, b, min_distance_)
@@ -85,7 +85,7 @@ Vec3 Swarm::separation(const Boid& b) const {
 }
 
 Vec3 Swarm::cohesion(const Boid& b) const {
-  Vec3 perceived_center(0, 0, 0);
+  Vec3 perceived_center;
   int  count = 0;
 
   for (const Boid& other_boid : boids_) {
@@ -128,7 +128,7 @@ Vec3 Swarm::cohesion(const Boid& b) const {
 }
 
 Vec3 Swarm::alignment(const Boid& b) const {
-  Vec3 pv(0, 0, 0);
+  Vec3 pv;
   int  count = 0;
 
   for (const Boid& other_boid : boids_) {
@@ -145,7 +145,7 @@ Vec3 Swarm::alignment(const Boid& b) const {
 }
 
 Vec3 Swarm::fear(const Boid& b) const {
-  Vec3       evade_vector(0, 0, 0);
+  Vec3       evade_vector;
   const Vec3 distance_to_predator =
       vecDistance(toroidal_, b.position(), predator_.position(), screen_);
   const double distance_norm = distance_to_predator.norm();
@@ -173,14 +173,12 @@ Swarm::Swarm()
     , cohesion_factor_(0.00005)
     , alignment_factor_(0.005)
     , fear_factor_(0.05)
-    , predator_(Boid())
+    , predator_()
     , screen_(Vec3(600, 300, 300))
-    , wind_(Vec3())
-    , toroidal_(false)
-    , cooldown_(0) {
-  for (int i = 0; i < size_; ++i) {
-    boids_.push_back(Boid(Vec3(0, 0, 0), Vec3(0, 0, 0)));
-  }
+    , wind_()
+    , toroidal_()
+    , cooldown_() {
+  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
 
   Init();
 }
@@ -201,9 +199,7 @@ Swarm::Swarm(const Swarm& other)
     , wind_(other.wind_)
     , toroidal_(other.toroidal_)
     , cooldown_(other.cooldown_) {
-  for (int i = 0; i < size_; ++i) {
-    boids_.push_back(Boid(Vec3(0, 0, 0), Vec3(0, 0, 0)));
-  }
+  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
 
   Init();
 }
@@ -224,7 +220,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
     , toroidal_(global_vars.toroidal_bool)
-    , cooldown_(0) {
+    , cooldown_() {
   if (size_ <= 1) {
     throw std::invalid_argument("Swarm size must be greater than 1");
   }
@@ -257,9 +253,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
         "Fear factor must be greater than 0 and smaller than 100");
   }
 
-  for (int i = 0; i < size_; ++i) {
-    boids_.push_back(Boid(Vec3(0, 0, 0), Vec3(0, 0, 0)));
-  }
+  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
 
   Init();
 }
