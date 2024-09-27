@@ -1,5 +1,5 @@
-#ifndef VEC3_H
-#define VEC3_H
+#ifndef VEC3_HPP
+#define VEC3_HPP
 
 #include <stdexcept>
 
@@ -126,4 +126,4 @@ inline std::string Vec3::toString() const {
 }
 } // namespace boids
 
-#endif // VEC3_H
+#endif // VEC3_HPP

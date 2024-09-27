@@ -6,9 +6,8 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
-#include <cmath>
 #include <random>
-#include <vector>
+#include <stdexcept>
 
 namespace boids {
 void Predator::Init() {

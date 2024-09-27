@@ -1,5 +1,5 @@
-#ifndef BOID_H
-#define BOID_H
+#ifndef BOID_HPP
+#define BOID_HPP
 
 #include "vec3.hpp"
 
@@ -56,4 +56,4 @@ inline Boid& Boid::operator=(const Boid& other) {
 }
 } // namespace boids
 
-#endif // BOID_H
+#endif // BOID_HPP

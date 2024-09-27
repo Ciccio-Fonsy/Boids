@@ -1,13 +1,11 @@
-#ifndef SWARM_H
-#define SWARM_H
+#ifndef SWARM_HPP
+#define SWARM_HPP
 
 #include "boid.hpp"
 #include "statistics.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
 
-#include <cmath>
-#include <random>
 #include <vector>
 
 namespace boids {
@@ -112,4 +110,4 @@ inline bool Swarm::toroidal() const { return toroidal_; }
 inline int Swarm::cooldown() const { return cooldown_; }
 } // namespace boids
 
-#endif // SWARM_H
+#endif // SWARM_HPP

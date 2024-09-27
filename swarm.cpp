@@ -5,8 +5,8 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
-#include <cmath>
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 namespace boids {

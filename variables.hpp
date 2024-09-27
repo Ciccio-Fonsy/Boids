@@ -1,10 +1,7 @@
-#ifndef VARIABLES_H
-#define VARIABLES_H
+#ifndef VARIABLES_HPP
+#define VARIABLES_HPP
 
-#include "boid.hpp"
 #include "vec3.hpp"
-
-#include <vector>
 
 namespace boids {
 struct GlobalVariables {
@@ -31,6 +28,14 @@ struct SwarmVariables {
   double alignment_factor  = 0.005;
   double fear_factor       = 0.05;
 };
+
+struct ConversionFactors {
+  int speed_k = 100;
+  int separation_k = 1000;
+  int cohesion_k = 1000000;
+  int alignment_k = 10000;
+  int fear_k = 1000;
+};
 } // namespace boids
 
-#endif
+#endif // VARIABLES_HPP

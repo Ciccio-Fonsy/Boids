@@ -1,5 +1,6 @@
 #include "functions.hpp"
 
+#include "boid.hpp"
 #include "predator.hpp"
 #include "statistics.hpp"
 #include "swarm.hpp"
@@ -9,16 +10,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include <cmath>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <limits>
 #include <random>
-#include <string>
-#include <vector>
 
 namespace boids {
+ConversionFactors conversion;
+
 void casualParameters(PredatorVariables& predator_vars,
                       SwarmVariables& swarm_vars, double& windspeed) {
   std::random_device rd;
@@ -27,35 +25,27 @@ void casualParameters(PredatorVariables& predator_vars,
   std::uniform_real_distribution<> dis0(1, 5);
   swarm_vars.wingspan = dis0(gen);
 
-  std::uniform_real_distribution<> dis1(0.001, 2);
-  swarm_vars.max_speed = dis1(gen);
+  std::uniform_real_distribution<> dis1(0.001, 200);
+  swarm_vars.max_speed       = dis1(gen) / conversion.speed_k;
+  predator_vars.attack_speed = dis1(gen) / conversion.speed_k;
 
   std::uniform_real_distribution<> dis2(swarm_vars.wingspan, 100);
   swarm_vars.min_distance = dis2(gen);
 
   std::uniform_real_distribution<> dis3(0.001, 100);
-  swarm_vars.separation_factor = dis3(gen) / 1000;
+  swarm_vars.separation_factor = dis3(gen) / conversion.separation_k;
+  swarm_vars.cohesion_factor   = dis3(gen) / conversion.cohesion_k;
+  swarm_vars.alignment_factor  = dis3(gen) / conversion.alignment_k;
+  swarm_vars.fear_factor       = dis3(gen) / conversion.fear_k;
 
-  std::uniform_real_distribution<> dis4(0.001, 100);
-  swarm_vars.cohesion_factor = dis4(gen) / 1000000;
+  std::uniform_real_distribution<> dis4(swarm_vars.wingspan, 500);
+  swarm_vars.sight_distance = dis4(gen);
 
-  std::uniform_real_distribution<> dis5(0.001, 100);
-  swarm_vars.alignment_factor = dis5(gen) / 10000;
+  std::uniform_real_distribution<> dis5(50, 500);
+  predator_vars.attack_range = dis5(gen);
 
-  std::uniform_real_distribution<> dis6(0.001, 100);
-  swarm_vars.fear_factor = dis6(gen) / 1000;
-
-  std::uniform_real_distribution<> dis7(swarm_vars.wingspan, 500);
-  swarm_vars.sight_distance = dis7(gen);
-
-  std::uniform_real_distribution<> dis8(0.001, 200);
-  predator_vars.attack_speed = dis8(gen) / 100;
-
-  std::uniform_real_distribution<> dis9(50, 500);
-  predator_vars.attack_range = dis9(gen);
-
-  std::uniform_real_distribution<> dis10(0.001, 20);
-  windspeed = dis10(gen) / 100;
+  std::uniform_real_distribution<> dis6(0.001, 20);
+  windspeed = dis6(gen) / conversion.speed_k;
 }
 
 void initializeParameters(GlobalVariables&   global_vars,
@@ -104,7 +94,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (max_speed <= 0 || max_speed > 200) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      swarm_vars.max_speed = max_speed / 100;
+      swarm_vars.max_speed = max_speed / conversion.speed_k;
     }
 
     std::cout << "Enter minimum distance (0 ~ 100): ";
@@ -122,7 +112,8 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (separation_factor <= 0 || separation_factor > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      swarm_vars.separation_factor = separation_factor / 1000;
+      swarm_vars.separation_factor =
+          separation_factor / conversion.separation_k;
     }
 
     std::cout << "Enter cohesion factor (0 ~ 100): ";
@@ -131,7 +122,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (cohesion_factor <= 0 || cohesion_factor > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      swarm_vars.cohesion_factor = cohesion_factor / 1000000;
+      swarm_vars.cohesion_factor = cohesion_factor / conversion.cohesion_k;
     }
 
     std::cout << "Enter alignment factor (0 ~ 100): ";
@@ -140,7 +131,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (alignment_factor <= 0 || alignment_factor > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      swarm_vars.alignment_factor = alignment_factor / 10000;
+      swarm_vars.alignment_factor = alignment_factor / conversion.alignment_k;
     }
 
     std::cout << "Enter fear factor (0 ~ 100): ";
@@ -149,7 +140,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (fear_factor <= 0 || fear_factor > 100) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      swarm_vars.fear_factor = fear_factor / 1000;
+      swarm_vars.fear_factor = fear_factor / conversion.fear_k;
     }
 
     std::cout << "Enter sight distance (0 ~ 500): ";
@@ -167,7 +158,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     if (attack_speed <= 0 || attack_speed > 200) {
       std::cout << "This value is not accetable, setted to default value\n";
     } else {
-      predator_vars.attack_speed = attack_speed / 100;
+      predator_vars.attack_speed = attack_speed / conversion.speed_k;
     }
 
     std::cout << "Enter predator attack range (0 ~ 500): ";
@@ -186,7 +177,7 @@ void initializeParameters(GlobalVariables&   global_vars,
       if (windspeed_input <= 0 || windspeed_input > 20) {
         std::cout << "This value is not accetable, setted to default value\n";
       } else {
-        windspeed = windspeed_input / 100;
+        windspeed = windspeed_input / conversion.speed_k;
       }
     }
   } else {
@@ -202,19 +193,22 @@ void initializeParameters(GlobalVariables&   global_vars,
   std::cout << "Parameters setted at values:\n";
   std::cout << "Size:              " << swarm_vars.size << std::endl;
   std::cout << "Wingspan:          " << swarm_vars.wingspan << std::endl;
-  std::cout << "Max speed:         " << swarm_vars.max_speed * 100 << std::endl;
+  std::cout << "Max speed:         "
+            << swarm_vars.max_speed * conversion.speed_k << std::endl;
   std::cout << "Min distance:      " << swarm_vars.min_distance << std::endl;
-  std::cout << "Separation factor: " << swarm_vars.separation_factor * 1000
+  std::cout << "Separation factor: "
+            << swarm_vars.separation_factor * conversion.separation_k
             << std::endl;
-  std::cout << "Cohesion factor:   " << swarm_vars.cohesion_factor * 1000000
+  std::cout << "Cohesion factor:   "
+            << swarm_vars.cohesion_factor * conversion.cohesion_k << std::endl;
+  std::cout << "Alignment factor:  "
+            << swarm_vars.alignment_factor * conversion.alignment_k
             << std::endl;
-  std::cout << "Alignment factor:  " << swarm_vars.alignment_factor * 10000
-            << std::endl;
-  std::cout << "Fear factor:       " << swarm_vars.fear_factor * 1000
-            << std::endl;
+  std::cout << "Fear factor:       "
+            << swarm_vars.fear_factor * conversion.fear_k << std::endl;
   std::cout << "Sight distance:    " << swarm_vars.sight_distance << std::endl;
-  std::cout << "Attack speed:      " << predator_vars.attack_speed * 100
-            << std::endl;
+  std::cout << "Attack speed:      "
+            << predator_vars.attack_speed * conversion.speed_k << std::endl;
   std::cout << "Attack range:      " << predator_vars.attack_range << std::endl;
 
   if (windbool) {
@@ -225,8 +219,10 @@ void initializeParameters(GlobalVariables&   global_vars,
     std::uniform_real_distribution<> dis_z(-5, 5);
     global_vars.wind =
         Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
-    std::cout << "Wind Speed:        " << windspeed * 100 << std::endl;
-    std::cout << "Wind:              " << (global_vars.wind * 100).toString()
+    std::cout << "Wind Speed:        " << windspeed * conversion.speed_k
+              << std::endl;
+    std::cout << "Wind:              "
+              << (global_vars.wind * conversion.speed_k).toString()
               << std::endl;
   }
 }
@@ -252,13 +248,59 @@ void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) {
   window_xz.setPosition(sf::Vector2i(0, 0));
 }
 
-void initializeShapes(float wingspan, sf::CircleShape& boid_shape,
+void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
                       sf::CircleShape& predator_shape) {
-  boid_shape.setRadius(wingspan);
+  float wingspanf = static_cast<float>(wingspan);
+
+  boid_shape.setRadius(wingspanf);
   boid_shape.setFillColor(sf::Color::White);
 
-  predator_shape.setRadius(wingspan * 2);
+  predator_shape.setRadius(wingspanf * 2);
   predator_shape.setFillColor(sf::Color::Red);
+}
+
+void drawBoids(const Swarm& swarm, const Predator& predator,
+               sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
+               sf::CircleShape& predator_shape) {
+  if (plane > 1) { throw std::out_of_range("index out of range"); }
+
+  const Vec3& screen = swarm.screen();
+
+  double width  = window.getSize().x;
+  double height = window.getSize().y;
+
+  for (int i = 0; i < swarm.size(); ++i) {
+    sf::Vector2<double> position;
+
+    switch (plane) {
+    case 0:
+      position.x = swarm[i].position().x() / screen.x() * width;
+      position.y = swarm[i].position().y() / screen.y() * height;
+      break;
+    case 1:
+      position.x = swarm[i].position().x() / screen.x() * width;
+      position.y = swarm[i].position().z() / screen.z() * height;
+      break;
+    }
+
+    boid_shape.setPosition(sf::Vector2f(position));
+    window.draw(boid_shape);
+  }
+
+  sf::Vector2<double> predator_position;
+  switch (plane) {
+  case 0:
+    predator_position.x = predator.position().x() / screen.x() * width;
+    predator_position.y = predator.position().y() / screen.y() * height;
+    break;
+  case 1:
+    predator_position.x = predator.position().x() / screen.x() * width;
+    predator_position.y = predator.position().z() / screen.z() * height;
+    break;
+  }
+
+  predator_shape.setPosition(sf::Vector2f(predator_position));
+  window.draw(predator_shape);
 }
 
 void saveStatisticsOnFile(const std::string&       filename,
@@ -270,20 +312,60 @@ void saveStatisticsOnFile(const std::string&       filename,
     file
         << "\nsize              = " << swarm_vars.size
         << "\nwingspan          = " << swarm_vars.wingspan
-        << "\nmax speed         = " << swarm_vars.max_speed * 100
+        << "\nmax speed         = " << swarm_vars.max_speed * conversion.speed_k
         << "\nmin distance      = " << swarm_vars.min_distance
-        << "\nseparation factor = " << swarm_vars.separation_factor * 1000
-        << "\ncohesion factor   = " << swarm_vars.cohesion_factor * 1000000
-        << "\nalignment factor  = " << swarm_vars.alignment_factor * 10000
-        << "\nfear factor       = " << swarm_vars.fear_factor * 1000
+        << "\nseparation factor = "
+        << swarm_vars.separation_factor * conversion.separation_k
+        << "\ncohesion factor   = "
+        << swarm_vars.cohesion_factor * conversion.cohesion_k
+        << "\nalignment factor  = "
+        << swarm_vars.alignment_factor * conversion.alignment_k
+        << "\nfear factor       = "
+        << swarm_vars.fear_factor * conversion.fear_k
         << "\nsight distance    = " << swarm_vars.sight_distance
-        << "\nattack speed      = " << predator_vars.attack_speed * 100
+        << "\nattack speed      = "
+        << predator_vars.attack_speed * conversion.speed_k
         << "\nattack range      = " << predator_vars.attack_range
-        << "\nwind speed        = " << global_vars.wind.norm()
-        << "\nwind              = " << global_vars.wind.toString()
+        << "\nwind speed        = "
+        << global_vars.wind.norm() * conversion.speed_k
+        << "\nwind              = "
+        << (global_vars.wind * conversion.speed_k).toString()
         << "\ntoroidal          = " << global_vars.toroidal_bool << "\n"
         << "\n     t  mean_distance  distance_std_dev  mean_velocity  velocity_std_dev  n_boids"
         << std::endl;
+    file.close();
+  } else {
+    std::cerr << "Errore: impossibile salvare le posizioni sul file "
+              << filename << std::endl;
+  }
+}
+
+void printStatistics(Swarm& swarm, int t, const std::string& filename) {
+  std::vector<double> distances;
+  std::vector<double> velocities;
+
+  for (int i = 0; i < swarm.size(); ++i) {
+    velocities.push_back(swarm[i].velocity().norm() * conversion.speed_k);
+    for (int j = i + 1; j < swarm.size(); ++j) {
+      distances.push_back(distance(swarm.toroidal(), swarm[i].position(),
+                                   swarm[j].position(), swarm.screen()));
+    }
+  }
+  std::ofstream file(filename, std::ios::app);
+  double        mean_dist = mean(distances), mean_vel = mean(velocities);
+  std::cout << "t = " << std::setw(6) << t
+            << "; mean_distance = " << std::setw(7) << mean_dist
+            << "; distance_std_dev = " << std::setw(7)
+            << stdDev(distances, mean_dist)
+            << "; mean_velocity = " << std::setw(7) << mean_vel
+            << "; velocity_std_dev = " << std::setw(11)
+            << stdDev(velocities, mean_vel) << "; n_boids = " << std::setw(3)
+            << swarm.size() << std::endl;
+  if (file.is_open()) {
+    file << std::setw(6) << t << std::setw(15) << mean_dist << std::setw(18)
+         << stdDev(distances, mean_dist) << std::setw(15) << mean_vel
+         << std::setw(18) << stdDev(velocities, mean_vel) << std::setw(9)
+         << swarm.size() << std::endl;
     file.close();
   }
 }

@@ -1,15 +1,11 @@
-#ifndef PREDATOR_H
-#define PREDATOR_H
+#ifndef PREDATOR_HPP
+#define PREDATOR_HPP
 
 #include "boid.hpp"
 #include "statistics.hpp"
 #include "swarm.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
-
-#include <cmath>
-#include <random>
-#include <vector>
 
 namespace boids {
 class Predator : public Boid {
@@ -63,4 +59,4 @@ inline const Vec3& Predator::wind() const { return wind_; }
 inline bool Predator::toroidal() const { return toroidal_; }
 } // namespace boids
 
-#endif // PREDATOR_H
+#endif // PREDATOR_HPP

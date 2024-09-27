@@ -1,5 +1,5 @@
-#ifndef STATISTICS_H
-#define STATISTICS_H
+#ifndef STATISTICS_HPP
+#define STATISTICS_HPP
 
 #include "boid.hpp"
 #include "vec3.hpp"
@@ -9,9 +9,10 @@
 #include <vector>
 
 namespace boids {
-// From b to a
+void border(const Vec3& screen, bool toroidal, Boid& boid);
+
 inline Vec3 vecDistance(bool toroidal, const Vec3& a, const Vec3& b,
-                        const Vec3& width) {
+                        const Vec3& width) { // From b to a
   if (toroidal) {
     double dx = a.x() - b.x();
     double dy = a.y() - b.y();
@@ -49,40 +50,6 @@ inline double stdDev(const std::vector<double>& values, double mean_value) {
   return std::sqrt(sum / static_cast<double>(values.size()));
 }
 
-inline void border(const Vec3& screen, bool toroidal, Boid& boid) {
-  Vec3 bounce       = boid.velocity();
-  Vec3 new_position = boid.position();
-
-  for (int j = 0; j < 2; ++j) {
-    if (toroidal) {
-      if (new_position[j] > screen[j]) {
-        new_position[j] -= screen[j];
-      } else if (new_position[j] < 0) {
-        new_position[j] = screen[j] - new_position[j];
-      }
-    } else {
-      if (boid.position()[j] < 0) {
-        new_position[j] = 0;
-        if (boid.velocity()[j] < 0) { bounce[j] *= -0.9; }
-      } else if (boid.position()[j] > screen[j]) {
-        new_position[j] = screen[j];
-        if (boid.velocity()[j] > 0) { bounce[j] *= -0.9; }
-      }
-    }
-  }
-
-  if (boid.position()[2] < 0) {
-    new_position.set_z(0);
-    if (boid.velocity()[2] < 0) { bounce[2] *= -0.9; }
-  } else if (boid.position().z() > screen.z()) {
-    new_position.set_z(screen.z());
-    if (boid.velocity()[2] > 0) { bounce[2] *= -0.1; }
-  }
-
-  boid.set_velocity(bounce);
-  boid.set_position(new_position);
-}
-
 inline Vec3 maintainHeight(Boid& boid, double target_height,
                            double division_factor) {
   Vec3 correction(0, 0, 0);
@@ -94,4 +61,4 @@ inline Vec3 maintainHeight(Boid& boid, double target_height,
 }
 } // namespace boids
 
-#endif // STATISTICS_H
+#endif // STATISTICS_HPP

@@ -1,7 +1,6 @@
 #include "vec3.hpp"
 
 #include <cmath>
-#include <stdexcept>
 
 namespace boids {
 Vec3::Vec3()
