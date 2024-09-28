@@ -38,18 +38,20 @@ void Swarm::Init() {
 }
 
 void Swarm::bounce(Boid& b) {
+  const Vec3& b_position = b.position();
+  const Vec3& b_velocity = b.velocity();
+
   for (Boid& other_boid : boids_) {
     if (other_boid != b && isWithinRange(other_boid, b, 2 * wingspan_)) {
-      if (b.position() == other_boid.position()) {
-        b.set_position(b.position() + Vec3(0, 0, wingspan_ / 10));
+      const Vec3& other_position = other_boid.position();
+      const Vec3& other_velocity = other_boid.velocity();
+
+      if (b_position == other_position) {
+        b.set_position(b_position + Vec3(0, 0, wingspan_ / 10));
       }
 
-      const Vec3 b_position     = b.position();
-      const Vec3 other_position = other_boid.position();
       const Vec3 separation_vector =
           vecDistance(toroidal_, other_position, b_position, screen_);
-      const Vec3 b_velocity        = b.velocity();
-      const Vec3 other_velocity    = other_boid.velocity();
       const Vec3 relative_velocity = b_velocity - other_velocity;
       const bool approaching = separation_vector.dot(relative_velocity) > 0;
 
@@ -70,13 +72,16 @@ void Swarm::bounce(Boid& b) {
 }
 
 Vec3 Swarm::separation(const Boid& b) const {
-  Vec3 c;
+  const Vec3& b_position = b.position();
+  Vec3        c;
 
   for (const Boid& other_boid : boids_) {
+    const Vec3& other_position = other_boid.position();
+
     if (other_boid != b && isWithinRange(other_boid, b, min_distance_)
-        && other_boid.position() != b.position()) {
+        && other_position != b_position) {
       const Vec3 separation_vector =
-          vecDistance(toroidal_, other_boid.position(), b.position(), screen_);
+          vecDistance(toroidal_, other_position, b_position, screen_);
       c -= separation_vector.normalize() / separation_vector.norm();
     }
   }
@@ -147,7 +152,7 @@ Vec3 Swarm::alignment(const Boid& b) const {
 Vec3 Swarm::fear(const Boid& b) const {
   Vec3       evade_vector;
   const Vec3 distance_to_predator =
-      vecDistance(toroidal_, b.position(), predator_.position(), screen_);
+      vecDistance(toroidal_, b.position(), predator_->position(), screen_);
   const double distance_norm = distance_to_predator.norm();
 
   if (distance_norm == 0) {
@@ -173,7 +178,8 @@ Swarm::Swarm()
     , cohesion_factor_(0.00005)
     , alignment_factor_(0.005)
     , fear_factor_(0.05)
-    , predator_()
+    , height_factor_(0.0005)
+    , predator_(nullptr)
     , screen_(Vec3(600, 300, 300))
     , wind_()
     , toroidal_()
@@ -194,6 +200,7 @@ Swarm::Swarm(const Swarm& other)
     , cohesion_factor_(other.cohesion_factor_)
     , alignment_factor_(other.alignment_factor_)
     , fear_factor_(other.fear_factor_)
+    , height_factor_(other.height_factor_)
     , predator_(other.predator_)
     , screen_(other.screen_)
     , wind_(other.wind_)
@@ -205,7 +212,7 @@ Swarm::Swarm(const Swarm& other)
 }
 
 Swarm::Swarm(const GlobalVariables& global_vars,
-             const SwarmVariables& swarm_vars, const Boid& predator)
+             const SwarmVariables& swarm_vars, const Boid* predator)
     : size_(swarm_vars.size)
     , wingspan_(swarm_vars.wingspan)
     , max_speed_(swarm_vars.max_speed)
@@ -216,13 +223,14 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , cohesion_factor_(swarm_vars.cohesion_factor)
     , alignment_factor_(swarm_vars.alignment_factor)
     , fear_factor_(swarm_vars.fear_factor)
+    , height_factor_(swarm_vars.height_factor)
     , predator_(predator)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
     , toroidal_(global_vars.toroidal_bool)
     , cooldown_() {
-  if (size_ <= 1) {
-    throw std::invalid_argument("Swarm size must be greater than 1");
+  if (size_ <= 0) {
+    throw std::invalid_argument("Swarm size must be greater than 0");
   }
   if (wingspan_ <= 0) {
     throw std::invalid_argument("Wingspan must be greater than 0");
@@ -236,45 +244,29 @@ Swarm::Swarm(const GlobalVariables& global_vars,
   if (sight_distance_ <= 0) {
     throw std::invalid_argument("Sight distance must be greater than 0");
   }
-  if (separation_factor_ <= 0 || separation_factor_ > 100) {
-    throw std::invalid_argument(
-        "Separation factor must be greater than 0 and smaller than 100");
-  }
-  if (cohesion_factor_ <= 0 || cohesion_factor_ > 100) {
-    throw std::invalid_argument(
-        "Cohesion factor must be greater than 0 and smaller than 100");
-  }
-  if (alignment_factor_ <= 0 || alignment_factor_ > 100) {
-    throw std::invalid_argument(
-        "Alignment factor must be greater than 0 and smaller than 100");
-  }
-  if (fear_factor_ <= 0 || fear_factor_ > 100) {
-    throw std::invalid_argument(
-        "Fear factor must be greater than 0 and smaller than 100");
-  }
 
   for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
 
   Init();
 }
 
-void Swarm::updateSwarm(Boid& predator) {
+void Swarm::updateSwarm() {
   ++cooldown_;
-  predator_ = predator;
 
   std::vector<int> boids_to_remove;
 
   for (int i = 0; i < size_; ++i) {
     Boid& current_boid = boids_[static_cast<std::size_t>(i)];
 
-    if (isWithinRange(predator_, current_boid, wingspan_)) {
+    if (isWithinRange(*predator_, current_boid, wingspan_)) {
       boids_to_remove.push_back(i);
       cooldown_ = 0;
     } else {
       const Vec3 v1 = separation(current_boid);
       const Vec3 v2 = cohesion(current_boid);
       const Vec3 v3 = alignment(current_boid);
-      const Vec3 v4 = maintainHeight(current_boid, preferred_height_, 1000);
+      const Vec3 v4 =
+          maintainHeight(current_boid, preferred_height_, height_factor_);
 
       bounce(current_boid);
       current_boid.updateBoidVelocity(v1 + v2 + v3 + v4, max_speed_);
@@ -285,7 +277,8 @@ void Swarm::updateSwarm(Boid& predator) {
     }
   }
 
-  for (auto it = boids_to_remove.rbegin(); it != boids_to_remove.rend(); ++it) {
+  for (std::vector<int>::reverse_iterator it = boids_to_remove.rbegin();
+       it != boids_to_remove.rend(); ++it) {
     boids_.erase(boids_.begin() + static_cast<int>(*it));
     --size_;
   }

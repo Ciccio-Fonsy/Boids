@@ -42,11 +42,11 @@ inline void handleEvents(sf::RenderWindow& window) {
 }
 
 inline void updateSimulation(Predator& predator, Swarm& swarm, int& t,
-                             const std::string& filename) {
+                             int print_period, const std::string& filename) {
   predator.updatePredator(swarm);
-  swarm.updateSwarm(predator);
+  swarm.updateSwarm();
 
-  if (t % 100 == 0) { printStatistics(swarm, t, filename); }
+  if (t % print_period == 0) { printStatistics(swarm, t, filename); }
   ++t;
 }
 } // namespace boids

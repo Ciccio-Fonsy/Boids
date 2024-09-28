@@ -12,6 +12,7 @@ class Predator : public Boid {
   const double attack_range_;
   const double attack_speed_;
   const double preferred_height_;
+  const double height_factor_;
   const Vec3   screen_;
   const Vec3   wind_;
   const bool   toroidal_;
@@ -31,6 +32,7 @@ class Predator : public Boid {
   double      attack_range() const;
   double      attack_speed() const;
   double      preferred_height() const;
+  double      height_factor() const;
   const Vec3& screen() const;
   const Vec3& wind() const;
   bool        toroidal() const;
@@ -51,6 +53,8 @@ inline double Predator::attack_range() const { return attack_range_; }
 inline double Predator::attack_speed() const { return attack_speed_; }
 
 inline double Predator::preferred_height() const { return preferred_height_; }
+
+inline double Predator::height_factor() const { return height_factor_; }
 
 inline const Vec3& Predator::screen() const { return screen_; }
 

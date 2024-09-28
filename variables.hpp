@@ -27,14 +27,39 @@ struct SwarmVariables {
   double cohesion_factor   = 0.00005;
   double alignment_factor  = 0.005;
   double fear_factor       = 0.05;
+  double height_factor     = 0.0005;
 };
 
 struct ConversionFactors {
-  int speed_k = 100;
-  int separation_k = 1000;
-  int cohesion_k = 1000000;
-  int alignment_k = 10000;
-  int fear_k = 1000;
+  static const double speed_k;
+  static const double separation_k;
+  static const double cohesion_k;
+  static const double alignment_k;
+  static const double fear_k;
+  static const double height_k;
+};
+
+struct LimitValues {
+  static const int size_lower;
+  static const int size_upper;
+
+  static const int wingspan_lower;
+  static const int wingspan_upper;
+
+  static const double min_distance_upper;
+  static const double sight_distance_upper;
+
+  static const double factors_lower;
+  static const double factors_upper;
+
+  static const double speed_lower;
+  static const double speed_upper;
+
+  static const double windspeed_lower;
+  static const double windspeed_upper;
+
+  static const double attack_range_lower;
+  static const double attack_range_upper;
 };
 } // namespace boids
 

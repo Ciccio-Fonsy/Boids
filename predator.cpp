@@ -66,6 +66,7 @@ Predator::Predator()
     , attack_range_()
     , attack_speed_()
     , preferred_height_(100)
+    , height_factor_(0.01)
     , screen_(Vec3(600, 300, 300))
     , wind_()
     , toroidal_() {}
@@ -75,6 +76,7 @@ Predator::Predator(const Predator& other)
     , attack_range_(other.attack_range_)
     , attack_speed_(other.attack_speed_)
     , preferred_height_(other.preferred_height_)
+    , height_factor_(other.height_factor_)
     , screen_(other.screen_)
     , wind_(other.wind_)
     , toroidal_(other.toroidal_) {}
@@ -85,6 +87,7 @@ Predator::Predator(const GlobalVariables&   global_vars,
     , attack_range_(predator_vars.attack_range)
     , attack_speed_(predator_vars.attack_speed)
     , preferred_height_(global_vars.screen.z() / 3)
+    , height_factor_(0.01)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
     , toroidal_(global_vars.toroidal_bool) {
@@ -102,8 +105,8 @@ void Predator::updatePredator(Swarm& swarm) {
   if (swarm.cooldown() >= 1000) {
     attack(swarm);
   } else {
-    updateBoidVelocity(maintainHeight(*this, preferred_height_, 100),
-                       attack_speed_ * 0.6);
+    updateBoidVelocity(maintainHeight(*this, preferred_height_, height_factor_),
+                       attack_speed_ / 2);
   }
   updateBoidVelocity(Vec3(), attack_speed_);
   updateBoid(wind_, wind_.norm() + attack_speed_);

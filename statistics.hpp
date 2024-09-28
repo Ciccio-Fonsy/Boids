@@ -51,13 +51,13 @@ inline double stdDev(const std::vector<double>& values, double mean_value) {
 }
 
 inline Vec3 maintainHeight(Boid& boid, double target_height,
-                           double division_factor) {
-  Vec3 correction(0, 0, 0);
+                           double height_factor) {
+  Vec3 correction;
   if (std::abs(boid.position().z() - target_height) != 0
       && (boid.position().z() - target_height) * boid.velocity().z() > 0) {
     correction.set_z(target_height - boid.position().z());
   }
-  return correction / division_factor;
+  return correction * height_factor;
 }
 } // namespace boids
 

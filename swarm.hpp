@@ -21,7 +21,8 @@ class Swarm {
   const double      cohesion_factor_;
   const double      alignment_factor_;
   const double      fear_factor_;
-  Boid              predator_;
+  const double      height_factor_;
+  const Boid*       predator_;
   const Vec3        screen_;
   const Vec3        wind_;
   const bool        toroidal_;
@@ -40,7 +41,7 @@ class Swarm {
   Swarm();
   Swarm(const Swarm& other);
   Swarm(const GlobalVariables& global_vars, const SwarmVariables& swarm_vars,
-        const Boid& predator);
+        const Boid* predator);
 
   Boid&       operator[](int i);
   const Boid& operator[](int i) const;
@@ -55,12 +56,13 @@ class Swarm {
   double      cohesion_factor() const;
   double      alignment_factor() const;
   double      fear_factor() const;
+  double      height_factor() const;
   const Vec3& screen() const;
   const Vec3& wind() const;
   bool        toroidal() const;
   int         cooldown() const;
 
-  void updateSwarm(Boid& predator);
+  void updateSwarm();
 };
 
 inline bool Swarm::isWithinRange(const Boid& b1, const Boid& b2,
@@ -99,6 +101,8 @@ inline double Swarm::cohesion_factor() const { return cohesion_factor_; }
 inline double Swarm::alignment_factor() const { return alignment_factor_; }
 
 inline double Swarm::fear_factor() const { return fear_factor_; }
+
+inline double Swarm::height_factor() const { return height_factor_; }
 
 inline const Vec3& Swarm::screen() const { return screen_; }
 
