@@ -62,6 +62,8 @@ class Swarm {
   bool        toroidal() const;
   int         cooldown() const;
 
+  void set_predator(const Boid* predator);
+
   void updateSwarm();
 };
 
@@ -111,6 +113,8 @@ inline const Vec3& Swarm::wind() const { return wind_; }
 inline bool Swarm::toroidal() const { return toroidal_; }
 
 inline int Swarm::cooldown() const { return cooldown_; }
+
+inline void Swarm::set_predator(const Boid* predator) { predator_ = predator; }
 } // namespace boids
 
 #endif // SWARM_HPP

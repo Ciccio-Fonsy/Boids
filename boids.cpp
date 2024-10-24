@@ -26,8 +26,13 @@ int main() {
   boids::drawWindows(window_top, window_side);
   boids::initializeShapes(swarm_vars.wingspan, boid_shape, predator_shape);
 
-  boids::Predator predator(global_vars, predator_vars);
-  boids::Swarm    swarm(global_vars, swarm_vars, &predator);
+  std::unique_ptr<boids::Predator> predator = nullptr;
+
+  if (global_vars.predator_bool) {
+    predator = std::make_unique<boids::Predator>(global_vars, predator_vars);
+  }
+
+  boids::Swarm swarm(global_vars, swarm_vars, predator.get());
 
   int t = 0;
 
@@ -41,16 +46,16 @@ int main() {
     boids::handleEvents(window_side);
 
     window_top.clear();
-    boids::drawBoids(swarm, predator, window_top, 0, boid_shape,
+    boids::drawBoids(predator.get(), swarm, window_top, 0, boid_shape,
                      predator_shape);
     window_top.display();
 
     window_side.clear();
-    boids::drawBoids(swarm, predator, window_side, 1, boid_shape,
+    boids::drawBoids(predator.get(), swarm, window_side, 1, boid_shape,
                      predator_shape);
     window_side.display();
 
-    boids::updateSimulation(predator, swarm, t, print_period, "boids_save.txt");
+    boids::updateSimulation(predator.get(), swarm, t, print_period, "boids_save.txt");
 
     float frame_time = clock.getElapsedTime().asSeconds();
     if (frame_time < target_frame_time) {

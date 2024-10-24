@@ -15,8 +15,9 @@
 #include <random>
 
 namespace boids {
-void casualParameters(PredatorVariables& predator_vars,
-                      SwarmVariables& swarm_vars, double& windspeed) {
+void casualParameters(GlobalVariables&   global_vars,
+                      PredatorVariables& predator_vars,
+                      SwarmVariables&    swarm_vars) {
   std::random_device rd;
   std::mt19937       gen(rd());
 
@@ -40,27 +41,28 @@ void casualParameters(PredatorVariables& predator_vars,
   swarm_vars.fear_factor       = dis3(gen) / ConversionFactors::fear_k;
   swarm_vars.height_factor     = dis3(gen) / ConversionFactors::height_k;
 
-  std::uniform_real_distribution<> dis4(LimitValues::speed_lower,
-                                        LimitValues::speed_upper);
-  swarm_vars.max_speed       = dis4(gen) / ConversionFactors::speed_k;
-  predator_vars.attack_speed = dis4(gen) / ConversionFactors::speed_k;
+  if (global_vars.wind_bool) {
+    std::uniform_real_distribution<> dis4(LimitValues::windspeed_lower,
+                                          LimitValues::windspeed_upper);
+    global_vars.windspeed = dis4(gen) / ConversionFactors::speed_k;
+  }
 
-  std::uniform_real_distribution<> dis5(LimitValues::windspeed_lower,
-                                        LimitValues::windspeed_upper);
-  windspeed = dis5(gen) / ConversionFactors::speed_k;
+  if (global_vars.predator_bool) {
+    std::uniform_real_distribution<> dis5(LimitValues::speed_lower,
+                                          LimitValues::speed_upper);
+    swarm_vars.max_speed       = dis5(gen) / ConversionFactors::speed_k;
+    predator_vars.attack_speed = dis5(gen) / ConversionFactors::speed_k;
 
-  std::uniform_real_distribution<> dis6(LimitValues::attack_range_lower,
-                                        LimitValues::attack_range_upper);
-  predator_vars.attack_range = dis6(gen);
+    std::uniform_real_distribution<> dis6(LimitValues::attack_range_lower,
+                                          LimitValues::attack_range_upper);
+    predator_vars.attack_range = dis6(gen);
+  }
 }
 
 void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars) {
   std::string input;
-  bool        windbool;
-  double      windspeed = 0.02;
-  bool        manually;
 
   std::cout << "Enter swarm size (2 ~ " << LimitValues::size_upper << "): ";
   int size;
@@ -73,7 +75,13 @@ void initializeParameters(GlobalVariables&   global_vars,
 
   std::cout << "Enable wind? [y/N]: ";
   std::cin >> input;
-  windbool = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+  global_vars.wind_bool =
+      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+
+  std::cout << "Enable predator? [y/N]: ";
+  std::cin >> input;
+  global_vars.predator_bool =
+      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
 
   std::cout << "Enable toroidal space? (Recommended with wind enabled) [y/N]: ";
   std::cin >> input;
@@ -82,7 +90,8 @@ void initializeParameters(GlobalVariables&   global_vars,
 
   std::cout << "Insert parameters manually? [y/N]: ";
   std::cin >> input;
-  manually = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+  bool manually =
+      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
 
   if (manually) {
     std::cout << "Enter wingspan (" << LimitValues::wingspan_lower << " ~ "
@@ -187,39 +196,41 @@ void initializeParameters(GlobalVariables&   global_vars,
       swarm_vars.sight_distance = sight_distance;
     }
 
-    std::cout << "Enter predator attack speed (" << LimitValues::speed_lower
-              << " ~ " << LimitValues::speed_upper << "): ";
-    double attack_speed;
-    std::cin >> attack_speed;
-    if (attack_speed < LimitValues::speed_lower
-        || attack_speed > LimitValues::speed_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      predator_vars.attack_speed = attack_speed / ConversionFactors::speed_k;
-    }
-
-    std::cout << "Enter predator attack range ("
-              << LimitValues::attack_range_lower << " ~ "
-              << LimitValues::attack_range_upper << "): ";
-    double attack_range;
-    std::cin >> attack_range;
-    if (attack_range <= LimitValues::attack_range_lower
-        || attack_range > LimitValues::attack_range_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      predator_vars.attack_range = attack_range;
-    }
-
-    if (windbool) {
-      std::cout << "Enter wind speed (" << LimitValues::windspeed_lower << " ~ "
-                << LimitValues::windspeed_upper << "): ";
-      double windspeed_input;
-      std::cin >> windspeed_input;
-      if (windspeed_input < LimitValues::windspeed_lower
-          || windspeed_input > LimitValues::windspeed_upper) {
+    if (global_vars.predator_bool) {
+      std::cout << "Enter predator attack speed (" << LimitValues::speed_lower
+                << " ~ " << LimitValues::speed_upper << "): ";
+      double attack_speed;
+      std::cin >> attack_speed;
+      if (attack_speed < LimitValues::speed_lower
+          || attack_speed > LimitValues::speed_upper) {
         std::cout << "This value is not accetable, setted to default value\n";
       } else {
-        windspeed = windspeed_input / ConversionFactors::speed_k;
+        predator_vars.attack_speed = attack_speed / ConversionFactors::speed_k;
+      }
+
+      std::cout << "Enter predator attack range ("
+                << LimitValues::attack_range_lower << " ~ "
+                << LimitValues::attack_range_upper << "): ";
+      double attack_range;
+      std::cin >> attack_range;
+      if (attack_range <= LimitValues::attack_range_lower
+          || attack_range > LimitValues::attack_range_upper) {
+        std::cout << "This value is not accetable, setted to default value\n";
+      } else {
+        predator_vars.attack_range = attack_range;
+      }
+    }
+
+    if (global_vars.wind_bool) {
+      std::cout << "Enter wind speed (" << LimitValues::windspeed_lower << " ~ "
+                << LimitValues::windspeed_upper << "): ";
+      double windspeed;
+      std::cin >> windspeed;
+      if (windspeed < LimitValues::windspeed_lower
+          || windspeed > LimitValues::windspeed_upper) {
+        std::cout << "This value is not accetable, setted to default value\n";
+      } else {
+        global_vars.windspeed = windspeed / ConversionFactors::speed_k;
       }
     }
   } else {
@@ -229,7 +240,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     std::cin >> input;
     casual = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
 
-    if (casual) { casualParameters(predator_vars, swarm_vars, windspeed); }
+    if (casual) { casualParameters(global_vars, predator_vars, swarm_vars); }
   }
 
   std::cout << "Parameters setted at values:\n";
@@ -253,12 +264,16 @@ void initializeParameters(GlobalVariables&   global_vars,
             << swarm_vars.height_factor * ConversionFactors::height_k
             << std::endl;
   std::cout << "Sight distance:    " << swarm_vars.sight_distance << std::endl;
-  std::cout << "Attack speed:      "
-            << predator_vars.attack_speed * ConversionFactors::speed_k
-            << std::endl;
-  std::cout << "Attack range:      " << predator_vars.attack_range << std::endl;
 
-  if (windbool) {
+  if (global_vars.predator_bool) {
+    std::cout << "Attack speed:      "
+              << predator_vars.attack_speed * ConversionFactors::speed_k
+              << std::endl;
+    std::cout << "Attack range:      " << predator_vars.attack_range
+              << std::endl;
+  }
+
+  if (global_vars.wind_bool) {
     const double wind_horizontal = 50;
     const double wind_vertical   = 5;
 
@@ -267,9 +282,10 @@ void initializeParameters(GlobalVariables&   global_vars,
     std::uniform_real_distribution<> dis_x(-wind_horizontal, wind_horizontal);
     std::uniform_real_distribution<> dis_y(-wind_horizontal, wind_horizontal);
     std::uniform_real_distribution<> dis_z(-wind_vertical, wind_vertical);
-    global_vars.wind =
-        Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize() * windspeed;
-    std::cout << "Wind Speed:        " << windspeed * ConversionFactors::speed_k
+    global_vars.wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize()
+                     * global_vars.windspeed;
+    std::cout << "Wind Speed:        "
+              << global_vars.windspeed * ConversionFactors::speed_k
               << std::endl;
     std::cout << "Wind:              "
               << (global_vars.wind * ConversionFactors::speed_k).toString()
@@ -309,7 +325,7 @@ void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
   predator_shape.setFillColor(sf::Color::Red);
 }
 
-void drawBoids(const Swarm& swarm, const Predator& predator,
+void drawBoids(const Predator* predator, const Swarm& swarm,
                sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
                sf::CircleShape& predator_shape) {
   if (plane > 1) { throw std::out_of_range("index out of range"); }
@@ -337,20 +353,22 @@ void drawBoids(const Swarm& swarm, const Predator& predator,
     window.draw(boid_shape);
   }
 
-  sf::Vector2<double> predator_position;
-  switch (plane) {
-  case 0:
-    predator_position.x = predator.position().x() / screen.x() * width;
-    predator_position.y = predator.position().y() / screen.y() * height;
-    break;
-  case 1:
-    predator_position.x = predator.position().x() / screen.x() * width;
-    predator_position.y = predator.position().z() / screen.z() * height;
-    break;
-  }
+  if (predator) {
+    sf::Vector2<double> predator_position;
+    switch (plane) {
+    case 0:
+      predator_position.x = predator->position().x() / screen.x() * width;
+      predator_position.y = predator->position().y() / screen.y() * height;
+      break;
+    case 1:
+      predator_position.x = predator->position().x() / screen.x() * width;
+      predator_position.y = predator->position().z() / screen.z() * height;
+      break;
+    }
 
-  predator_shape.setPosition(sf::Vector2f(predator_position));
-  window.draw(predator_shape);
+    predator_shape.setPosition(sf::Vector2f(predator_position));
+    window.draw(predator_shape);
+  }
 }
 
 void saveStatisticsOnFile(const std::string&       filename,
@@ -359,32 +377,38 @@ void saveStatisticsOnFile(const std::string&       filename,
                           const SwarmVariables&    swarm_vars) {
   std::ofstream file(filename, std::ios::app);
   if (file.is_open()) {
+    file << "\nsize              = " << swarm_vars.size
+         << "\nwingspan          = " << swarm_vars.wingspan
+         << "\nmax speed         = "
+         << swarm_vars.max_speed * ConversionFactors::speed_k
+         << "\nmin distance      = " << swarm_vars.min_distance
+         << "\nseparation factor = "
+         << swarm_vars.separation_factor * ConversionFactors::separation_k
+         << "\ncohesion factor   = "
+         << swarm_vars.cohesion_factor * ConversionFactors::cohesion_k
+         << "\nalignment factor  = "
+         << swarm_vars.alignment_factor * ConversionFactors::alignment_k
+         << "\nfear factor       = "
+         << swarm_vars.fear_factor * ConversionFactors::fear_k
+         << "\nheight factor     = "
+         << swarm_vars.height_factor * ConversionFactors::height_k
+         << "\nsight distance    = " << swarm_vars.sight_distance
+         << "\npredator          = " << global_vars.predator_bool;
+    if (global_vars.predator_bool) {
+      file << "\nattack speed      = "
+           << predator_vars.attack_speed * ConversionFactors::speed_k
+           << "\nattack range      = " << predator_vars.attack_range;
+    }
+    file << "\nwind              = " << global_vars.wind_bool;
+    if (global_vars.wind_bool) {
+      file << "\nwind speed        = "
+           << global_vars.windspeed * ConversionFactors::speed_k
+           << "\nwind vector       = "
+           << (global_vars.wind * ConversionFactors::speed_k).toString();
+    }
     file
-        << "\nsize              = " << swarm_vars.size
-        << "\nwingspan          = " << swarm_vars.wingspan
-        << "\nmax speed         = "
-        << swarm_vars.max_speed * ConversionFactors::speed_k
-        << "\nmin distance      = " << swarm_vars.min_distance
-        << "\nseparation factor = "
-        << swarm_vars.separation_factor * ConversionFactors::separation_k
-        << "\ncohesion factor   = "
-        << swarm_vars.cohesion_factor * ConversionFactors::cohesion_k
-        << "\nalignment factor  = "
-        << swarm_vars.alignment_factor * ConversionFactors::alignment_k
-        << "\nfear factor       = "
-        << swarm_vars.fear_factor * ConversionFactors::fear_k
-        << "\nheight factor     = "
-        << swarm_vars.height_factor * ConversionFactors::height_k
-        << "\nsight distance    = " << swarm_vars.sight_distance
-        << "\nattack speed      = "
-        << predator_vars.attack_speed * ConversionFactors::speed_k
-        << "\nattack range      = " << predator_vars.attack_range
-        << "\nwind speed        = "
-        << global_vars.wind.norm() * ConversionFactors::speed_k
-        << "\nwind              = "
-        << (global_vars.wind * ConversionFactors::speed_k).toString()
-        << "\ntoroidal          = " << global_vars.toroidal_bool << "\n"
-        << "\n     t  mean_distance  distance_std_dev  mean_velocity  velocity_std_dev  n_boids"
+        << "\ntoroidal          = " << global_vars.toroidal_bool
+        << "\n\n     t  mean_distance  distance_std_dev  mean_velocity  velocity_std_dev  n_boids"
         << std::endl;
     file.close();
   } else {

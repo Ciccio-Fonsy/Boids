@@ -258,7 +258,7 @@ void Swarm::updateSwarm() {
   for (int i = 0; i < size_; ++i) {
     Boid& current_boid = boids_[static_cast<std::size_t>(i)];
 
-    if (isWithinRange(*predator_, current_boid, wingspan_)) {
+    if (predator_ && isWithinRange(*predator_, current_boid, wingspan_)) {
       boids_to_remove.push_back(i);
       cooldown_ = 0;
     } else {
@@ -270,7 +270,11 @@ void Swarm::updateSwarm() {
 
       bounce(current_boid);
       current_boid.updateBoidVelocity(v1 + v2 + v3 + v4, max_speed_);
-      current_boid.updateBoidVelocity(fear(current_boid), max_speed_);
+
+      if (predator_) {
+        current_boid.updateBoidVelocity(fear(current_boid), max_speed_);
+      }
+
       current_boid.updateBoid(wind_, wind_.norm() + max_speed_);
 
       border(screen_, toroidal_, current_boid);

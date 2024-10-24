@@ -17,15 +17,16 @@
 #include <vector>
 
 namespace boids {
-void casualParameters(PredatorVariables& predator_vars,
-                      SwarmVariables& swarm_vars, double& windspeed);
+void casualParameters(GlobalVariables&   global_vars,
+                      PredatorVariables& predator_vars,
+                      SwarmVariables&    swarm_vars);
 void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars);
 void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz);
 void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
                       sf::CircleShape& predator_shape);
-void drawBoids(const Swarm& swarm, const Predator& predator,
+void drawBoids(const Predator* predator, const Swarm& swarm,
                sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
                sf::CircleShape& predator_shape);
 void printStatistics(Swarm& swarm, int t, const std::string& filename);
@@ -41,9 +42,9 @@ inline void handleEvents(sf::RenderWindow& window) {
   }
 }
 
-inline void updateSimulation(Predator& predator, Swarm& swarm, int& t,
+inline void updateSimulation(Predator* predator, Swarm& swarm, int& t,
                              int print_period, const std::string& filename) {
-  predator.updatePredator(swarm);
+  if (predator) { predator->updatePredator(swarm); }
   swarm.updateSwarm();
 
   if (t % print_period == 0) { printStatistics(swarm, t, filename); }

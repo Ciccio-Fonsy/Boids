@@ -5,9 +5,12 @@
 
 namespace boids {
 struct GlobalVariables {
-  Vec3 screen        = Vec3(600, 300, 300);
-  Vec3 wind          = Vec3(0, 0, 0);
-  bool toroidal_bool = false;
+  Vec3   screen        = Vec3(600, 300, 300);
+  double windspeed     = 0.2;
+  Vec3   wind          = Vec3(0, 0, 0);
+  bool   wind_bool     = false;
+  bool   predator_bool = false;
+  bool   toroidal_bool = false;
 };
 
 struct PredatorVariables {
