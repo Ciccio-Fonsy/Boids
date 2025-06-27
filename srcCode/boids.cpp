@@ -1,7 +1,7 @@
 #include "boid.hpp"
 #include "functions.hpp"
 #include "predator.hpp"
-#include "statistics.hpp"
+#include "prey.hpp"
 #include "swarm.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"

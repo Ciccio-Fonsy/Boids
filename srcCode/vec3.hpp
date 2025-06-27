@@ -20,22 +20,24 @@ class Vec3 {
   void   set_y(double y);
   void   set_z(double z);
 
-  bool    operator==(const Vec3& other) const;
-  bool    operator!=(const Vec3& other) const;
-  Vec3    operator+(const Vec3& other) const;
-  Vec3&   operator+=(const Vec3& other);
-  Vec3    operator-(const Vec3& other) const;
-  Vec3&   operator-=(const Vec3& other);
-  Vec3    operator*(double scalar) const;
-  Vec3&   operator*=(double scalar);
-  Vec3    operator/(double scalar) const;
-  Vec3&   operator/=(double scalar);
-  double  norm() const;
-  Vec3    normalize() const;
-  Vec3&   normalizeAssign();
-  double  dot(const Vec3& other) const;
-  Vec3    cross(const Vec3& other) const;
-  double  operator[](int i) const;
+  bool   operator==(const Vec3& other) const;
+  bool   operator!=(const Vec3& other) const;
+  Vec3   operator+(const Vec3& other) const;
+  Vec3&  operator+=(const Vec3& other);
+  Vec3   operator-(const Vec3& other) const;
+  Vec3&  operator-=(const Vec3& other);
+  Vec3   operator*(double scalar) const;
+  Vec3&  operator*=(double scalar);
+  Vec3   operator/(double scalar) const;
+  Vec3&  operator/=(double scalar);
+  double norm() const;
+  Vec3   normalize() const;
+  Vec3&  normalizeAssign();
+  double dot(const Vec3& other) const;
+  Vec3   cross(const Vec3& other) const;
+  Vec3   vecDistance(bool toroidal, const Vec3& other, const Vec3& width) const;
+  double distance(bool toroidal, const Vec3& other, const Vec3& width) const;
+  double operator[](int i) const;
   double& operator[](int i);
 
   std::string toString() const;
@@ -98,14 +100,51 @@ inline Vec3& Vec3::operator/=(double scalar) {
   return *this;
 }
 
+inline double Vec3::norm() const {
+  return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
+}
+
+inline Vec3 Vec3::normalize() const {
+  double n = norm();
+  if (n != 0) return Vec3(x_ / n, y_ / n, z_ / n);
+  return *this;
+}
+
+inline Vec3& Vec3::normalizeAssign() {
+  *this = normalize();
+  return *this;
+}
+
+inline double Vec3::dot(const Vec3& other) const {
+  return x_ * other.x_ + y_ * other.y_ + z_ * other.z_;
+}
+
+inline Vec3 Vec3::cross(const Vec3& other) const {
+  return Vec3(y_ * other.z_ - z_ * other.y_, z_ * other.x_ - x_ * other.z_,
+              x_ * other.y_ - y_ * other.x_);
+}
+
+inline double Vec3::distance(bool toroidal, const Vec3& other,
+                             const Vec3& width) const {
+  return vecDistance(toroidal, other, width).norm();
+}
+
 inline double Vec3::operator[](int i) const {
-  if (i < 0 || i > 2) { throw std::out_of_range("Index out of range"); }
-  return (i == 0) ? x_ : (i == 1) ? y_ : z_;
+  switch (i) {
+  case 0 : return x_;
+  case 1 : return y_;
+  case 2 : return z_;
+  default: throw std::out_of_range("Index out of range");
+  }
 }
 
 inline double& Vec3::operator[](int i) {
-  if (i < 0 || i > 2) { throw std::out_of_range("Index out of range"); }
-  return (i == 0) ? x_ : (i == 1) ? y_ : z_;
+  switch (i) {
+  case 0 : return x_;
+  case 1 : return y_;
+  case 2 : return z_;
+  default: throw std::out_of_range("Index out of range");
+  }
 }
 
 inline std::string Vec3::toString() const {

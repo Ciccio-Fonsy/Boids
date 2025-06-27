@@ -4,7 +4,7 @@
 #include "boid.hpp"
 #include "functions.hpp"
 #include "predator.hpp"
-#include "statistics.hpp"
+#include "prey.hpp"
 #include "swarm.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
@@ -125,42 +125,42 @@ TEST_CASE("Vec3 Cross Product") {
   CHECK(cross_v2 == boids::Vec3(-15.0, -2.0, 39.0));
 }
 
-TEST_CASE("Boid Default Constructor") {
-  boids::Boid b;
+TEST_CASE("Prey Default Constructor") {
+  boids::Prey b;
   CHECK(b.position() == boids::Vec3(0.0, 0.0, 0.0));
   CHECK(b.velocity() == boids::Vec3(0.0, 0.0, 0.0));
 }
 
-TEST_CASE("Boid Parameterized Constructor") {
+TEST_CASE("Prey Parameterized Constructor") {
   boids::Vec3 pos(1.0, 2.0, 3.0);
   boids::Vec3 vel(0.5, 0.5, 0.5);
-  boids::Boid b(pos, vel);
+  boids::Prey b(pos, vel);
 
   CHECK(b.position() == pos);
   CHECK(b.velocity() == vel);
 }
 
-TEST_CASE("Boid Copy Constructor") {
+TEST_CASE("Prey Copy Constructor") {
   boids::Vec3 pos(1.0, 2.0, 3.0);
   boids::Vec3 vel(0.5, 0.5, 0.5);
-  boids::Boid b1(pos, vel);
-  boids::Boid b2(b1);
+  boids::Prey b1(pos, vel);
+  boids::Prey b2(b1);
 
   CHECK(b2 == b1);
 }
 
-TEST_CASE("Boid Assignment Operator") {
+TEST_CASE("Prey Assignment Operator") {
   boids::Vec3 pos(1.0, 2.0, 3.0);
   boids::Vec3 vel(0.5, 0.5, 0.5);
-  boids::Boid b1(pos, vel);
-  boids::Boid b2;
+  boids::Prey b1(pos, vel);
+  boids::Prey b2;
 
   b2 = b1;
   CHECK(b2 == b1);
 }
 
-TEST_CASE("Boid Position and Velocity Setters") {
-  boids::Boid b;
+TEST_CASE("Prey Position and Velocity Setters") {
+  boids::Prey b;
   boids::Vec3 new_pos(1.0, 1.0, 1.0);
   boids::Vec3 new_vel(0.1, 0.2, 0.3);
 
@@ -171,10 +171,10 @@ TEST_CASE("Boid Position and Velocity Setters") {
   CHECK(b.velocity() == new_vel);
 }
 
-TEST_CASE("Boid Velocity Update with max_speed") {
+TEST_CASE("Prey Velocity Update with max_speed") {
   boids::Vec3 pos(0.0, 0.0, 0.0);
   boids::Vec3 vel(1.0, 1.0, 1.0);
-  boids::Boid b(pos, vel);
+  boids::Prey b(pos, vel);
 
   boids::Vec3 delta_v(1.0, 1.0, 1.0);
   double      max_speed = 2.0;
@@ -188,10 +188,10 @@ TEST_CASE("Boid Velocity Update with max_speed") {
   CHECK(b.velocity().z() == doctest::Approx(1.1547));
 }
 
-TEST_CASE("Boid Update with max_speed") {
+TEST_CASE("Prey Update with max_speed") {
   boids::Vec3 pos(0.0, 0.0, 0.0);
   boids::Vec3 vel(1.0, 1.0, 1.0);
-  boids::Boid b(pos, vel);
+  boids::Prey b(pos, vel);
 
   boids::Vec3 delta_v(0.5, 0.5, 0.5);
   double      max_speed = 2.0;
@@ -213,9 +213,9 @@ TEST_CASE("Border Handling: Toroidal and Bouncing") {
   boids::Vec3 screen(10.0, 10.0, 10.0);
 
   // Test 1: Toroidal wrapping
-  boids::Boid toroidalBoid(boids::Vec3(11.0, 11.0, 5.0),
+  boids::Prey toroidalBoid(boids::Vec3(11.0, 11.0, 5.0),
                            boids::Vec3(1.0, 1.0, 1.0));
-  boids::border(screen, true, toroidalBoid);
+  toroidalBoid.border(screen, true);
 
   CHECK(toroidalBoid.position().x() == doctest::Approx(1.0));
   CHECK(toroidalBoid.position().y() == doctest::Approx(1.0));
@@ -226,9 +226,9 @@ TEST_CASE("Border Handling: Toroidal and Bouncing") {
   CHECK(toroidalBoid.velocity().z() == doctest::Approx(1.0));
 
   // Test 2: Bouncing off the walls
-  boids::Boid bouncingBoid(boids::Vec3(11.0, 11.0, -1.0),
+  boids::Prey bouncingBoid(boids::Vec3(11.0, 11.0, -1.0),
                            boids::Vec3(1.0, 1.0, -2.0));
-  boids::border(screen, false, bouncingBoid);
+  bouncingBoid.border(screen, false);
 
   CHECK(bouncingBoid.position().x() == doctest::Approx(10.0));
   CHECK(bouncingBoid.position().y() == doctest::Approx(10.0));
@@ -245,13 +245,12 @@ TEST_CASE("vecDistance and distance: Toroidal and Non-Toroidal") {
   boids::Vec3 b(9.0, 9.0, 9.0);
 
   // Test 1: Non-Toroidal distance
-  CHECK(boids::vecDistance(false, a, b, width)
-        == boids::Vec3(-8.0, -8.0, -8.0));
-  CHECK(boids::distance(false, a, b, width) == doctest::Approx(13.8564));
+  CHECK(a.vecDistance(false, b, width) == boids::Vec3(-8.0, -8.0, -8.0));
+  CHECK(a.distance(false, b, width) == doctest::Approx(13.8564));
 
   // Test 2: Toroidal distance
-  CHECK(boids::vecDistance(true, a, b, width) == boids::Vec3(2.0, 2.0, -8.0));
-  CHECK(boids::distance(true, a, b, width) == doctest::Approx(8.48528));
+  CHECK(a.vecDistance(true, b, width) == boids::Vec3(2.0, 2.0, -8.0));
+  CHECK(a.distance(true, b, width) == doctest::Approx(8.48528));
 }
 
 TEST_CASE("mean and stdDev: Statistical functions") {
@@ -261,15 +260,14 @@ TEST_CASE("mean and stdDev: Statistical functions") {
   CHECK(boids::mean(values) == doctest::Approx(3.0));
 
   // Test 2: Standard Deviation
-  double mean_value = boids::mean(values);
-  CHECK(boids::stdDev(values, mean_value) == doctest::Approx(1.41421356));
+  CHECK(boids::stdDev(values) == doctest::Approx(1.41421356));
 }
 
 TEST_CASE("maintainHeight: Height adjustment") {
-  boids::Boid boid(boids::Vec3(1.0, 1.0, 5.0), boids::Vec3(0.0, 0.0, 1.0));
+  boids::Prey boid(boids::Vec3(1.0, 1.0, 5.0), boids::Vec3(0.0, 0.0, 1.0));
 
   // Test: Boid is moving away from the target height
-  boids::Vec3 correction = boids::maintainHeight(boid, 3.0, 2.0);
+  boids::Vec3 correction = boid.maintainHeight(3.0, 2.0);
   CHECK(correction.z()
         == doctest::Approx(-4.0)); // Moving down to the target height
 }
@@ -317,7 +315,7 @@ TEST_CASE("Conversion Factors Initialization") {
 TEST_CASE("Swarm Initialization") {
   boids::GlobalVariables global_vars;
   boids::SwarmVariables  swarm_vars;
-  boids::Boid            predator;
+  boids::Predator        predator;
 
   boids::Swarm swarm(global_vars, swarm_vars, &predator);
 
@@ -331,7 +329,7 @@ TEST_CASE("Swarm Initialization") {
 TEST_CASE("Swarm Boid Access") {
   boids::GlobalVariables global_vars;
   boids::SwarmVariables  swarm_vars;
-  boids::Boid            predator;
+  boids::Predator        predator;
 
   boids::Swarm swarm(global_vars, swarm_vars, &predator);
 
@@ -343,7 +341,7 @@ TEST_CASE("Swarm Boid Access") {
 TEST_CASE("Swarm Update") {
   boids::GlobalVariables global_vars;
   boids::SwarmVariables  swarm_vars;
-  boids::Boid            predator;
+  boids::Predator        predator;
 
   boids::Swarm swarm(global_vars, swarm_vars, &predator);
 

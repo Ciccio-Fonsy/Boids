@@ -1,7 +1,7 @@
 #include "predator.hpp"
 
 #include "boid.hpp"
-#include "statistics.hpp"
+#include "prey.hpp"
 #include "swarm.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
@@ -35,28 +35,28 @@ void Predator::Init() {
   }
 }
 
-const Boid* Predator::findPrey(const Swarm& swarm) const {
-  const Boid* nearest_prey     = nullptr;
+const Prey* Predator::findPrey(const Swarm& swarm) const {
+  const Prey* nearest_prey     = nullptr;
   double      nearest_distance = screen_.norm();
 
   for (int i = 0; i < swarm.size(); ++i) {
-    const Boid&  current_boid = swarm[i];
+    const Prey&  current_prey = swarm[i];
     const double dist =
-        distance(toroidal_, current_boid.position(), position(), screen_);
+        current_prey.position().distance(toroidal_, position(), screen_);
     if (dist < nearest_distance && dist <= attack_range_) {
       nearest_distance = dist;
-      nearest_prey     = &current_boid;
+      nearest_prey     = &current_prey;
     }
   }
   return nearest_prey;
 }
 
 void Predator::attack(Swarm& swarm) {
-  const Boid* prey = findPrey(swarm);
+  const Prey* prey = findPrey(swarm);
   if (prey) {
     Vec3 prey_position = prey->position();
     Vec3 direction_to_prey =
-        vecDistance(toroidal_, prey_position, position(), screen_).normalize();
+        prey_position.vecDistance(toroidal_, position(), screen_).normalize();
     set_velocity(direction_to_prey * attack_speed_);
   }
 }
@@ -96,13 +96,13 @@ void Predator::updatePredator(Swarm& swarm) {
     attack(swarm);
   } else {
     ++cooldown_;
-    
-    updateBoidVelocity(maintainHeight(*this, preferred_height_, height_factor_),
+
+    updateBoidVelocity(maintainHeight(preferred_height_, height_factor_),
                        attack_speed_ / 2);
   }
   updateBoidVelocity(Vec3(), attack_speed_);
   updateBoid(wind_, wind_.norm() + attack_speed_);
 
-  border(screen_, toroidal_, *this);
+  border(screen_, toroidal_);
 }
 } // namespace boids

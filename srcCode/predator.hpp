@@ -2,7 +2,7 @@
 #define PREDATOR_HPP
 
 #include "boid.hpp"
-#include "statistics.hpp"
+#include "prey.hpp"
 #include "swarm.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
@@ -19,7 +19,7 @@ class Predator : public Boid {
   int          cooldown_;
 
   void        Init();
-  const Boid* findPrey(const Swarm& swarm) const;
+  const Prey* findPrey(const Swarm& swarm) const;
   void        attack(Swarm& swarm);
 
  public:
@@ -36,7 +36,7 @@ class Predator : public Boid {
   bool        toroidal() const;
   int         cooldown() const;
 
-  void reset_cooldown();
+  void resetCooldown();
   void updatePredator(Swarm& swarm);
 };
 
@@ -56,7 +56,7 @@ inline bool Predator::toroidal() const { return toroidal_; }
 
 inline int Predator::cooldown() const { return cooldown_; }
 
-inline void Predator::reset_cooldown() { cooldown_ = 0; }
+inline void Predator::resetCooldown() { cooldown_ = 0; }
 } // namespace boids
 
 #endif // PREDATOR_HPP

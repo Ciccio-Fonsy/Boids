@@ -2,7 +2,7 @@
 #define SWARM_HPP
 
 #include "boid.hpp"
-#include "statistics.hpp"
+#include "prey.hpp"
 #include "variables.hpp"
 #include "vec3.hpp"
 
@@ -10,7 +10,7 @@
 
 namespace boids {
 class Swarm {
-  std::vector<Boid> boids_;
+  std::vector<Prey> preys_;
   int               size_;
   const double      wingspan_;
   const double      max_speed_;
@@ -22,27 +22,28 @@ class Swarm {
   const double      alignment_factor_;
   const double      fear_factor_;
   const double      height_factor_;
-  const Boid*       predator_;
   const Vec3        screen_;
   const Vec3        wind_;
   const bool        toroidal_;
 
+  Boid* predator_;
+
   bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
 
   void Init();
-  void bounce(Boid& b);
-  Vec3 separation(const Boid& b) const;
-  Vec3 cohesion(const Boid& b) const;
-  Vec3 alignment(const Boid& b) const;
-  Vec3 fear(const Boid& b) const;
+  void bounce(Prey& b);
+  Vec3 separation(const Prey& b) const;
+  Vec3 cohesion(const Prey& b) const;
+  Vec3 alignment(const Prey& b) const;
+  Vec3 fear(const Prey& b) const;
 
  public:
   Swarm();
   Swarm(const GlobalVariables& global_vars, const SwarmVariables& swarm_vars,
-        const Boid* predator);
+        Boid* predator);
 
-  Boid&       operator[](int i);
-  const Boid& operator[](int i) const;
+  Prey&       operator[](int i);
+  const Prey& operator[](int i) const;
 
   int         size() const;
   double      wingspan() const;
@@ -59,26 +60,24 @@ class Swarm {
   const Vec3& wind() const;
   bool        toroidal() const;
 
-  void set_predator(const Boid* predator);
-
   void updateSwarm();
 };
 
 inline bool Swarm::isWithinRange(const Boid& b1, const Boid& b2,
                                  double range) const {
-  return distance(toroidal_, b1.position(), b2.position(), screen_) <= range;
+  return b1.position().distance(toroidal_, b2.position(), screen_) <= range;
 }
 
-inline Boid& Swarm::operator[](int i) {
+inline Prey& Swarm::operator[](int i) {
   if (i < 0 || i >= size_) { throw std::out_of_range("Index out of range"); }
 
-  return boids_[static_cast<std::size_t>(i)];
+  return preys_[static_cast<std::size_t>(i)];
 }
 
-inline const Boid& Swarm::operator[](int i) const {
+inline const Prey& Swarm::operator[](int i) const {
   if (i < 0 || i >= size_) { throw std::out_of_range("Index out of range"); }
 
-  return boids_[static_cast<std::size_t>(i)];
+  return preys_[static_cast<std::size_t>(i)];
 }
 
 inline int Swarm::size() const { return static_cast<int>(size_); }
@@ -108,8 +107,6 @@ inline const Vec3& Swarm::screen() const { return screen_; }
 inline const Vec3& Swarm::wind() const { return wind_; }
 
 inline bool Swarm::toroidal() const { return toroidal_; }
-
-inline void Swarm::set_predator(const Boid* predator) { predator_ = predator; }
 } // namespace boids
 
 #endif // SWARM_HPP
