@@ -8,10 +8,7 @@ Vec3::Vec3()
     , y_()
     , z_() {}
 
-Vec3::Vec3(const Vec3& other)
-    : x_(other.x_)
-    , y_(other.y_)
-    , z_(other.z_) {}
+//Vec3::Vec3(const Vec3& other) = default;
 
 Vec3::Vec3(double x, double y, double z)
     : x_(x)
