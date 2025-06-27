@@ -184,11 +184,13 @@ Swarm::Swarm()
     , wind_()
     , toroidal_()
     , cooldown_() {
-  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
-
+  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
+  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
+  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
   Init();
 }
 
+/*
 Swarm::Swarm(const Swarm& other)
     : size_(other.size_)
     , wingspan_(other.wingspan_)
@@ -206,10 +208,15 @@ Swarm::Swarm(const Swarm& other)
     , wind_(other.wind_)
     , toroidal_(other.toroidal_)
     , cooldown_(other.cooldown_) {
-  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
+
+  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
+  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
+  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
+    
 
   Init();
 }
+*/
 
 Swarm::Swarm(const GlobalVariables& global_vars,
              const SwarmVariables& swarm_vars, const Boid* predator)
@@ -245,7 +252,9 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     throw std::invalid_argument("Sight distance must be greater than 0");
   }
 
-  for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
+  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
+  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
+  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
 
   Init();
 }
