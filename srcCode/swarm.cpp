@@ -5,6 +5,7 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
+#include <cassert>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -78,7 +79,8 @@ Vec3 Swarm::separation(const Boid& b) const {
   for (const Boid& other_boid : boids_) {
     const Vec3& other_position = other_boid.position();
 
-    if (other_boid != b && isWithinRange(other_boid, b, min_distance_)
+    if (other_boid != b
+        && isWithinRange(other_boid, b, min_distance_)
         && other_position != b_position) {
       const Vec3 separation_vector =
           vecDistance(toroidal_, other_position, b_position, screen_);
@@ -150,6 +152,7 @@ Vec3 Swarm::alignment(const Boid& b) const {
 }
 
 Vec3 Swarm::fear(const Boid& b) const {
+  assert(predator_ != nullptr);
   Vec3       evade_vector;
   const Vec3 distance_to_predator =
       vecDistance(toroidal_, b.position(), predator_->position(), screen_);
@@ -182,41 +185,11 @@ Swarm::Swarm()
     , predator_(nullptr)
     , screen_(Vec3(600, 300, 300))
     , wind_()
-    , toroidal_()
-    , cooldown_() {
-  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
-  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
-  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
-  Init();
-}
-
-/*
-Swarm::Swarm(const Swarm& other)
-    : size_(other.size_)
-    , wingspan_(other.wingspan_)
-    , max_speed_(other.max_speed_)
-    , min_distance_(other.min_distance_)
-    , sight_distance_(other.sight_distance_)
-    , preferred_height_(other.preferred_height_)
-    , separation_factor_(other.separation_factor_)
-    , cohesion_factor_(other.cohesion_factor_)
-    , alignment_factor_(other.alignment_factor_)
-    , fear_factor_(other.fear_factor_)
-    , height_factor_(other.height_factor_)
-    , predator_(other.predator_)
-    , screen_(other.screen_)
-    , wind_(other.wind_)
-    , toroidal_(other.toroidal_)
-    , cooldown_(other.cooldown_) {
-
-  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
-  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
-  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
-    
+    , toroidal_() {
+  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_));
 
   Init();
 }
-*/
 
 Swarm::Swarm(const GlobalVariables& global_vars,
              const SwarmVariables& swarm_vars, const Boid* predator)
@@ -234,8 +207,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , predator_(predator)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
-    , toroidal_(global_vars.toroidal_bool)
-    , cooldown_() {
+    , toroidal_(global_vars.toroidal_bool) {
   if (size_ <= 0) {
     throw std::invalid_argument("Swarm size must be greater than 0");
   }
@@ -252,16 +224,12 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     throw std::invalid_argument("Sight distance must be greater than 0");
   }
 
-  //for (int i = 0; i < size_; ++i) { boids_.push_back(Boid()); }
-  //MILA: uso il costruttore di std::vector per inizializzare il vettore con un numero specifico di oggetti Boid
-  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_)); 
+  boids_ = std::vector<Boid>(static_cast<std::size_t>(size_));
 
   Init();
 }
 
 void Swarm::updateSwarm() {
-  ++cooldown_;
-
   std::vector<int> boids_to_remove;
 
   for (int i = 0; i < size_; ++i) {
@@ -269,7 +237,7 @@ void Swarm::updateSwarm() {
 
     if (predator_ && isWithinRange(*predator_, current_boid, wingspan_)) {
       boids_to_remove.push_back(i);
-      cooldown_ = 0;
+      predator_->reset_cooldown();
     } else {
       const Vec3 v1 = separation(current_boid);
       const Vec3 v2 = cohesion(current_boid);

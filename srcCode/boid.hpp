@@ -10,7 +10,6 @@ class Boid {
 
  public:
   Boid();
-  Boid(const Boid& other);
   Boid(Vec3 position, Vec3 velocity);
 
   Vec3 position() const;
@@ -20,7 +19,6 @@ class Boid {
 
   bool  operator==(const Boid& other) const;
   bool  operator!=(const Boid& other) const;
-  Boid& operator=(const Boid& other);
 
   void updateBoidVelocity(Vec3 delta_v, double max_speed);
   void updateBoid(Vec3 delta_v, double max_speed);
@@ -44,14 +42,6 @@ inline bool Boid::operator==(const Boid& other) const {
 
 inline bool Boid::operator!=(const Boid& other) const {
   return !(*this == other);
-}
-
-inline Boid& Boid::operator=(const Boid& other) {
-  if (this != &other) {
-    position_ = other.position_;
-    velocity_ = other.velocity_;
-  }
-  return *this;
 }
 } // namespace boids
 

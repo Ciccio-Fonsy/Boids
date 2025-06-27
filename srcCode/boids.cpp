@@ -6,8 +6,11 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+
+//for e algoritmi lambda
 
 int main() {
   boids::GlobalVariables   global_vars;

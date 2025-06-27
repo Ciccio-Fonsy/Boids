@@ -16,6 +16,7 @@ class Predator : public Boid {
   const Vec3   screen_;
   const Vec3   wind_;
   const bool   toroidal_;
+  int          cooldown_;
 
   void        Init();
   const Boid* findPrey(const Swarm& swarm) const;
@@ -23,11 +24,8 @@ class Predator : public Boid {
 
  public:
   Predator();
-  Predator(const Predator& other);
   Predator(const GlobalVariables&   global_vars,
            const PredatorVariables& predator_vars);
-
-  Predator& operator=(const Predator& other);
 
   double      attack_range() const;
   double      attack_speed() const;
@@ -36,17 +34,11 @@ class Predator : public Boid {
   const Vec3& screen() const;
   const Vec3& wind() const;
   bool        toroidal() const;
+  int         cooldown() const;
 
+  void reset_cooldown();
   void updatePredator(Swarm& swarm);
 };
-
-inline Predator& Predator::operator=(const Predator& other) {
-  if (this != &other) {
-    set_position(other.position());
-    set_velocity(other.velocity());
-  }
-  return *this;
-}
 
 inline double Predator::attack_range() const { return attack_range_; }
 
@@ -61,6 +53,10 @@ inline const Vec3& Predator::screen() const { return screen_; }
 inline const Vec3& Predator::wind() const { return wind_; }
 
 inline bool Predator::toroidal() const { return toroidal_; }
+
+inline int Predator::cooldown() const { return cooldown_; }
+
+inline void Predator::reset_cooldown() { cooldown_ = 0; }
 } // namespace boids
 
 #endif // PREDATOR_HPP

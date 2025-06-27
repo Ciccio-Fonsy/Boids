@@ -17,6 +17,9 @@
 #include <vector>
 
 namespace boids {
+void casualParameters(GlobalVariables&   global_vars,
+                      PredatorVariables& predator_vars,
+                      SwarmVariables&    swarm_vars);
 void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars);

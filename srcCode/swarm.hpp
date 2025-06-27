@@ -26,7 +26,6 @@ class Swarm {
   const Vec3        screen_;
   const Vec3        wind_;
   const bool        toroidal_;
-  int               cooldown_;
 
   bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
 
@@ -39,7 +38,6 @@ class Swarm {
 
  public:
   Swarm();
-  //Swarm(const Swarm& other);
   Swarm(const GlobalVariables& global_vars, const SwarmVariables& swarm_vars,
         const Boid* predator);
 
@@ -60,7 +58,6 @@ class Swarm {
   const Vec3& screen() const;
   const Vec3& wind() const;
   bool        toroidal() const;
-  int         cooldown() const;
 
   void set_predator(const Boid* predator);
 
@@ -111,8 +108,6 @@ inline const Vec3& Swarm::screen() const { return screen_; }
 inline const Vec3& Swarm::wind() const { return wind_; }
 
 inline bool Swarm::toroidal() const { return toroidal_; }
-
-inline int Swarm::cooldown() const { return cooldown_; }
 
 inline void Swarm::set_predator(const Boid* predator) { predator_ = predator; }
 } // namespace boids

@@ -71,16 +71,6 @@ Predator::Predator()
     , wind_()
     , toroidal_() {}
 
-Predator::Predator(const Predator& other)
-    : Boid(other)
-    , attack_range_(other.attack_range_)
-    , attack_speed_(other.attack_speed_)
-    , preferred_height_(other.preferred_height_)
-    , height_factor_(other.height_factor_)
-    , screen_(other.screen_)
-    , wind_(other.wind_)
-    , toroidal_(other.toroidal_) {}
-
 Predator::Predator(const GlobalVariables&   global_vars,
                    const PredatorVariables& predator_vars)
     : Boid()
@@ -102,9 +92,11 @@ Predator::Predator(const GlobalVariables&   global_vars,
 }
 
 void Predator::updatePredator(Swarm& swarm) {
-  if (swarm.cooldown() >= 1000) {
+  if (cooldown_ >= 1000) {
     attack(swarm);
   } else {
+    ++cooldown_;
+    
     updateBoidVelocity(maintainHeight(*this, preferred_height_, height_factor_),
                        attack_speed_ / 2);
   }

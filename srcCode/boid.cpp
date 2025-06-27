@@ -7,10 +7,6 @@ Boid::Boid()
     : position_()
     , velocity_() {}
 
-Boid::Boid(const Boid& other)
-    : position_(other.position_)
-    , velocity_(other.velocity_) {}
-
 Boid::Boid(Vec3 position, Vec3 velocity)
     : position_(position)
     , velocity_(velocity) {}

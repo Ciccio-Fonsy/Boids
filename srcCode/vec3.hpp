@@ -11,12 +11,7 @@ class Vec3 {
 
  public:
   Vec3();
-  //Vec3(const Vec3& other);
   Vec3(double x, double y, double z);
-
-  //MILA: Usa i costruttori di copia e assegnazione di default
-  Vec3(const Vec3&) = default;
-  Vec3& operator=(const Vec3&) = default;
 
   double x() const;
   double y() const;
@@ -27,7 +22,6 @@ class Vec3 {
 
   bool    operator==(const Vec3& other) const;
   bool    operator!=(const Vec3& other) const;
-  //Vec3&   operator=(const Vec3& other);
   Vec3    operator+(const Vec3& other) const;
   Vec3&   operator+=(const Vec3& other);
   Vec3    operator-(const Vec3& other) const;
@@ -66,8 +60,6 @@ inline bool Vec3::operator==(const Vec3& other) const {
 inline bool Vec3::operator!=(const Vec3& other) const {
   return !(*this == other);
 }
-
-
 
 inline Vec3 Vec3::operator+(const Vec3& other) const {
   return Vec3(x_ + other.x_, y_ + other.y_, z_ + other.z_);
@@ -117,8 +109,13 @@ inline double& Vec3::operator[](int i) {
 }
 
 inline std::string Vec3::toString() const {
-  return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ", "
-       + std::to_string(z_) + ")";
+  return "("
+       + std::to_string(x_)
+       + ", "
+       + std::to_string(y_)
+       + ", "
+       + std::to_string(z_)
+       + ")";
 }
 } // namespace boids
 
