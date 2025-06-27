@@ -37,7 +37,7 @@ find_package(SFML 2.6 COMPONENTS system window graphics REQUIRED)
 
 # dichiara un eseguibile chiamato "progetto", prodotto a partire dai file sorgente indicati
 # sostituire "progetto" con il nome del proprio eseguibile e i file sorgente con i propri (con nomi sensati!)
-add_executable(progetto boids.cpp boid.cpp functions.cpp predator.cpp statistics.cpp swarm.cpp variables.cpp vec3.cpp)
+add_executable(progetto boids.cpp boid.cpp functions.cpp predator.cpp prey.cpp swarm.cpp variables.cpp vec3.cpp)
 # nel caso si usi SFML. analogamente per eventuali altre librerie
 target_link_libraries(progetto PRIVATE sfml-system sfml-window sfml-graphics) 
 
@@ -48,7 +48,7 @@ target_link_libraries(progetto PRIVATE sfml-system sfml-window sfml-graphics)
 if (BUILD_TESTING)
 
   # aggiungi l'eseguibile progetto.t
-  add_executable(progetto.t boids.test.cpp boid.cpp functions.cpp predator.cpp statistics.cpp swarm.cpp variables.cpp vec3.cpp) # test
+  add_executable(progetto.t boids.test.cpp boid.cpp functions.cpp predator.cpp prey.cpp swarm.cpp variables.cpp vec3.cpp) # test
 
   target_link_libraries(progetto.t PRIVATE sfml-graphics sfml-window sfml-system)
 

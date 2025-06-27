@@ -13,7 +13,7 @@ class Prey : public Boid {
   void resetCooldown();
 };
 
-inline void resetCooldown() {};
+inline void Prey::resetCooldown() {};
 } // namespace boids
 
 #endif // PREY_HPP

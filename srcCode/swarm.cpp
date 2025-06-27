@@ -182,10 +182,10 @@ Swarm::Swarm()
     , alignment_factor_(0.005)
     , fear_factor_(0.05)
     , height_factor_(0.0005)
-    , predator_(nullptr)
     , screen_(Vec3(600, 300, 300))
     , wind_()
-    , toroidal_() {
+    , toroidal_()
+    , predator_(nullptr) {
   preys_ = std::vector<Prey>(static_cast<std::size_t>(size_));
 
   Init();
@@ -204,10 +204,10 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , alignment_factor_(swarm_vars.alignment_factor)
     , fear_factor_(swarm_vars.fear_factor)
     , height_factor_(swarm_vars.height_factor)
-    , predator_(predator)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
-    , toroidal_(global_vars.toroidal_bool) {
+    , toroidal_(global_vars.toroidal_bool)
+    , predator_(predator) {
   if (size_ <= 0) {
     throw std::invalid_argument("Swarm size must be greater than 0");
   }

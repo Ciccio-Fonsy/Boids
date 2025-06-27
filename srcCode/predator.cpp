@@ -6,6 +6,7 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
+#include <iostream>
 #include <random>
 #include <stdexcept>
 
@@ -69,7 +70,8 @@ Predator::Predator()
     , height_factor_(0.01)
     , screen_(Vec3(600, 300, 300))
     , wind_()
-    , toroidal_() {}
+    , toroidal_()
+    , cooldown_() {}
 
 Predator::Predator(const GlobalVariables&   global_vars,
                    const PredatorVariables& predator_vars)
@@ -80,7 +82,8 @@ Predator::Predator(const GlobalVariables&   global_vars,
     , height_factor_(0.01)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
-    , toroidal_(global_vars.toroidal_bool) {
+    , toroidal_(global_vars.toroidal_bool)
+    , cooldown_() {
   if (attack_range_ <= 0) {
     throw std::invalid_argument("attack_range must be greater than 0");
   }

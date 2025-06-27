@@ -16,6 +16,7 @@ class Predator : public Boid {
   const Vec3   screen_;
   const Vec3   wind_;
   const bool   toroidal_;
+  
   int          cooldown_;
 
   void        Init();
