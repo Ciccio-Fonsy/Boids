@@ -107,7 +107,7 @@ inline double Vec3::norm() const {
 
 inline Vec3 Vec3::normalize() const {
   double n = norm();
-  if (n != 0) return Vec3(x_ / n, y_ / n, z_ / n);
+  if (n != 0) { return Vec3(x_ / n, y_ / n, z_ / n); }
   return *this;
 }
 

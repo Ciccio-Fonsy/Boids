@@ -25,8 +25,7 @@ class Swarm {
   const Vec3        screen_;
   const Vec3        wind_;
   const bool        toroidal_;
-
-  Boid* predator_;
+  Boid*             predator_;
 
   bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
 
@@ -70,13 +69,11 @@ inline bool Swarm::isWithinRange(const Boid& b1, const Boid& b2,
 
 inline Prey& Swarm::operator[](int i) {
   if (i < 0 || i >= size_) { throw std::out_of_range("Index out of range"); }
-
   return preys_[static_cast<std::size_t>(i)];
 }
 
 inline const Prey& Swarm::operator[](int i) const {
   if (i < 0 || i >= size_) { throw std::out_of_range("Index out of range"); }
-
   return preys_[static_cast<std::size_t>(i)];
 }
 

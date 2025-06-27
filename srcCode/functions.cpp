@@ -387,8 +387,6 @@ void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
 void drawBoids(const Predator* predator, const Swarm& swarm,
                sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
                sf::CircleShape& predator_shape) {
-  if (plane > 1) { throw std::out_of_range("index out of range"); }
-
   const Vec3& screen = swarm.screen();
 
   double width  = window.getSize().x;
@@ -406,6 +404,7 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
       position.x = swarm[i].position().x() / screen.x() * width;
       position.y = swarm[i].position().z() / screen.z() * height;
       break;
+    default: throw std::out_of_range("index out of range");
     }
 
     boid_shape.setPosition(sf::Vector2f(position));
@@ -423,6 +422,7 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
       predator_position.x = predator->position().x() / screen.x() * width;
       predator_position.y = predator->position().z() / screen.z() * height;
       break;
+    default: throw std::out_of_range("index out of range");
     }
 
     predator_shape.setPosition(sf::Vector2f(predator_position));
