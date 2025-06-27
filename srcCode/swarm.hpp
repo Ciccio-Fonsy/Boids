@@ -39,7 +39,7 @@ class Swarm {
 
  public:
   Swarm();
-  Swarm(const Swarm& other);
+  //Swarm(const Swarm& other);
   Swarm(const GlobalVariables& global_vars, const SwarmVariables& swarm_vars,
         const Boid* predator);
 
