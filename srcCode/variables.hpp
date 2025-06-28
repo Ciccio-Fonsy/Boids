@@ -6,7 +6,7 @@
 namespace boids {
 struct GlobalVariables {
   Vec3   screen        = Vec3(600, 300, 300);
-  double windspeed     = 0.2;
+  double windspeed     = 0.1;
   Vec3   wind          = Vec3(0, 0, 0);
   bool   wind_bool     = false;
   bool   predator_bool = false;
@@ -15,7 +15,7 @@ struct GlobalVariables {
 
 struct PredatorVariables {
   double attack_range = 300;
-  double attack_speed = 1.1;
+  double attack_speed = 1.3;
 };
 
 struct SwarmVariables {
@@ -25,6 +25,7 @@ struct SwarmVariables {
   double max_speed      = 1;
   double min_distance   = 30;
   double sight_distance = 150;
+  double visual_field   = 60;
 
   double separation_factor = 0.05;
   double cohesion_factor   = 0.00005;
@@ -35,6 +36,7 @@ struct SwarmVariables {
 
 struct ConversionFactors {
   static const double speed_k;
+  static const double visual_field_k;
   static const double separation_k;
   static const double cohesion_k;
   static const double alignment_k;
@@ -51,6 +53,9 @@ struct LimitValues {
 
   static const double min_distance_upper;
   static const double sight_distance_upper;
+
+  static const double visual_field_lower;
+  static const double visual_field_upper;
 
   static const double factors_lower;
   static const double factors_upper;

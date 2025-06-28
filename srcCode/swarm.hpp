@@ -6,6 +6,7 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
+#include <cmath>
 #include <vector>
 
 namespace boids {
@@ -16,6 +17,7 @@ class Swarm {
   const double      max_speed_;
   const double      min_distance_;
   const double      sight_distance_;
+  const double      visual_field_;
   const double      preferred_height_;
   const double      separation_factor_;
   const double      cohesion_factor_;
@@ -28,6 +30,7 @@ class Swarm {
   Boid*             predator_;
 
   bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
+  bool isWithinField(const Boid& b1, const Boid& b2) const;
 
   void Init();
   void bounce(Prey& b);
@@ -49,6 +52,7 @@ class Swarm {
   double      max_speed() const;
   double      min_distance() const;
   double      sight_distance() const;
+  double      visual_field() const;
   double      preferred_height() const;
   double      separation_factor() const;
   double      cohesion_factor() const;
@@ -65,6 +69,16 @@ class Swarm {
 inline bool Swarm::isWithinRange(const Boid& b1, const Boid& b2,
                                  double range) const {
   return b1.position().distance(toroidal_, b2.position(), screen_) <= range;
+}
+
+inline bool Swarm::isWithinField(const Boid& observer,
+                                 const Boid& target) const {
+  return observer.velocity().norm() == 0
+      || observer.velocity().normalize().dot(
+             target.position()
+                 .vecDistance(toroidal_, observer.position(), screen_)
+                 .normalize())
+             >= std::cos(visual_field_);
 }
 
 inline Prey& Swarm::operator[](int i) {
@@ -86,6 +100,8 @@ inline double Swarm::max_speed() const { return max_speed_; }
 inline double Swarm::min_distance() const { return min_distance_; }
 
 inline double Swarm::sight_distance() const { return sight_distance_; }
+
+inline double Swarm::visual_field() const { return visual_field_; }
 
 inline double Swarm::preferred_height() const { return preferred_height_; }
 

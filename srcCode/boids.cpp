@@ -6,11 +6,13 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
-#include <memory>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-//for e algoritmi lambda
+#include <memory>
+#include <iostream>
+
+// for e algoritmi lambda
 
 int main() {
   boids::GlobalVariables   global_vars;
@@ -42,7 +44,7 @@ int main() {
   const int   print_period      = 100;
   const float target_frame_time = 1.0f / 180.0f;
 
-  while (window_top.isOpen() && window_side.isOpen() && swarm.size() > 1) {
+  while (window_top.isOpen() && window_side.isOpen() && swarm.size() > 0) {
     sf::Clock clock;
 
     boids::handleEvents(window_top);
@@ -58,13 +60,18 @@ int main() {
                      predator_shape);
     window_side.display();
 
-    boids::updateSimulation(predator.get(), swarm, t, print_period, "boids_save.txt");
+    boids::updateSimulation(predator.get(), swarm, t, print_period,
+                            "boids_save.txt");
 
     float frame_time = clock.getElapsedTime().asSeconds();
     if (frame_time < target_frame_time) {
       sf::sleep(sf::seconds(target_frame_time - frame_time));
     }
   }
+
+  if (swarm.size() == 0) { std::cout << "No boids left, "; }
+
+  std::cout << "terminating execution\n";
 
   return 0;
 }

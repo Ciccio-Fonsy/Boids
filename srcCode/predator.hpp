@@ -36,6 +36,7 @@ class Predator : public Boid {
   bool        toroidal() const;
   int         cooldown() const;
 
+  void stall(const Vec3& wind, double max_speed);
   void resetCooldown();
   void updatePredator(Swarm& swarm);
 };
@@ -57,6 +58,15 @@ inline bool Predator::toroidal() const { return toroidal_; }
 inline int Predator::cooldown() const { return cooldown_; }
 
 inline void Predator::resetCooldown() { cooldown_ = 0; }
+
+inline void Predator::stall(const Vec3& wind, double max_speed) {
+  if ((velocity() - wind).norm() <= 0.2 * max_speed) {
+    updateBoidVelocity(
+        wind,
+        Vec3((velocity() - wind).x(), (velocity() - wind).y(), 0.2 * max_speed),
+        max_speed);
+  }
+};
 } // namespace boids
 
 #endif // PREDATOR_HPP

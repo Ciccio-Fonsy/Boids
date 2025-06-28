@@ -25,13 +25,15 @@ class Boid {
   bool operator==(const Boid& other) const;
   bool operator!=(const Boid& other) const;
 
-  void updateBoidVelocity(Vec3 delta_v, double max_speed);
-  void updateBoid(Vec3 delta_v, double max_speed);
+  void updateBoidVelocity(const Vec3& wind, const Vec3& delta_v,
+                          double max_speed);
+  void updateBoid(const Vec3& wind, const Vec3& delta_v, double max_speed);
 
   void border(const Vec3& screen, bool toroidal);
   Vec3 maintainHeight(double target_height, double height_factor) const;
 
-  virtual void resetCooldown() = 0;
+  virtual void stall(const Vec3& wind, double max_speed) = 0;
+  virtual void resetCooldown()                           = 0;
 };
 
 inline Vec3 Boid::position() const { return position_; }
@@ -52,6 +54,21 @@ inline bool Boid::operator==(const Boid& other) const {
 
 inline bool Boid::operator!=(const Boid& other) const {
   return !(*this == other);
+}
+
+inline void Boid::updateBoidVelocity(const Vec3& wind, const Vec3& delta_v,
+                                     double max_speed) {
+  velocity_ += delta_v;
+
+  if ((velocity_ - wind).norm() > max_speed) {
+    velocity_ = (velocity_ - wind).normalize() * max_speed + wind;
+  }
+}
+
+inline void Boid::updateBoid(const Vec3& wind, const Vec3& delta_v,
+                             double max_speed) {
+  updateBoidVelocity(wind, delta_v, max_speed);
+  set_position(position() + velocity());
 }
 
 inline Vec3 Boid::maintainHeight(double target_height,

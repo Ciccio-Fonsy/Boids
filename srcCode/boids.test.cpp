@@ -179,7 +179,7 @@ TEST_CASE("Prey Velocity Update with max_speed") {
   boids::Vec3 delta_v(1.0, 1.0, 1.0);
   double      max_speed = 2.0;
 
-  b.updateBoidVelocity(delta_v, max_speed);
+  b.updateBoidVelocity(boids::Vec3(0, 0, 0), delta_v, max_speed);
 
   // Ensure the velocity norm is clamped to max_speed
   CHECK(b.velocity().norm() == doctest::Approx(max_speed));
@@ -196,7 +196,7 @@ TEST_CASE("Prey Update with max_speed") {
   boids::Vec3 delta_v(0.5, 0.5, 0.5);
   double      max_speed = 2.0;
 
-  b.updateBoid(delta_v, max_speed);
+  b.updateBoid(boids::Vec3(0, 0, 0), delta_v, max_speed);
 
   // Ensure the velocity norm is clamped to max_speed
   CHECK(b.velocity().norm() == doctest::Approx(max_speed));
@@ -230,13 +230,13 @@ TEST_CASE("Border Handling: Toroidal and Bouncing") {
                            boids::Vec3(1.0, 1.0, -2.0));
   bouncingBoid.border(screen, false);
 
-  CHECK(bouncingBoid.position().x() == doctest::Approx(10.0));
-  CHECK(bouncingBoid.position().y() == doctest::Approx(10.0));
-  CHECK(bouncingBoid.position().z() == doctest::Approx(0.0));
+  CHECK(bouncingBoid.position().x() == doctest::Approx(9.5));
+  CHECK(bouncingBoid.position().y() == doctest::Approx(9.5));
+  CHECK(bouncingBoid.position().z() == doctest::Approx(0.5));
 
-  CHECK(bouncingBoid.velocity().x() == doctest::Approx(-0.9));
-  CHECK(bouncingBoid.velocity().y() == doctest::Approx(-0.9));
-  CHECK(bouncingBoid.velocity().z() == doctest::Approx(1.8));
+  CHECK(bouncingBoid.velocity().x() == doctest::Approx(-0.5));
+  CHECK(bouncingBoid.velocity().y() == doctest::Approx(-0.5));
+  CHECK(bouncingBoid.velocity().z() == doctest::Approx(1));
 }
 
 TEST_CASE("vecDistance and distance: Toroidal and Non-Toroidal") {
@@ -284,7 +284,7 @@ TEST_CASE("Predator Variables Initialization") {
   boids::PredatorVariables predator_vars;
 
   CHECK(predator_vars.attack_range == 300);
-  CHECK(predator_vars.attack_speed == 1.1);
+  CHECK(predator_vars.attack_speed == 1.3);
 }
 
 TEST_CASE("Swarm Variables Initialization") {

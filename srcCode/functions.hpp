@@ -54,7 +54,10 @@ inline double stdDev(const std::vector<double>& values) {
 inline void handleEvents(sf::RenderWindow& window) {
   sf::Event event;
   while (window.pollEvent(event)) {
-    if (event.type == sf::Event::Closed) { window.close(); }
+    if (event.type == sf::Event::Closed) {
+      window.close();
+      std::cout << "Program closed, ";
+    }
   }
 }
 

@@ -5,6 +5,7 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <random>
 #include <stdexcept>
@@ -80,11 +81,12 @@ Vec3 Swarm::separation(const Prey& b) const {
     const Vec3& other_position = other_prey.position();
 
     if (other_prey != b
-        && isWithinRange(other_prey, b, min_distance_)
-        && other_position != b_position) {
-      const Vec3 separation_vector =
+        && isWithinRange(b, other_prey, min_distance_)
+        && other_position != b_position
+        && isWithinField(b, other_prey)) {
+      const Vec3 separation =
           other_position.vecDistance(toroidal_, b_position, screen_);
-      c -= separation_vector.normalize() / separation_vector.norm();
+      c -= separation.normalize() / separation.norm();
     }
   }
 
@@ -96,7 +98,9 @@ Vec3 Swarm::cohesion(const Prey& b) const {
   int  count = 0;
 
   for (const Prey& other_prey : preys_) {
-    if (other_prey != b && isWithinRange(b, other_prey, sight_distance_)) {
+    if (other_prey != b
+        && isWithinRange(b, other_prey, sight_distance_)
+        && isWithinField(b, other_prey)) {
       Vec3 position = other_prey.position();
 
       if (toroidal_) {
@@ -139,7 +143,9 @@ Vec3 Swarm::alignment(const Prey& b) const {
   int  count = 0;
 
   for (const Prey& other_prey : preys_) {
-    if (other_prey != b && isWithinRange(other_prey, b, min_distance_)) {
+    if (other_prey != b
+        && isWithinRange(b, other_prey, sight_distance_)
+        && isWithinField(b, other_prey)) {
       pv += other_prey.velocity();
       ++count;
     }
@@ -160,7 +166,7 @@ Vec3 Swarm::fear(const Prey& b) const {
 
   if (distance_norm == 0) {
     evade_vector = b.velocity().normalize() * max_speed_;
-  } else if (distance_norm <= sight_distance_) {
+  } else if (distance_norm <= sight_distance_ && isWithinField(b, *predator_)) {
     const Vec3   flee_direction = distance_to_predator.normalize();
     const double evade_strength =
         (sight_distance_ - distance_norm) / sight_distance_;
@@ -176,6 +182,7 @@ Swarm::Swarm()
     , max_speed_(1)
     , min_distance_(30)
     , sight_distance_(150)
+    , visual_field_(60)
     , preferred_height_(200)
     , separation_factor_(0.05)
     , cohesion_factor_(0.00005)
@@ -198,6 +205,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , max_speed_(swarm_vars.max_speed)
     , min_distance_(swarm_vars.min_distance)
     , sight_distance_(swarm_vars.sight_distance)
+    , visual_field_(swarm_vars.visual_field)
     , preferred_height_(global_vars.screen.z() * 2 / 3)
     , separation_factor_(swarm_vars.separation_factor)
     , cohesion_factor_(swarm_vars.cohesion_factor)
@@ -230,38 +238,36 @@ Swarm::Swarm(const GlobalVariables& global_vars,
 }
 
 void Swarm::updateSwarm() {
-  std::vector<int> preys_to_remove;
+  preys_.erase(
+      std::remove_if(preys_.begin(), preys_.end(),
+                     [this](Prey& prey) {
+                       if (predator_
+                           && isWithinRange(*predator_, prey, wingspan_)) {
+                         predator_->resetCooldown();
+                         return true; // Mark this prey for removal
+                       } else {
+                         const Vec3 v1 = separation(prey);
+                         const Vec3 v2 = cohesion(prey);
+                         const Vec3 v3 = alignment(prey);
+                         const Vec3 v4 = prey.maintainHeight(preferred_height_,
+                                                             height_factor_);
 
-  for (int i = 0; i < size_; ++i) {
-    Prey& current_prey = preys_[static_cast<std::size_t>(i)];
+                         bounce(prey);
+                         prey.updateBoidVelocity(wind_, v1 + v2 + v3 + v4, max_speed_);
 
-    if (predator_ && isWithinRange(*predator_, current_prey, wingspan_)) {
-      preys_to_remove.push_back(i);
-      predator_->resetCooldown();
-    } else {
-      const Vec3 v1 = separation(current_prey);
-      const Vec3 v2 = cohesion(current_prey);
-      const Vec3 v3 = alignment(current_prey);
-      const Vec3 v4 =
-          current_prey.maintainHeight(preferred_height_, height_factor_);
+                         if (predator_) {
+                           prey.updateBoidVelocity(wind_, fear(prey), max_speed_);
+                         }
 
-      bounce(current_prey);
-      current_prey.updateBoidVelocity(v1 + v2 + v3 + v4, max_speed_);
+                         prey.stall(wind_, max_speed_);
+                         prey.updateBoid(wind_, wind_, max_speed_);
+                         prey.border(screen_, toroidal_);
 
-      if (predator_) {
-        current_prey.updateBoidVelocity(fear(current_prey), max_speed_);
-      }
+                         return false; // Keep this prey
+                       }
+                     }),
+      preys_.end());
 
-      current_prey.updateBoid(wind_, wind_.norm() + max_speed_);
-
-      current_prey.border(screen_, toroidal_);
-    }
-  }
-
-  for (std::vector<int>::reverse_iterator it = preys_to_remove.rbegin();
-       it != preys_to_remove.rend(); ++it) {
-    preys_.erase(preys_.begin() + static_cast<int>(*it));
-    --size_;
-  }
+  size_ = static_cast<int>(preys_.size());
 }
 } // namespace boids

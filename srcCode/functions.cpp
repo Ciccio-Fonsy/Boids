@@ -32,29 +32,34 @@ void casualParameters(GlobalVariables&   global_vars,
                                         LimitValues::sight_distance_upper);
   swarm_vars.sight_distance = dis2(gen);
 
-  std::uniform_real_distribution<> dis3(LimitValues::factors_lower,
+  std::uniform_real_distribution<> dis3(LimitValues::visual_field_lower,
+                                        LimitValues::visual_field_upper);
+  swarm_vars.visual_field = dis3(gen) / ConversionFactors::visual_field_k;
+
+  std::uniform_real_distribution<> dis4(LimitValues::factors_lower,
                                         LimitValues::factors_upper);
-  swarm_vars.separation_factor = dis3(gen) / ConversionFactors::separation_k;
-  swarm_vars.cohesion_factor   = dis3(gen) / ConversionFactors::cohesion_k;
-  swarm_vars.alignment_factor  = dis3(gen) / ConversionFactors::alignment_k;
-  swarm_vars.fear_factor       = dis3(gen) / ConversionFactors::fear_k;
-  swarm_vars.height_factor     = dis3(gen) / ConversionFactors::height_k;
+  swarm_vars.separation_factor = dis4(gen) / ConversionFactors::separation_k;
+  swarm_vars.cohesion_factor   = dis4(gen) / ConversionFactors::cohesion_k;
+  swarm_vars.alignment_factor  = dis4(gen) / ConversionFactors::alignment_k;
+  swarm_vars.fear_factor       = dis4(gen) / ConversionFactors::fear_k;
+  swarm_vars.height_factor     = dis4(gen) / ConversionFactors::height_k;
 
   if (global_vars.wind_bool) {
-    std::uniform_real_distribution<> dis4(LimitValues::windspeed_lower,
+    std::uniform_real_distribution<> dis5(LimitValues::windspeed_lower,
                                           LimitValues::windspeed_upper);
-    global_vars.windspeed = dis4(gen) / ConversionFactors::speed_k;
+    global_vars.windspeed = dis5(gen) / ConversionFactors::speed_k;
   }
 
-  if (global_vars.predator_bool) {
-    std::uniform_real_distribution<> dis5(LimitValues::speed_lower,
-                                          LimitValues::speed_upper);
-    swarm_vars.max_speed       = dis5(gen) / ConversionFactors::speed_k;
-    predator_vars.attack_speed = dis5(gen) / ConversionFactors::speed_k;
+  std::uniform_real_distribution<> dis6(LimitValues::speed_lower,
+                                        LimitValues::speed_upper);
+  swarm_vars.max_speed = dis6(gen) / ConversionFactors::speed_k;
 
-    std::uniform_real_distribution<> dis6(LimitValues::attack_range_lower,
+  if (global_vars.predator_bool) {
+    predator_vars.attack_speed = dis6(gen) / ConversionFactors::speed_k;
+
+    std::uniform_real_distribution<> dis7(LimitValues::attack_range_lower,
                                           LimitValues::attack_range_upper);
-    predator_vars.attack_range = dis6(gen);
+    predator_vars.attack_range = dis7(gen);
   }
 }
 
@@ -231,6 +236,22 @@ void initializeParameters(GlobalVariables&   global_vars,
       swarm_vars.sight_distance = sight_distance;
     }
 
+    std::cout
+        << "Enter visual field ("
+        << LimitValues::visual_field_lower
+        << " ~ "
+        << LimitValues::visual_field_upper
+        << "): ";
+    double visual_field;
+    std::cin >> visual_field;
+    if (visual_field < LimitValues::visual_field_lower
+        || visual_field > LimitValues::visual_field_upper) {
+      std::cout << "This value is not accetable, setted to default value\n";
+    } else {
+      swarm_vars.visual_field =
+          visual_field / ConversionFactors::visual_field_k;
+    }
+
     if (global_vars.predator_bool) {
       std::cout
           << "Enter predator attack speed ("
@@ -318,6 +339,10 @@ void initializeParameters(GlobalVariables&   global_vars,
       << swarm_vars.height_factor * ConversionFactors::height_k
       << std::endl;
   std::cout << "Sight distance:    " << swarm_vars.sight_distance << std::endl;
+  std::cout
+      << "Visual field:      "
+      << swarm_vars.visual_field * ConversionFactors::visual_field_k
+      << std::endl;
 
   if (global_vars.predator_bool) {
     std::cout
@@ -457,6 +482,8 @@ void saveStatisticsOnFile(const std::string&       filename,
         << swarm_vars.height_factor * ConversionFactors::height_k
         << "\nsight distance    = "
         << swarm_vars.sight_distance
+        << "\nvisual field      = "
+        << swarm_vars.visual_field * ConversionFactors::visual_field_k
         << "\npredator          = "
         << global_vars.predator_bool;
     if (global_vars.predator_bool) {
@@ -482,7 +509,7 @@ void saveStatisticsOnFile(const std::string&       filename,
     file.close();
   } else {
     std::cerr
-        << "Errore: impossibile salvare le posizioni sul file "
+        << "Error: unable to save datas on file: "
         << filename
         << std::endl;
   }
@@ -500,9 +527,16 @@ void printStatistics(Swarm& swarm, int t, const std::string& filename) {
           swarm.toroidal(), swarm[j].position(), swarm.screen()));
     }
   }
+
+  if (distances.empty()) { distances.push_back(0); }
+
   std::ofstream file(filename, std::ios::app);
-  double        mean_dist = mean(distances), mean_vel = mean(velocities);
-  double        std_dist = stdDev(distances), std_vel = stdDev(velocities);
+
+  double mean_dist = mean(distances);
+  double mean_vel  = mean(velocities);
+  double std_dist  = stdDev(distances);
+  double std_vel   = stdDev(velocities);
+
   std::cout
       << "t = "
       << std::setw(6)

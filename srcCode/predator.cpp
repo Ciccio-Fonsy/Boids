@@ -100,11 +100,12 @@ void Predator::updatePredator(Swarm& swarm) {
   } else {
     ++cooldown_;
 
-    updateBoidVelocity(maintainHeight(preferred_height_, height_factor_),
+    updateBoidVelocity(wind_, maintainHeight(preferred_height_, height_factor_),
                        attack_speed_ / 2);
   }
-  updateBoidVelocity(Vec3(), attack_speed_);
-  updateBoid(wind_, wind_.norm() + attack_speed_);
+  updateBoidVelocity(wind_, Vec3(), attack_speed_);
+  stall(wind_, attack_speed_);
+  updateBoid(wind_, wind_, attack_speed_);
 
   border(screen_, toroidal_);
 }
