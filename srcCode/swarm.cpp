@@ -20,10 +20,9 @@ void Swarm::init() {
 
   for (Prey& b : preys_) {
     const double x = ds(gen) * screen_.x();
-    const double z = ds(gen) * screen_.z();
     const double y = ds(gen) * screen_.y();
 
-    b.set_position(Vec3(x, y, z));
+    b.set_position(Vec3(x, y, screen_.z()));
 
     double max_deviation = max_speed_ / std::sqrt(3);
 

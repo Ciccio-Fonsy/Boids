@@ -345,24 +345,24 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
   double width  = window.getSize().x;
   double height = window.getSize().y;
 
-  for (int i = 0; i < swarm.size(); ++i) {
+  std::for_each(swarm.begin(), swarm.end(), [&](const Prey& prey) {
     sf::Vector2<double> position;
 
     switch (plane) {
     case 0:
-      position.x = swarm[i].position().x() / screen.x() * width;
-      position.y = swarm[i].position().y() / screen.y() * height;
+      position.x = prey.position().x() / screen.x() * width;
+      position.y = prey.position().y() / screen.y() * height;
       break;
     case 1:
-      position.x = swarm[i].position().x() / screen.x() * width;
-      position.y = swarm[i].position().z() / screen.z() * height;
+      position.x = prey.position().x() / screen.x() * width;
+      position.y = prey.position().z() / screen.z() * height;
       break;
     default: throw std::out_of_range("index out of range");
     }
 
     boid_shape.setPosition(sf::Vector2f(position));
     window.draw(boid_shape);
-  }
+  });
 
   if (predator) {
     sf::Vector2<double> predator_position;

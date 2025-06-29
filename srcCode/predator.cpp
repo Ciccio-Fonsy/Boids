@@ -18,9 +18,8 @@ void Predator::init() {
 
   const double x = ds(gen) * screen_.x();
   const double y = ds(gen) * screen_.y();
-  const double z = ds(gen) * screen_.z();
 
-  set_position(Vec3(x, y, z));
+  set_position(Vec3(x, y, 0));
 
   const double max_deviation = attack_speed_ / std::sqrt(3);
 
@@ -76,7 +75,7 @@ Vec3 Predator::height() const {
 Vec3 Predator::circle(double r) const {
   Vec3 v = velocity();
 
-  return Vec3(-v.y(), v.x(), 0) * v.norm() / r;
+  return Vec3(v.y(), -v.x(), 0) * v.norm() / r;
 }
 
 Predator::Predator()
@@ -117,7 +116,7 @@ void Predator::updatePredator(Swarm& swarm) {
   } else {
     ++cooldown_;
 
-    updateBoidVelocity(wind_, height() + circle(100), attack_speed_ / 2);
+    updateBoidVelocity(wind_, height() + circle(screen_.norm() / 4), attack_speed_ / 2);
   }
   stall(wind_, attack_speed_);
   updateBoid(wind_, wind_, attack_speed_);

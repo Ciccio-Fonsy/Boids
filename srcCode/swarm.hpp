@@ -48,6 +48,12 @@ class Swarm {
   Prey&       operator[](int i);
   const Prey& operator[](int i) const;
 
+  std::vector<Prey>::iterator begin();
+  std::vector<Prey>::iterator end();
+
+  std::vector<Prey>::const_iterator begin() const;
+  std::vector<Prey>::const_iterator end() const;
+
   int         size() const;
   double      wingspan() const;
   double      max_speed() const;
@@ -90,6 +96,16 @@ inline Prey& Swarm::operator[](int i) {
 inline const Prey& Swarm::operator[](int i) const {
   if (i < 0 || i >= size_) { throw std::out_of_range("Index out of range"); }
   return preys_[static_cast<std::size_t>(i)];
+}
+
+inline std::vector<Prey>::iterator Swarm::begin() { return preys_.begin(); }
+inline std::vector<Prey>::iterator Swarm::end() { return preys_.end(); }
+
+inline std::vector<Prey>::const_iterator Swarm::begin() const {
+  return preys_.begin();
+}
+inline std::vector<Prey>::const_iterator Swarm::end() const {
+  return preys_.end();
 }
 
 inline int Swarm::size() const { return static_cast<int>(size_); }
