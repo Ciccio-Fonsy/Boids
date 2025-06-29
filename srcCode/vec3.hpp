@@ -6,21 +6,13 @@
 #include <stdexcept>
 
 namespace boids {
-class Vec3 {
+struct Vec3 {
   double x_;
   double y_;
   double z_;
 
- public:
   Vec3();
   Vec3(double x, double y, double z);
-
-  double x() const;
-  double y() const;
-  double z() const;
-  void   set_x(double x);
-  void   set_y(double y);
-  void   set_z(double z);
 
   bool   operator==(const Vec3& other) const;
   bool   operator!=(const Vec3& other) const;
@@ -55,18 +47,6 @@ inline Vec3::Vec3(double x, double y, double z)
     : x_(x)
     , y_(y)
     , z_(z) {}
-
-inline double Vec3::x() const { return x_; }
-
-inline double Vec3::y() const { return y_; }
-
-inline double Vec3::z() const { return z_; }
-
-inline void Vec3::set_x(double x) { x_ = x; }
-
-inline void Vec3::set_y(double y) { y_ = y; }
-
-inline void Vec3::set_z(double z) { z_ = z; }
 
 inline bool Vec3::operator==(const Vec3& other) const {
   return x_ == other.x_ && y_ == other.y_ && z_ == other.z_;

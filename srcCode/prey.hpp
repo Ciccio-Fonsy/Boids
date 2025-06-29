@@ -24,7 +24,7 @@ inline void Prey::stall(const Vec3& wind, double max_speed) {
   if ((velocity() - wind).norm() <= 0.4 * max_speed) {
     updateBoidVelocity(
         wind,
-        Vec3((velocity() - wind).x(), (velocity() - wind).y(), 0.4 * max_speed),
+        Vec3((velocity() - wind).x_, (velocity() - wind).y_, 0.4 * max_speed),
         max_speed);
   }
 }

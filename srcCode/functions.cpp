@@ -308,8 +308,8 @@ void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) {
   unsigned int window_height =
       (screen_height / 2) - 2 * padding - app_bar_height;
 
-  window_xy.create(sf::VideoMode(window_width, window_height), "XY Plane");
-  window_xz.create(sf::VideoMode(window_width, window_height), "XZ Plane");
+  window_xy.create(sf::VideoMode(window_width, window_height), "Top view");
+  window_xz.create(sf::VideoMode(window_width, window_height), "Side view");
 
   window_xy.setPosition(
       sf::Vector2i(0, static_cast<int>(window_height + 3 * padding)));
@@ -350,12 +350,12 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
 
     switch (plane) {
     case 0:
-      position.x = prey.position().x() / screen.x() * width;
-      position.y = prey.position().y() / screen.y() * height;
+      position.x = prey.position().x_ / screen.x_ * width;
+      position.y = prey.position().y_ / screen.y_ * height;
       break;
     case 1:
-      position.x = prey.position().x() / screen.x() * width;
-      position.y = prey.position().z() / screen.z() * height;
+      position.x = prey.position().x_ / screen.x_ * width;
+      position.y = prey.position().z_ / screen.z_ * height;
       break;
     default: throw std::out_of_range("index out of range");
     }
@@ -368,12 +368,12 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
     sf::Vector2<double> predator_position;
     switch (plane) {
     case 0:
-      predator_position.x = predator->position().x() / screen.x() * width;
-      predator_position.y = predator->position().y() / screen.y() * height;
+      predator_position.x = predator->position().x_ / screen.x_ * width;
+      predator_position.y = predator->position().y_ / screen.y_ * height;
       break;
     case 1:
-      predator_position.x = predator->position().x() / screen.x() * width;
-      predator_position.y = predator->position().z() / screen.z() * height;
+      predator_position.x = predator->position().x_ / screen.x_ * width;
+      predator_position.y = predator->position().z_ / screen.z_ * height;
       break;
     default: throw std::out_of_range("index out of range");
     }

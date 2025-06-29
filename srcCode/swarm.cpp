@@ -19,10 +19,10 @@ void Swarm::init() {
   std::uniform_real_distribution<> dv(-1.0, 1.0);
 
   for (Prey& b : preys_) {
-    const double x = ds(gen) * screen_.x();
-    const double y = ds(gen) * screen_.y();
+    const double x = ds(gen) * screen_.x_;
+    const double y = ds(gen) * screen_.y_;
 
-    b.set_position(Vec3(x, y, screen_.z()));
+    b.set_position(Vec3(x, y, screen_.z_));
 
     double max_deviation = max_speed_ / std::sqrt(3);
 
@@ -158,9 +158,9 @@ Vec3 Swarm::alignment(const Prey& b) const {
 
 Vec3 Swarm::height(const Prey& b) const {
   Vec3   correction;
-  double dh = preferred_height_ - b.position().z();
+  double dh = preferred_height_ - b.position().z_;
 
-  if (dh * b.velocity().z() <= 0) { correction.set_z(dh); }
+  if (dh * b.velocity().z_ <= 0) { correction.z_ = dh; }
 
   return correction * height_factor_;
 }
@@ -214,7 +214,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
     , min_distance_(swarm_vars.min_distance)
     , sight_distance_(swarm_vars.sight_distance)
     , visual_field_(swarm_vars.visual_field)
-    , preferred_height_(global_vars.screen.z() * 2 / 3)
+    , preferred_height_(global_vars.screen.z_ * 2 / 3)
     , separation_factor_(swarm_vars.separation_factor)
     , cohesion_factor_(swarm_vars.cohesion_factor)
     , alignment_factor_(swarm_vars.alignment_factor)

@@ -11,16 +11,16 @@
 
 TEST_CASE("Vec3 Default Constructor") {
   boids::Vec3 v;
-  CHECK(v.x() == 0.0);
-  CHECK(v.y() == 0.0);
-  CHECK(v.z() == 0.0);
+  CHECK(v.x_ == 0.0);
+  CHECK(v.y_ == 0.0);
+  CHECK(v.z_ == 0.0);
 }
 
 TEST_CASE("Vec3 Parameterized Constructor") {
   boids::Vec3 v(1.0, 2.0, 3.0);
-  CHECK(v.x() == 1.0);
-  CHECK(v.y() == 2.0);
-  CHECK(v.z() == 3.0);
+  CHECK(v.x_ == 1.0);
+  CHECK(v.y_ == 2.0);
+  CHECK(v.z_ == 3.0);
 }
 
 TEST_CASE("Vec3 Copy Constructor") {
@@ -84,9 +84,9 @@ TEST_CASE("Vec3 Norm Calculation") {
 TEST_CASE("Vec3 Normalize") {
   boids::Vec3 v(3.0, 4.0, 0.0);
   boids::Vec3 norm_v = v.normalize();
-  CHECK(norm_v.x() == doctest::Approx(0.6));
-  CHECK(norm_v.y() == doctest::Approx(0.8));
-  CHECK(norm_v.z() == doctest::Approx(0.0));
+  CHECK(norm_v.x_ == doctest::Approx(0.6));
+  CHECK(norm_v.y_ == doctest::Approx(0.8));
+  CHECK(norm_v.z_ == doctest::Approx(0.0));
   CHECK(norm_v.norm() == doctest::Approx(1.0));
 
   boids::Vec3 zero_v(0.0, 0.0, 0.0);
@@ -97,9 +97,9 @@ TEST_CASE("Vec3 Normalize") {
 TEST_CASE("Vec3 NormalizeAssign") {
   boids::Vec3 v(3.0, 4.0, 0.0);
   v.normalizeAssign();
-  CHECK(v.x() == doctest::Approx(0.6));
-  CHECK(v.y() == doctest::Approx(0.8));
-  CHECK(v.z() == doctest::Approx(0.0));
+  CHECK(v.x_ == doctest::Approx(0.6));
+  CHECK(v.y_ == doctest::Approx(0.8));
+  CHECK(v.z_ == doctest::Approx(0.0));
   CHECK(v.norm() == doctest::Approx(1.0));
 }
 
@@ -183,9 +183,9 @@ TEST_CASE("Prey Velocity Update with max_speed") {
 
   // Ensure the velocity norm is clamped to max_speed
   CHECK(b.velocity().norm() == doctest::Approx(max_speed));
-  CHECK(b.velocity().x() == doctest::Approx(1.1547));
-  CHECK(b.velocity().y() == doctest::Approx(1.1547));
-  CHECK(b.velocity().z() == doctest::Approx(1.1547));
+  CHECK(b.velocity().x_ == doctest::Approx(1.1547));
+  CHECK(b.velocity().y_ == doctest::Approx(1.1547));
+  CHECK(b.velocity().z_ == doctest::Approx(1.1547));
 }
 
 TEST_CASE("Prey Update with max_speed") {
@@ -200,13 +200,13 @@ TEST_CASE("Prey Update with max_speed") {
 
   // Ensure the velocity norm is clamped to max_speed
   CHECK(b.velocity().norm() == doctest::Approx(max_speed));
-  CHECK(b.velocity().x() == doctest::Approx(1.1547));
-  CHECK(b.velocity().y() == doctest::Approx(1.1547));
-  CHECK(b.velocity().z() == doctest::Approx(1.1547));
+  CHECK(b.velocity().x_ == doctest::Approx(1.1547));
+  CHECK(b.velocity().y_ == doctest::Approx(1.1547));
+  CHECK(b.velocity().z_ == doctest::Approx(1.1547));
   // Ensure the position is updated based on the velocity
-  CHECK(b.position().x() == doctest::Approx(1.1547));
-  CHECK(b.position().y() == doctest::Approx(1.1547));
-  CHECK(b.position().z() == doctest::Approx(1.1547));
+  CHECK(b.position().x_ == doctest::Approx(1.1547));
+  CHECK(b.position().y_ == doctest::Approx(1.1547));
+  CHECK(b.position().z_ == doctest::Approx(1.1547));
 }
 
 TEST_CASE("Border Handling: Toroidal and Bouncing") {
@@ -217,26 +217,26 @@ TEST_CASE("Border Handling: Toroidal and Bouncing") {
                            boids::Vec3(1.0, 1.0, 1.0));
   toroidalBoid.border(screen, true);
 
-  CHECK(toroidalBoid.position().x() == doctest::Approx(1.0));
-  CHECK(toroidalBoid.position().y() == doctest::Approx(1.0));
-  CHECK(toroidalBoid.position().z() == doctest::Approx(5.0));
+  CHECK(toroidalBoid.position().x_ == doctest::Approx(1.0));
+  CHECK(toroidalBoid.position().y_ == doctest::Approx(1.0));
+  CHECK(toroidalBoid.position().z_ == doctest::Approx(5.0));
 
-  CHECK(toroidalBoid.velocity().x() == doctest::Approx(1.0));
-  CHECK(toroidalBoid.velocity().y() == doctest::Approx(1.0));
-  CHECK(toroidalBoid.velocity().z() == doctest::Approx(1.0));
+  CHECK(toroidalBoid.velocity().x_ == doctest::Approx(1.0));
+  CHECK(toroidalBoid.velocity().y_ == doctest::Approx(1.0));
+  CHECK(toroidalBoid.velocity().z_ == doctest::Approx(1.0));
 
   // Test 2: Bouncing off the walls
   boids::Prey bouncingBoid(boids::Vec3(11.0, 11.0, -1.0),
                            boids::Vec3(1.0, 1.0, -2.0));
   bouncingBoid.border(screen, false);
 
-  CHECK(bouncingBoid.position().x() == doctest::Approx(9.5));
-  CHECK(bouncingBoid.position().y() == doctest::Approx(9.5));
-  CHECK(bouncingBoid.position().z() == doctest::Approx(0.5));
+  CHECK(bouncingBoid.position().x_ == doctest::Approx(9.5));
+  CHECK(bouncingBoid.position().y_ == doctest::Approx(9.5));
+  CHECK(bouncingBoid.position().z_ == doctest::Approx(0.5));
 
-  CHECK(bouncingBoid.velocity().x() == doctest::Approx(-0.5));
-  CHECK(bouncingBoid.velocity().y() == doctest::Approx(-0.5));
-  CHECK(bouncingBoid.velocity().z() == doctest::Approx(1));
+  CHECK(bouncingBoid.velocity().x_ == doctest::Approx(-0.5));
+  CHECK(bouncingBoid.velocity().y_ == doctest::Approx(-0.5));
+  CHECK(bouncingBoid.velocity().z_ == doctest::Approx(1));
 }
 
 TEST_CASE("vecDistance and distance: Toroidal and Non-Toroidal") {

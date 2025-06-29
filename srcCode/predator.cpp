@@ -16,8 +16,8 @@ void Predator::init() {
   std::uniform_real_distribution<> ds(0, 1.0);
   std::uniform_real_distribution<> dv(-1.0, 1.0);
 
-  const double x = ds(gen) * screen_.x();
-  const double y = ds(gen) * screen_.y();
+  const double x = ds(gen) * screen_.x_;
+  const double y = ds(gen) * screen_.y_;
 
   set_position(Vec3(x, y, 0));
 
@@ -62,11 +62,11 @@ void Predator::attack(Swarm& swarm) {
 
 Vec3 Predator::height() const {
   Vec3   correction;
-  double dh = preferred_height_ - position().z();
+  double dh     = preferred_height_ - position().z_;
   double v_norm = velocity().norm();
 
-  if (v_norm == 0 || dh * velocity().z() / std::abs(dh) / v_norm <= 0.5) {
-    correction.set_z(dh);
+  if (v_norm == 0 || dh * velocity().z_ / std::abs(dh) / v_norm <= 0.5) {
+    correction.z_ = dh;
   }
 
   return correction * height_factor_;
@@ -75,7 +75,7 @@ Vec3 Predator::height() const {
 Vec3 Predator::circle(double r) const {
   Vec3 v = velocity();
 
-  return Vec3(v.y(), -v.x(), 0) * v.norm() / r;
+  return Vec3(v.y_, -v.x_, 0) * v.norm() / r;
 }
 
 Predator::Predator()
@@ -94,7 +94,7 @@ Predator::Predator(const GlobalVariables&   global_vars,
     : Boid()
     , attack_range_(predator_vars.attack_range)
     , attack_speed_(predator_vars.attack_speed)
-    , preferred_height_(global_vars.screen.z() / 3)
+    , preferred_height_(global_vars.screen.z_ / 3)
     , height_factor_(0.01)
     , screen_(global_vars.screen)
     , wind_(global_vars.wind)
@@ -116,7 +116,8 @@ void Predator::updatePredator(Swarm& swarm) {
   } else {
     ++cooldown_;
 
-    updateBoidVelocity(wind_, height() + circle(screen_.norm() / 4), attack_speed_ / 2);
+    updateBoidVelocity(wind_, height() + circle(screen_.norm() / 4),
+                       attack_speed_ / 2);
   }
   stall(wind_, attack_speed_);
   updateBoid(wind_, wind_, attack_speed_);
