@@ -2,6 +2,7 @@
 #define VEC3_HPP
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 
 namespace boids {
@@ -42,6 +43,9 @@ class Vec3 {
   double& operator[](int i);
 
   std::string toString() const;
+
+  friend Vec3          operator*(double scalar, const Vec3& v);
+  friend std::ostream& operator<<(std::ostream& os, const Vec3& v);
 };
 
 inline Vec3::Vec3()
@@ -102,7 +106,7 @@ inline Vec3& Vec3::operator*=(double scalar) {
 }
 
 inline Vec3 Vec3::operator/(double scalar) const {
-  if (scalar == 0) { throw std::invalid_argument("Division by zero."); }
+  if (scalar == 0) { throw std::domain_error("Division by zero."); }
   return Vec3(x_ / scalar, y_ / scalar, z_ / scalar);
 }
 
@@ -151,6 +155,13 @@ inline double& Vec3::operator[](int i) {
   case 2 : return z_;
   default: throw std::out_of_range("Index out of range");
   }
+}
+
+inline Vec3 operator*(double scalar, const Vec3& v) { return v * scalar; }
+
+inline std::ostream& operator<<(std::ostream& os, const Vec3& v) {
+  os << "(" << v.x_ << ", " << v.y_ << ", " << v.z_ << ")";
+  return os;
 }
 } // namespace boids
 

@@ -233,7 +233,7 @@ void initializeParameters(GlobalVariables&   global_vars,
         << std::endl;
     std::cout
         << "Wind:              "
-        << (global_vars.wind * ConversionFactors::speed_k).toString()
+        << (global_vars.wind * ConversionFactors::speed_k)
         << std::endl;
   }
 }
@@ -282,7 +282,7 @@ void saveStatisticsOnFile(const std::string&       filename,
           << "\nwind speed        = "
           << global_vars.windspeed * ConversionFactors::speed_k
           << "\nwind vector       = "
-          << (global_vars.wind * ConversionFactors::speed_k).toString();
+          << (global_vars.wind * ConversionFactors::speed_k);
     }
     file
         << "\ntoroidal          = "
