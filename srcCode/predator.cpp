@@ -62,6 +62,24 @@ void Predator::attack(Swarm& swarm) {
   }
 }
 
+Vec3 Predator::height() const {
+  Vec3   correction;
+  double dh = preferred_height_ - position().z();
+
+  if (std::abs(dh) != 0
+      && dh * velocity().z() / std::abs(dh) / velocity().norm() <= 0.5) {
+    correction.set_z(dh);
+  }
+
+  return correction * height_factor_;
+}
+
+Vec3 Predator::circle(double r) const {
+  Vec3 v = velocity();
+
+  return Vec3(-v.y(), v.x(), 0) * v.norm() / r;
+}
+
 Predator::Predator()
     : Boid()
     , attack_range_()
@@ -100,8 +118,7 @@ void Predator::updatePredator(Swarm& swarm) {
   } else {
     ++cooldown_;
 
-    updateBoidVelocity(wind_, maintainHeight(preferred_height_, height_factor_),
-                       attack_speed_ / 2);
+    updateBoidVelocity(wind_, height() + circle(100), attack_speed_ / 2);
   }
   updateBoidVelocity(wind_, Vec3(), attack_speed_);
   stall(wind_, attack_speed_);

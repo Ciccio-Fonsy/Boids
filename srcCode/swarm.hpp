@@ -37,6 +37,7 @@ class Swarm {
   Vec3 separation(const Prey& b) const;
   Vec3 cohesion(const Prey& b) const;
   Vec3 alignment(const Prey& b) const;
+  Vec3 height(const Prey& b) const;
   Vec3 fear(const Prey& b) const;
 
  public:

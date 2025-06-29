@@ -263,15 +263,6 @@ TEST_CASE("mean and stdDev: Statistical functions") {
   CHECK(boids::stdDev(values) == doctest::Approx(1.41421356));
 }
 
-TEST_CASE("maintainHeight: Height adjustment") {
-  boids::Prey boid(boids::Vec3(1.0, 1.0, 5.0), boids::Vec3(0.0, 0.0, 1.0));
-
-  // Test: Boid is moving away from the target height
-  boids::Vec3 correction = boid.maintainHeight(3.0, 2.0);
-  CHECK(correction.z()
-        == doctest::Approx(-4.0)); // Moving down to the target height
-}
-
 TEST_CASE("Global Variables Initialization") {
   boids::GlobalVariables global_vars;
 

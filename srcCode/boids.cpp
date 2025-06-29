@@ -9,8 +9,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include <memory>
 #include <iostream>
+#include <memory>
 
 // for e algoritmi lambda
 
@@ -42,7 +42,7 @@ int main() {
   int t = 0;
 
   const int   print_period      = 100;
-  const float target_frame_time = 1.0f / 180.0f;
+  const float target_frame_time = 1.0f / 60.0f;
 
   while (window_top.isOpen() && window_side.isOpen() && swarm.size() > 0) {
     sf::Clock clock;
@@ -50,12 +50,12 @@ int main() {
     boids::handleEvents(window_top);
     boids::handleEvents(window_side);
 
-    window_top.clear();
+    window_top.clear(sf::Color(124, 252, 0));
     boids::drawBoids(predator.get(), swarm, window_top, 0, boid_shape,
                      predator_shape);
     window_top.display();
 
-    window_side.clear();
+    window_side.clear(sf::Color(135, 206, 235));
     boids::drawBoids(predator.get(), swarm, window_side, 1, boid_shape,
                      predator_shape);
     window_side.display();

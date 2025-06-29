@@ -157,6 +157,15 @@ Vec3 Swarm::alignment(const Prey& b) const {
   return (pv - b.velocity()) * alignment_factor_;
 }
 
+Vec3 Swarm::height(const Prey& b) const {
+  Vec3   correction;
+  double dh = preferred_height_ - b.position().z();
+
+  if (std::abs(dh) != 0 && (dh)*b.velocity().z() <= 0) { correction.set_z(dh); }
+
+  return correction * height_factor_;
+}
+
 Vec3 Swarm::fear(const Prey& b) const {
   assert(predator_ != nullptr);
   Vec3       evade_vector;
@@ -239,33 +248,32 @@ Swarm::Swarm(const GlobalVariables& global_vars,
 
 void Swarm::updateSwarm() {
   preys_.erase(
-      std::remove_if(preys_.begin(), preys_.end(),
-                     [this](Prey& prey) {
-                       if (predator_
-                           && isWithinRange(*predator_, prey, wingspan_)) {
-                         predator_->resetCooldown();
-                         return true; // Mark this prey for removal
-                       } else {
-                         const Vec3 v1 = separation(prey);
-                         const Vec3 v2 = cohesion(prey);
-                         const Vec3 v3 = alignment(prey);
-                         const Vec3 v4 = prey.maintainHeight(preferred_height_,
-                                                             height_factor_);
+      std::remove_if(
+          preys_.begin(), preys_.end(),
+          [this](Prey& prey) {
+            if (predator_ && isWithinRange(*predator_, prey, wingspan_)) {
+              predator_->resetCooldown();
+              return true; // Mark this prey for removal
+            } else {
+              const Vec3 v1 = separation(prey);
+              const Vec3 v2 = cohesion(prey);
+              const Vec3 v3 = alignment(prey);
+              const Vec3 v4 = height(prey);
 
-                         bounce(prey);
-                         prey.updateBoidVelocity(wind_, v1 + v2 + v3 + v4, max_speed_);
+              bounce(prey);
+              prey.updateBoidVelocity(wind_, v1 + v2 + v3 + v4, max_speed_);
 
-                         if (predator_) {
-                           prey.updateBoidVelocity(wind_, fear(prey), max_speed_);
-                         }
+              if (predator_) {
+                prey.updateBoidVelocity(wind_, fear(prey), max_speed_);
+              }
 
-                         prey.stall(wind_, max_speed_);
-                         prey.updateBoid(wind_, wind_, max_speed_);
-                         prey.border(screen_, toroidal_);
+              prey.stall(wind_, max_speed_);
+              prey.updateBoid(wind_, wind_, max_speed_);
+              prey.border(screen_, toroidal_);
 
-                         return false; // Keep this prey
-                       }
-                     }),
+              return false; // Keep this prey
+            }
+          }),
       preys_.end());
 
   size_ = static_cast<int>(preys_.size());

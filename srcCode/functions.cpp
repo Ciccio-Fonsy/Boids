@@ -9,14 +9,48 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <random>
 
 namespace boids {
-void casualParameters(GlobalVariables&   global_vars,
-                      PredatorVariables& predator_vars,
-                      SwarmVariables&    swarm_vars) {
+static bool isYes(const std::string& prompt) {
+  std::string input;
+
+  std::cout << prompt << " [y/N]: ";
+  std::cin >> input;
+
+  std::transform(input.begin(), input.end(), input.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+
+  return input == "y" || input == "ye" || input == "yes";
+}
+
+template<typename T> static T getParameterFromUser(const std::string& parameter,
+                                                   T lower, T upper,
+                                                   T conversion_factor = 1) {
+  T value;
+  std::cout
+      << "Enter "
+      << parameter
+      << " ("
+      << lower
+      << " ~ "
+      << upper
+      << "): ";
+  std::cin >> value;
+  if (value < lower || value > upper) {
+    throw std::out_of_range("This value is not acceptable");
+  } else {
+    return value / conversion_factor;
+  }
+}
+
+static void casualParameters(GlobalVariables&   global_vars,
+                             PredatorVariables& predator_vars,
+                             SwarmVariables&    swarm_vars) {
   std::random_device rd;
   std::mt19937       gen(rd());
 
@@ -66,251 +100,78 @@ void casualParameters(GlobalVariables&   global_vars,
 void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars) {
-  std::string input;
+  swarm_vars.size = getParameterFromUser("swarm size", LimitValues::size_lower,
+                                         LimitValues::size_upper);
 
-  std::cout << "Enter swarm size (2 ~ " << LimitValues::size_upper << "): ";
-  int size;
-  std::cin >> size;
-  if (size <= LimitValues::size_lower || size > LimitValues::size_upper) {
-    std::cout << "This value is not accetable, setted to default value\n";
-  } else {
-    swarm_vars.size = size;
-  }
+  global_vars.wind_bool = isYes("Enable wind?");
 
-  std::cout << "Enable wind? [y/N]: ";
-  std::cin >> input;
-  global_vars.wind_bool =
-      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+  global_vars.predator_bool = isYes("Enable predator?");
 
-  std::cout << "Enable predator? [y/N]: ";
-  std::cin >> input;
-  global_vars.predator_bool =
-      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
-
-  std::cout << "Enable toroidal space? (Recommended with wind enabled) [y/N]: ";
-  std::cin >> input;
   global_vars.toroidal_bool =
-      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+      isYes("Enable toroidal space? (Recommended with wind enabled)");
 
-  std::cout << "Insert parameters manually? [y/N]: ";
-  std::cin >> input;
-  bool manually =
-      (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+  if (isYes("Insert parameters manually?")) {
+    swarm_vars.wingspan = getParameterFromUser(
+        "wingspan", LimitValues::wingspan_lower, LimitValues::wingspan_upper);
 
-  if (manually) {
-    std::cout
-        << "Enter wingspan ("
-        << LimitValues::wingspan_lower
-        << " ~ "
-        << LimitValues::wingspan_upper
-        << "): ";
-    double wingspan;
-    std::cin >> wingspan;
-    if (wingspan < LimitValues::wingspan_lower
-        || wingspan > LimitValues::wingspan_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.wingspan = wingspan;
-    }
+    swarm_vars.max_speed = getParameterFromUser(
+        "maximum speed", LimitValues::speed_lower, LimitValues::speed_upper,
+        ConversionFactors::speed_k);
 
-    std::cout
-        << "Enter maximum speed ("
-        << LimitValues::speed_lower
-        << " ~ "
-        << LimitValues::speed_upper
-        << "): ";
-    double max_speed;
-    std::cin >> max_speed;
-    if (max_speed < LimitValues::speed_lower
-        || max_speed > LimitValues::speed_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.max_speed = max_speed / ConversionFactors::speed_k;
-    }
+    swarm_vars.min_distance =
+        getParameterFromUser("minimum distance", swarm_vars.wingspan,
+                             LimitValues::min_distance_upper);
 
-    std::cout
-        << "Enter minimum distance ("
-        << swarm_vars.wingspan
-        << " ~ "
-        << LimitValues::min_distance_upper
-        << "): ";
-    double min_distance;
-    std::cin >> min_distance;
-    if (min_distance < swarm_vars.wingspan
-        || min_distance > LimitValues::min_distance_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.min_distance = min_distance;
-    }
+    swarm_vars.separation_factor = getParameterFromUser(
+        "separation factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, ConversionFactors::separation_k);
 
-    std::cout
-        << "Enter separation factor ("
-        << LimitValues::factors_lower
-        << " ~ "
-        << LimitValues::factors_upper
-        << "): ";
-    double separation_factor;
-    std::cin >> separation_factor;
-    if (separation_factor < LimitValues::factors_lower
-        || separation_factor > LimitValues::factors_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.separation_factor =
-          separation_factor / ConversionFactors::separation_k;
-    }
+    swarm_vars.cohesion_factor = getParameterFromUser(
+        "cohesion factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, ConversionFactors::cohesion_k);
 
-    std::cout
-        << "Enter cohesion factor ("
-        << LimitValues::factors_lower
-        << " ~ "
-        << LimitValues::factors_upper
-        << "): ";
-    double cohesion_factor;
-    std::cin >> cohesion_factor;
-    if (cohesion_factor < LimitValues::factors_lower
-        || cohesion_factor > LimitValues::factors_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.cohesion_factor =
-          cohesion_factor / ConversionFactors::cohesion_k;
-    }
+    swarm_vars.alignment_factor = getParameterFromUser(
+        "alignment factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, ConversionFactors::alignment_k);
 
-    std::cout
-        << "Enter alignment factor ("
-        << LimitValues::factors_lower
-        << " ~ "
-        << LimitValues::factors_upper
-        << "): ";
-    double alignment_factor;
-    std::cin >> alignment_factor;
-    if (alignment_factor < LimitValues::factors_lower
-        || alignment_factor > LimitValues::factors_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.alignment_factor =
-          alignment_factor / ConversionFactors::alignment_k;
-    }
+    swarm_vars.fear_factor = getParameterFromUser(
+        "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
+        ConversionFactors::fear_k);
 
-    std::cout
-        << "Enter fear factor ("
-        << LimitValues::factors_lower
-        << " ~ "
-        << LimitValues::factors_upper
-        << "): ";
-    double fear_factor;
-    std::cin >> fear_factor;
-    if (fear_factor < LimitValues::factors_lower
-        || fear_factor > LimitValues::factors_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.fear_factor = fear_factor / ConversionFactors::fear_k;
-    }
+    swarm_vars.height_factor = getParameterFromUser(
+        "height factor", LimitValues::factors_lower, LimitValues::factors_upper,
+        ConversionFactors::height_k);
 
-    std::cout
-        << "Enter height factor ("
-        << LimitValues::factors_lower
-        << " ~ "
-        << LimitValues::factors_upper
-        << "): ";
-    double height_factor;
-    std::cin >> height_factor;
-    if (height_factor < LimitValues::factors_lower
-        || height_factor > LimitValues::factors_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.height_factor = height_factor / ConversionFactors::height_k;
-    }
+    swarm_vars.sight_distance =
+        getParameterFromUser("sight distance", swarm_vars.min_distance,
+                             LimitValues::sight_distance_upper);
 
-    std::cout
-        << "Enter sight distance ("
-        << swarm_vars.min_distance
-        << " ~ "
-        << LimitValues::sight_distance_upper
-        << "): ";
-    double sight_distance;
-    std::cin >> sight_distance;
-    if (sight_distance < swarm_vars.min_distance
-        || sight_distance > LimitValues::sight_distance_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.sight_distance = sight_distance;
-    }
-
-    std::cout
-        << "Enter visual field ("
-        << LimitValues::visual_field_lower
-        << " ~ "
-        << LimitValues::visual_field_upper
-        << "): ";
-    double visual_field;
-    std::cin >> visual_field;
-    if (visual_field < LimitValues::visual_field_lower
-        || visual_field > LimitValues::visual_field_upper) {
-      std::cout << "This value is not accetable, setted to default value\n";
-    } else {
-      swarm_vars.visual_field =
-          visual_field / ConversionFactors::visual_field_k;
-    }
+    swarm_vars.visual_field = getParameterFromUser(
+        "visual field", LimitValues::visual_field_lower,
+        LimitValues::visual_field_upper, ConversionFactors::visual_field_k);
 
     if (global_vars.predator_bool) {
-      std::cout
-          << "Enter predator attack speed ("
-          << LimitValues::speed_lower
-          << " ~ "
-          << LimitValues::speed_upper
-          << "): ";
-      double attack_speed;
-      std::cin >> attack_speed;
-      if (attack_speed < LimitValues::speed_lower
-          || attack_speed > LimitValues::speed_upper) {
-        std::cout << "This value is not accetable, setted to default value\n";
-      } else {
-        predator_vars.attack_speed = attack_speed / ConversionFactors::speed_k;
-      }
+      predator_vars.attack_speed = getParameterFromUser(
+          "predator attack speed", LimitValues::speed_lower,
+          LimitValues::speed_upper, ConversionFactors::speed_k);
 
-      std::cout
-          << "Enter predator attack range ("
-          << LimitValues::attack_range_lower
-          << " ~ "
-          << LimitValues::attack_range_upper
-          << "): ";
-      double attack_range;
-      std::cin >> attack_range;
-      if (attack_range <= LimitValues::attack_range_lower
-          || attack_range > LimitValues::attack_range_upper) {
-        std::cout << "This value is not accetable, setted to default value\n";
-      } else {
-        predator_vars.attack_range = attack_range;
-      }
+      predator_vars.attack_range = getParameterFromUser(
+          "predator attack range", LimitValues::attack_range_lower,
+          LimitValues::attack_range_upper);
     }
 
     if (global_vars.wind_bool) {
-      std::cout
-          << "Enter wind speed ("
-          << LimitValues::windspeed_lower
-          << " ~ "
-          << LimitValues::windspeed_upper
-          << "): ";
-      double windspeed;
-      std::cin >> windspeed;
-      if (windspeed < LimitValues::windspeed_lower
-          || windspeed > LimitValues::windspeed_upper) {
-        std::cout << "This value is not accetable, setted to default value\n";
-      } else {
-        global_vars.windspeed = windspeed / ConversionFactors::speed_k;
-      }
+      global_vars.windspeed = getParameterFromUser(
+          "wind speed", LimitValues::windspeed_lower,
+          LimitValues::windspeed_upper, ConversionFactors::speed_k);
     }
   } else {
-    bool casual;
-
-    std::cout << "casual parameters geneation? [y/N]: ";
-    std::cin >> input;
-    casual = (input == "y" || input == "Y" || input == "yes" || input == "Yes");
-
-    if (casual) { casualParameters(global_vars, predator_vars, swarm_vars); }
+    if (isYes("Casual parameters geneation?")) {
+      casualParameters(global_vars, predator_vars, swarm_vars);
+    }
   }
 
-  std::cout << "Parameters setted at values:\n";
+  std::cout << "Parameters set to values:\n";
   std::cout << "Size:              " << swarm_vars.size << std::endl;
   std::cout << "Wingspan:          " << swarm_vars.wingspan << std::endl;
   std::cout
@@ -356,14 +217,14 @@ void initializeParameters(GlobalVariables&   global_vars,
   }
 
   if (global_vars.wind_bool) {
-    const double wind_horizontal = 50;
-    const double wind_vertical   = 5;
-
     std::random_device               rd;
     std::mt19937                     gen(rd());
-    std::uniform_real_distribution<> dis_x(-wind_horizontal, wind_horizontal);
-    std::uniform_real_distribution<> dis_y(-wind_horizontal, wind_horizontal);
-    std::uniform_real_distribution<> dis_z(-wind_vertical, wind_vertical);
+    std::uniform_real_distribution<> dis_x(-LimitValues::wind_horizontal,
+                                           LimitValues::wind_horizontal);
+    std::uniform_real_distribution<> dis_y(-LimitValues::wind_horizontal,
+                                           LimitValues::wind_horizontal);
+    std::uniform_real_distribution<> dis_z(-LimitValues::wind_vertical,
+                                           LimitValues::wind_vertical);
     global_vars.wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize()
                      * global_vars.windspeed;
     std::cout
@@ -430,10 +291,7 @@ void saveStatisticsOnFile(const std::string&       filename,
         << std::endl;
     file.close();
   } else {
-    std::cerr
-        << "Error: unable to save datas on file: "
-        << filename
-        << std::endl;
+    throw std::runtime_error("Error: unable to save data to file: " + filename);
   }
 }
 
@@ -463,7 +321,7 @@ void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
   float wingspanf = static_cast<float>(wingspan);
 
   boid_shape.setRadius(wingspanf);
-  boid_shape.setFillColor(sf::Color::White);
+  boid_shape.setFillColor(sf::Color::Black);
 
   predator_shape.setRadius(wingspanf * 2);
   predator_shape.setFillColor(sf::Color::Red);
@@ -525,7 +383,8 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
   }
 }
 
-void printStatistics(Swarm& swarm, int t, const std::string& filename) {
+static void printStatistics(const Swarm& swarm, int t,
+                            const std::string& filename) {
   std::vector<double> distances;
   std::vector<double> velocities;
 
@@ -547,26 +406,6 @@ void printStatistics(Swarm& swarm, int t, const std::string& filename) {
   double std_dist  = stdDev(distances);
   double std_vel   = stdDev(velocities);
 
-  std::cout
-      << "t = "
-      << std::setw(6)
-      << t
-      << "; mean_distance = "
-      << std::setw(7)
-      << mean_dist
-      << "; distance_std_dev = "
-      << std::setw(7)
-      << std_dist
-      << "; mean_velocity = "
-      << std::setw(7)
-      << mean_vel
-      << "; velocity_std_dev = "
-      << std::setw(11)
-      << std_vel
-      << "; n_boids = "
-      << std::setw(3)
-      << swarm.size()
-      << std::endl;
   if (file.is_open()) {
     file
         << std::setw(6)
@@ -587,7 +426,7 @@ void printStatistics(Swarm& swarm, int t, const std::string& filename) {
 }
 
 void updateSimulation(Predator* predator, Swarm& swarm, int& t,
-                             int print_period, const std::string& filename) {
+                      int print_period, const std::string& filename) {
   if (predator) { predator->updatePredator(swarm); }
   swarm.updateSwarm();
 

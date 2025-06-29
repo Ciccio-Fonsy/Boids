@@ -30,7 +30,6 @@ class Boid {
   void updateBoid(const Vec3& wind, const Vec3& delta_v, double max_speed);
 
   void border(const Vec3& screen, bool toroidal);
-  Vec3 maintainHeight(double target_height, double height_factor) const;
 
   virtual void stall(const Vec3& wind, double max_speed) = 0;
   virtual void resetCooldown()                           = 0;
@@ -54,16 +53,6 @@ inline bool Boid::operator==(const Boid& other) const {
 
 inline bool Boid::operator!=(const Boid& other) const {
   return !(*this == other);
-}
-
-inline Vec3 Boid::maintainHeight(double target_height,
-                                 double height_factor) const {
-  Vec3 correction;
-  if (std::abs(position_.z() - target_height) != 0
-      && (position_.z() - target_height) * velocity_.z() > 0) {
-    correction.set_z(target_height - position_.z());
-  }
-  return correction * height_factor;
 }
 } // namespace boids
 

@@ -25,7 +25,7 @@ struct SwarmVariables {
   double max_speed      = 1;
   double min_distance   = 30;
   double sight_distance = 150;
-  double visual_field   = 60;
+  double visual_field   = M_PI * 3 / 2;
 
   double separation_factor = 0.05;
   double cohesion_factor   = 0.00005;
@@ -65,6 +65,9 @@ struct LimitValues {
 
   static const double windspeed_lower;
   static const double windspeed_upper;
+
+  static const double wind_horizontal;
+  static const double wind_vertical;
 
   static const double attack_range_lower;
   static const double attack_range_upper;

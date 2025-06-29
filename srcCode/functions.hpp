@@ -18,13 +18,9 @@
 #include <vector>
 
 namespace boids {
-void casualParameters(GlobalVariables&   global_vars,
-                      PredatorVariables& predator_vars,
-                      SwarmVariables&    swarm_vars);
 void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars);
-void printStatistics(Swarm& swarm, int t, const std::string& filename);
 void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz);
 void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
                       sf::CircleShape& predator_shape);

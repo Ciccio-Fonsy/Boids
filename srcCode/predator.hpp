@@ -21,6 +21,9 @@ class Predator : public Boid {
   void        Init();
   const Prey* findPrey(const Swarm& swarm) const;
   void        attack(Swarm& swarm);
+  Vec3        height() const;
+  Vec3        circle(double r) const;
+  void        stall(const Vec3& wind, double max_speed);
 
  public:
   Predator();
@@ -36,7 +39,6 @@ class Predator : public Boid {
   bool        toroidal() const;
   int         cooldown() const;
 
-  void stall(const Vec3& wind, double max_speed);
   void resetCooldown();
   void updatePredator(Swarm& swarm);
 };
