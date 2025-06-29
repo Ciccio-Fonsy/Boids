@@ -377,84 +377,6 @@ void initializeParameters(GlobalVariables&   global_vars,
   }
 }
 
-void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) {
-  const sf::VideoMode& desktop_mode = sf::VideoMode::getDesktopMode();
-
-  unsigned int screen_width  = desktop_mode.width;
-  unsigned int screen_height = desktop_mode.height;
-
-  unsigned int padding        = 12;
-  unsigned int app_bar_height = 40;
-
-  unsigned int window_width = (screen_width / 2) - padding;
-  unsigned int window_height =
-      (screen_height / 2) - 2 * padding - app_bar_height;
-
-  window_xy.create(sf::VideoMode(window_width, window_height), "XY Plane");
-  window_xz.create(sf::VideoMode(window_width, window_height), "XZ Plane");
-
-  window_xy.setPosition(
-      sf::Vector2i(0, static_cast<int>(window_height + 3 * padding)));
-  window_xz.setPosition(sf::Vector2i(0, 0));
-}
-
-void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
-                      sf::CircleShape& predator_shape) {
-  float wingspanf = static_cast<float>(wingspan);
-
-  boid_shape.setRadius(wingspanf);
-  boid_shape.setFillColor(sf::Color::White);
-
-  predator_shape.setRadius(wingspanf * 2);
-  predator_shape.setFillColor(sf::Color::Red);
-}
-
-void drawBoids(const Predator* predator, const Swarm& swarm,
-               sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
-               sf::CircleShape& predator_shape) {
-  const Vec3& screen = swarm.screen();
-
-  double width  = window.getSize().x;
-  double height = window.getSize().y;
-
-  for (int i = 0; i < swarm.size(); ++i) {
-    sf::Vector2<double> position;
-
-    switch (plane) {
-    case 0:
-      position.x = swarm[i].position().x() / screen.x() * width;
-      position.y = swarm[i].position().y() / screen.y() * height;
-      break;
-    case 1:
-      position.x = swarm[i].position().x() / screen.x() * width;
-      position.y = swarm[i].position().z() / screen.z() * height;
-      break;
-    default: throw std::out_of_range("index out of range");
-    }
-
-    boid_shape.setPosition(sf::Vector2f(position));
-    window.draw(boid_shape);
-  }
-
-  if (predator) {
-    sf::Vector2<double> predator_position;
-    switch (plane) {
-    case 0:
-      predator_position.x = predator->position().x() / screen.x() * width;
-      predator_position.y = predator->position().y() / screen.y() * height;
-      break;
-    case 1:
-      predator_position.x = predator->position().x() / screen.x() * width;
-      predator_position.y = predator->position().z() / screen.z() * height;
-      break;
-    default: throw std::out_of_range("index out of range");
-    }
-
-    predator_shape.setPosition(sf::Vector2f(predator_position));
-    window.draw(predator_shape);
-  }
-}
-
 void saveStatisticsOnFile(const std::string&       filename,
                           const GlobalVariables&   global_vars,
                           const PredatorVariables& predator_vars,
@@ -512,6 +434,94 @@ void saveStatisticsOnFile(const std::string&       filename,
         << "Error: unable to save datas on file: "
         << filename
         << std::endl;
+  }
+}
+
+void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) {
+  const sf::VideoMode& desktop_mode = sf::VideoMode::getDesktopMode();
+
+  unsigned int screen_width  = desktop_mode.width;
+  unsigned int screen_height = desktop_mode.height;
+
+  unsigned int padding        = 12;
+  unsigned int app_bar_height = 40;
+
+  unsigned int window_width = (screen_width / 2) - padding;
+  unsigned int window_height =
+      (screen_height / 2) - 2 * padding - app_bar_height;
+
+  window_xy.create(sf::VideoMode(window_width, window_height), "XY Plane");
+  window_xz.create(sf::VideoMode(window_width, window_height), "XZ Plane");
+
+  window_xy.setPosition(
+      sf::Vector2i(0, static_cast<int>(window_height + 3 * padding)));
+  window_xz.setPosition(sf::Vector2i(0, 0));
+}
+
+void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
+                      sf::CircleShape& predator_shape) {
+  float wingspanf = static_cast<float>(wingspan);
+
+  boid_shape.setRadius(wingspanf);
+  boid_shape.setFillColor(sf::Color::White);
+
+  predator_shape.setRadius(wingspanf * 2);
+  predator_shape.setFillColor(sf::Color::Red);
+}
+
+void handleEvents(sf::RenderWindow& window) {
+  sf::Event event;
+  while (window.pollEvent(event)) {
+    if (event.type == sf::Event::Closed) {
+      window.close();
+      std::cout << "Program closed, ";
+    }
+  }
+}
+
+void drawBoids(const Predator* predator, const Swarm& swarm,
+               sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
+               sf::CircleShape& predator_shape) {
+  const Vec3& screen = swarm.screen();
+
+  double width  = window.getSize().x;
+  double height = window.getSize().y;
+
+  for (int i = 0; i < swarm.size(); ++i) {
+    sf::Vector2<double> position;
+
+    switch (plane) {
+    case 0:
+      position.x = swarm[i].position().x() / screen.x() * width;
+      position.y = swarm[i].position().y() / screen.y() * height;
+      break;
+    case 1:
+      position.x = swarm[i].position().x() / screen.x() * width;
+      position.y = swarm[i].position().z() / screen.z() * height;
+      break;
+    default: throw std::out_of_range("index out of range");
+    }
+
+    boid_shape.setPosition(sf::Vector2f(position));
+    window.draw(boid_shape);
+  }
+
+  if (predator) {
+    sf::Vector2<double> predator_position;
+    switch (plane) {
+    case 0:
+      predator_position.x = predator->position().x() / screen.x() * width;
+      predator_position.y = predator->position().y() / screen.y() * height;
+      break;
+    case 1:
+      predator_position.x = predator->position().x() / screen.x() * width;
+      predator_position.y = predator->position().z() / screen.z() * height;
+      break;
+    default: throw std::out_of_range("index out of range");
+    }
+
+    predator_shape.setPosition(sf::Vector2f(predator_position));
+    window.draw(predator_shape);
   }
 }
 
@@ -574,5 +584,14 @@ void printStatistics(Swarm& swarm, int t, const std::string& filename) {
         << std::endl;
     file.close();
   }
+}
+
+void updateSimulation(Predator* predator, Swarm& swarm, int& t,
+                             int print_period, const std::string& filename) {
+  if (predator) { predator->updatePredator(swarm); }
+  swarm.updateSwarm();
+
+  if (t % print_period == 0) { printStatistics(swarm, t, filename); }
+  ++t;
 }
 } // namespace boids

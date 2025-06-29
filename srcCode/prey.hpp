@@ -14,15 +14,22 @@ class Prey : public Boid {
   void stall(const Vec3& wind, double max_speed);
 };
 
+inline Prey::Prey()
+    : Boid() {}
+
+inline Prey::Prey(Vec3 position, Vec3 velocity)
+    : Boid(position, velocity) {}
+
 inline void Prey::stall(const Vec3& wind, double max_speed) {
   if ((velocity() - wind).norm() <= 0.4 * max_speed) {
-    updateBoidVelocity(wind, 
+    updateBoidVelocity(
+        wind,
         Vec3((velocity() - wind).x(), (velocity() - wind).y(), 0.4 * max_speed),
         max_speed);
   }
-};
+}
 
-inline void Prey::resetCooldown() {};
+inline void Prey::resetCooldown() {}
 } // namespace boids
 
 #endif // PREY_HPP

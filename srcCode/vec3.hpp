@@ -44,6 +44,16 @@ class Vec3 {
   std::string toString() const;
 };
 
+inline Vec3::Vec3()
+    : x_()
+    , y_()
+    , z_() {}
+
+inline Vec3::Vec3(double x, double y, double z)
+    : x_(x)
+    , y_(y)
+    , z_(z) {}
+
 inline double Vec3::x() const { return x_; }
 
 inline double Vec3::y() const { return y_; }
@@ -125,11 +135,6 @@ inline Vec3 Vec3::cross(const Vec3& other) const {
               x_ * other.y_ - y_ * other.x_);
 }
 
-inline double Vec3::distance(bool toroidal, const Vec3& other,
-                             const Vec3& width) const {
-  return vecDistance(toroidal, other, width).norm();
-}
-
 inline double Vec3::operator[](int i) const {
   switch (i) {
   case 0 : return x_;
@@ -146,16 +151,6 @@ inline double& Vec3::operator[](int i) {
   case 2 : return z_;
   default: throw std::out_of_range("Index out of range");
   }
-}
-
-inline std::string Vec3::toString() const {
-  return "("
-       + std::to_string(x_)
-       + ", "
-       + std::to_string(y_)
-       + ", "
-       + std::to_string(z_)
-       + ")";
 }
 } // namespace boids
 

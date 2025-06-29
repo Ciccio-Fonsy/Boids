@@ -11,6 +11,21 @@ Boid::Boid(Vec3 position, Vec3 velocity)
     : position_(position)
     , velocity_(velocity) {}
 
+void Boid::updateBoidVelocity(const Vec3& wind, const Vec3& delta_v,
+                                     double max_speed) {
+  velocity_ += delta_v;
+
+  if ((velocity_ - wind).norm() > max_speed) {
+    velocity_ = (velocity_ - wind).normalize() * max_speed + wind;
+  }
+}
+
+void Boid::updateBoid(const Vec3& wind, const Vec3& delta_v,
+                             double max_speed) {
+  updateBoidVelocity(wind, delta_v, max_speed);
+  set_position(position() + velocity());
+}
+
 void Boid::border(const Vec3& screen, bool toroidal) {
   Vec3 bounce       = velocity_;
   Vec3 new_position = position_;

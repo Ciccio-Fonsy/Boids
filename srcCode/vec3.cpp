@@ -3,16 +3,6 @@
 #include <cmath>
 
 namespace boids {
-Vec3::Vec3()
-    : x_()
-    , y_()
-    , z_() {}
-
-Vec3::Vec3(double x, double y, double z)
-    : x_(x)
-    , y_(y)
-    , z_(z) {}
-
 Vec3 Vec3::vecDistance(bool toroidal, const Vec3& other,
                        const Vec3& width) const { // From b to a
   if (toroidal) {
@@ -27,5 +17,20 @@ Vec3 Vec3::vecDistance(bool toroidal, const Vec3& other,
     return dist;
   }
   return *this - other;
+}
+
+double Vec3::distance(bool toroidal, const Vec3& other,
+                      const Vec3& width) const {
+  return vecDistance(toroidal, other, width).norm();
+}
+
+std::string Vec3::toString() const {
+  return "("
+       + std::to_string(x_)
+       + ", "
+       + std::to_string(y_)
+       + ", "
+       + std::to_string(z_)
+       + ")";
 }
 } // namespace boids
