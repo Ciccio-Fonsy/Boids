@@ -42,8 +42,6 @@ class Vec3 {
   double operator[](int i) const;
   double& operator[](int i);
 
-  std::string toString() const;
-
   friend Vec3          operator*(double scalar, const Vec3& v);
   friend std::ostream& operator<<(std::ostream& os, const Vec3& v);
 };
@@ -83,7 +81,9 @@ inline Vec3 Vec3::operator+(const Vec3& other) const {
 }
 
 inline Vec3& Vec3::operator+=(const Vec3& other) {
-  *this = *this + other;
+  x_ += other.x_;
+  y_ += other.y_;
+  z_ += other.z_;
   return *this;
 }
 
@@ -92,7 +92,9 @@ inline Vec3 Vec3::operator-(const Vec3& other) const {
 }
 
 inline Vec3& Vec3::operator-=(const Vec3& other) {
-  *this = *this - other;
+  x_ -= other.x_;
+  y_ -= other.y_;
+  z_ -= other.z_;
   return *this;
 }
 
@@ -101,7 +103,9 @@ inline Vec3 Vec3::operator*(double scalar) const {
 }
 
 inline Vec3& Vec3::operator*=(double scalar) {
-  *this = *this * scalar;
+  x_ *= scalar;
+  y_ *= scalar;
+  z_ *= scalar;
   return *this;
 }
 
@@ -111,7 +115,10 @@ inline Vec3 Vec3::operator/(double scalar) const {
 }
 
 inline Vec3& Vec3::operator/=(double scalar) {
-  *this = *this / scalar;
+  if (scalar == 0) { throw std::domain_error("Division by zero."); }
+  x_ /= scalar;
+  y_ /= scalar;
+  z_ /= scalar;
   return *this;
 }
 
