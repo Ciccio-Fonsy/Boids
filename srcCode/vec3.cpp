@@ -1,5 +1,6 @@
 #include "vec3.hpp"
 
+#include <cassert>
 #include <cmath>
 
 namespace boids {
@@ -22,15 +23,5 @@ Vec3 Vec3::vecDistance(bool toroidal, const Vec3& other,
 double Vec3::distance(bool toroidal, const Vec3& other,
                       const Vec3& width) const {
   return vecDistance(toroidal, other, width).norm();
-}
-
-std::string Vec3::toString() const {
-  return "("
-       + std::to_string(x_)
-       + ", "
-       + std::to_string(y_)
-       + ", "
-       + std::to_string(z_)
-       + ")";
 }
 } // namespace boids

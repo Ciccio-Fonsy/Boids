@@ -6,12 +6,11 @@
 #include "variables.hpp"
 #include "vec3.hpp"
 
-#include <iostream>
 #include <random>
 #include <stdexcept>
 
 namespace boids {
-void Predator::Init() {
+void Predator::init() {
   std::random_device               rd;
   std::mt19937                     gen(rd());
   std::uniform_real_distribution<> ds(0, 1.0);
@@ -65,9 +64,9 @@ void Predator::attack(Swarm& swarm) {
 Vec3 Predator::height() const {
   Vec3   correction;
   double dh = preferred_height_ - position().z();
+  double v_norm = velocity().norm();
 
-  if (std::abs(dh) != 0
-      && dh * velocity().z() / std::abs(dh) / velocity().norm() <= 0.5) {
+  if (v_norm == 0 || dh * velocity().z() / std::abs(dh) / v_norm <= 0.5) {
     correction.set_z(dh);
   }
 
@@ -109,7 +108,7 @@ Predator::Predator(const GlobalVariables&   global_vars,
     throw std::invalid_argument("attack_speed must be greater than 0");
   }
 
-  Init();
+  init();
 }
 
 void Predator::updatePredator(Swarm& swarm) {
@@ -120,7 +119,6 @@ void Predator::updatePredator(Swarm& swarm) {
 
     updateBoidVelocity(wind_, height() + circle(100), attack_speed_ / 2);
   }
-  updateBoidVelocity(wind_, Vec3(), attack_speed_);
   stall(wind_, attack_speed_);
   updateBoid(wind_, wind_, attack_speed_);
 

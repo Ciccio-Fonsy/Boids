@@ -18,7 +18,7 @@ class Predator : public Boid {
   const bool   toroidal_;
   int          cooldown_;
 
-  void        Init();
+  void        init();
   const Prey* findPrey(const Swarm& swarm) const;
   void        attack(Swarm& swarm);
   Vec3        height() const;
@@ -68,7 +68,7 @@ inline void Predator::stall(const Vec3& wind, double max_speed) {
         Vec3((velocity() - wind).x(), (velocity() - wind).y(), 0.2 * max_speed),
         max_speed);
   }
-};
+}
 } // namespace boids
 
 #endif // PREDATOR_HPP

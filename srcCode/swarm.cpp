@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace boids {
-void Swarm::Init() {
+void Swarm::init() {
   std::random_device               rd;
   std::mt19937                     gen(rd());
   std::uniform_real_distribution<> ds(0, 1.0);
@@ -161,7 +161,7 @@ Vec3 Swarm::height(const Prey& b) const {
   Vec3   correction;
   double dh = preferred_height_ - b.position().z();
 
-  if (std::abs(dh) != 0 && (dh)*b.velocity().z() <= 0) { correction.set_z(dh); }
+  if (dh * b.velocity().z() <= 0) { correction.set_z(dh); }
 
   return correction * height_factor_;
 }
@@ -204,7 +204,7 @@ Swarm::Swarm()
     , predator_(nullptr) {
   preys_ = std::vector<Prey>(static_cast<std::size_t>(size_));
 
-  Init();
+  init();
 }
 
 Swarm::Swarm(const GlobalVariables& global_vars,
@@ -243,7 +243,7 @@ Swarm::Swarm(const GlobalVariables& global_vars,
 
   preys_ = std::vector<Prey>(static_cast<std::size_t>(size_));
 
-  Init();
+  init();
 }
 
 void Swarm::updateSwarm() {

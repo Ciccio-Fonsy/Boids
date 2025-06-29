@@ -32,7 +32,7 @@ class Swarm {
   bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
   bool isWithinField(const Boid& b1, const Boid& b2) const;
 
-  void Init();
+  void init();
   void bounce(Prey& b);
   Vec3 separation(const Prey& b) const;
   Vec3 cohesion(const Prey& b) const;
