@@ -174,7 +174,7 @@ Vec3 Swarm::fear(const Prey& b) const {
 
   if (distance_norm == 0) {
     evade_vector = b.velocity().normalize() * max_speed_;
-  } else if (distance_norm <= sight_distance_ && isWithinField(b, *predator_)) {
+  } else if (distance_norm <= sight_distance_) {
     const Vec3   flee_direction = distance_to_predator.normalize();
     const double evade_strength =
         (sight_distance_ - distance_norm) / sight_distance_;

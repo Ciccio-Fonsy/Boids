@@ -25,7 +25,7 @@ struct SwarmVariables {
   double max_speed      = 1;
   double min_distance   = 30;
   double sight_distance = 150;
-  double visual_field   = M_PI * 3 / 2;
+  double visual_field   = M_PI * 2 / 3;
 
   double separation_factor = 0.05;
   double cohesion_factor   = 0.00005;
@@ -35,6 +35,7 @@ struct SwarmVariables {
 };
 
 struct ConversionFactors {
+  static const double space_k;
   static const double speed_k;
   static const double visual_field_k;
   static const double separation_k;
@@ -48,10 +49,13 @@ struct LimitValues {
   static const int size_lower;
   static const int size_upper;
 
-  static const int wingspan_lower;
-  static const int wingspan_upper;
+  static const double wingspan_lower;
+  static const double wingspan_upper;
 
+  static const double min_distance_lower;
   static const double min_distance_upper;
+
+  static const double sight_distance_lower;
   static const double sight_distance_upper;
 
   static const double visual_field_lower;
