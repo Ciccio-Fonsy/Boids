@@ -71,7 +71,7 @@ int main() {
 
   if (swarm.size() == 0) { std::cout << "No boids left, "; }
 
-  std::cout << "terminating execution\n";
+  std::cout << "terminating execution\nData saved on file boids_save.txt\n";
 
   return 0;
 }

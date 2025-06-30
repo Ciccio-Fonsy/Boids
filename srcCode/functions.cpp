@@ -30,6 +30,7 @@ static bool isYes(const std::string& prompt) {
 
 template<typename T>
 static T getParameterFromUser(const std::string& parameter, T lower, T upper,
+                              const std::string& measure_unit,
                               T conversion_factor, bool factor = 0) {
   T value;
   std::cout
@@ -39,7 +40,9 @@ static T getParameterFromUser(const std::string& parameter, T lower, T upper,
       << lower
       << " ~ "
       << upper
-      << "): ";
+      << ") "
+      << measure_unit
+      << ": ";
   std::cin >> value;
   if (value < lower || value > upper) {
     throw std::out_of_range("This value is not acceptable");
@@ -109,7 +112,7 @@ void initializeParameters(GlobalVariables&   global_vars,
                           PredatorVariables& predator_vars,
                           SwarmVariables&    swarm_vars) {
   swarm_vars.size = getParameterFromUser("swarm size", LimitValues::size_lower,
-                                         LimitValues::size_upper, 1);
+                                         LimitValues::size_upper, "boids", 1);
 
   global_vars.wind_bool = isYes("Enable wind?");
 
@@ -121,59 +124,60 @@ void initializeParameters(GlobalVariables&   global_vars,
   if (isYes("Insert parameters manually?")) {
     swarm_vars.wingspan = getParameterFromUser(
         "wingspan", LimitValues::wingspan_lower, LimitValues::wingspan_upper,
-        ConversionFactors::space_k);
-
-    swarm_vars.max_speed = getParameterFromUser(
-        "maximum speed", LimitValues::speed_lower, LimitValues::speed_upper,
-        ConversionFactors::speed_k);
+        "m", ConversionFactors::space_k);
 
     swarm_vars.min_distance = getParameterFromUser(
         "minimum distance", LimitValues::min_distance_lower,
-        LimitValues::min_distance_upper, ConversionFactors::space_k);
-
-    swarm_vars.separation_factor = getParameterFromUser(
-        "separation factor", LimitValues::factors_lower,
-        LimitValues::factors_upper, ConversionFactors::separation_k, 1);
-
-    swarm_vars.cohesion_factor = getParameterFromUser(
-        "cohesion factor", LimitValues::factors_lower,
-        LimitValues::factors_upper, ConversionFactors::cohesion_k, 1);
-
-    swarm_vars.alignment_factor = getParameterFromUser(
-        "alignment factor", LimitValues::factors_lower,
-        LimitValues::factors_upper, ConversionFactors::alignment_k, 1);
-
-    swarm_vars.fear_factor = getParameterFromUser(
-        "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
-        ConversionFactors::fear_k, 1);
-
-    swarm_vars.height_factor = getParameterFromUser(
-        "height factor", LimitValues::factors_lower, LimitValues::factors_upper,
-        ConversionFactors::height_k, 1);
+        LimitValues::min_distance_upper, "m", ConversionFactors::space_k);
 
     swarm_vars.sight_distance = getParameterFromUser(
         "sight distance", LimitValues::sight_distance_lower,
-        LimitValues::sight_distance_upper, ConversionFactors::space_k);
+        LimitValues::sight_distance_upper, "m", ConversionFactors::space_k);
 
-    swarm_vars.visual_field = getParameterFromUser(
-        "visual field", LimitValues::visual_field_lower,
-        LimitValues::visual_field_upper, ConversionFactors::visual_field_k);
+    swarm_vars.visual_field =
+        getParameterFromUser("visual field", LimitValues::visual_field_lower,
+                             LimitValues::visual_field_upper, "°",
+                             ConversionFactors::visual_field_k);
+
+    swarm_vars.max_speed = getParameterFromUser(
+        "maximum speed", LimitValues::speed_lower, LimitValues::speed_upper,
+        "m/s", ConversionFactors::speed_k);
+
+    swarm_vars.separation_factor = getParameterFromUser(
+        "separation factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, "", ConversionFactors::separation_k, 1);
+
+    swarm_vars.cohesion_factor = getParameterFromUser(
+        "cohesion factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, "", ConversionFactors::cohesion_k, 1);
+
+    swarm_vars.alignment_factor = getParameterFromUser(
+        "alignment factor", LimitValues::factors_lower,
+        LimitValues::factors_upper, "", ConversionFactors::alignment_k, 1);
+
+    swarm_vars.fear_factor = getParameterFromUser(
+        "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
+        "", ConversionFactors::fear_k, 1);
+
+    swarm_vars.height_factor = getParameterFromUser(
+        "height factor", LimitValues::factors_lower, LimitValues::factors_upper,
+        "", ConversionFactors::height_k, 1);
 
     if (global_vars.predator_bool) {
+      predator_vars.attack_range = getParameterFromUser(
+          "predator attack range", LimitValues::attack_range_lower,
+          LimitValues::attack_range_upper, "m", ConversionFactors::space_k);
+
       predator_vars.attack_speed = getParameterFromUser(
           "predator attack speed",
           swarm_vars.max_speed * ConversionFactors::speed_k,
-          LimitValues::speed_upper, ConversionFactors::speed_k);
-
-      predator_vars.attack_range = getParameterFromUser(
-          "predator attack range", LimitValues::attack_range_lower,
-          LimitValues::attack_range_upper, ConversionFactors::space_k);
+          LimitValues::speed_upper, "m/s", ConversionFactors::speed_k);
     }
 
     if (global_vars.wind_bool) {
       global_vars.windspeed = getParameterFromUser(
           "wind speed", LimitValues::windspeed_lower,
-          LimitValues::windspeed_upper, ConversionFactors::speed_k);
+          LimitValues::windspeed_upper, "m/s", ConversionFactors::speed_k);
     }
   } else {
     if (isYes("Casual parameters geneation?")) {
@@ -182,18 +186,35 @@ void initializeParameters(GlobalVariables&   global_vars,
   }
 
   std::cout << "Parameters set to values:\n";
-  std::cout << "Size:              " << swarm_vars.size << std::endl;
+  std::cout
+      << "Size:              "
+      << swarm_vars.size
+      << " boids"
+      << std::endl;
   std::cout
       << "Wingspan:          "
       << swarm_vars.wingspan * ConversionFactors::space_k
-      << std::endl;
-  std::cout
-      << "Max speed:         "
-      << swarm_vars.max_speed * ConversionFactors::speed_k
+      << " m"
       << std::endl;
   std::cout
       << "Min distance:      "
       << swarm_vars.min_distance * ConversionFactors::space_k
+      << " m"
+      << std::endl;
+  std::cout
+      << "Sight distance:    "
+      << swarm_vars.sight_distance * ConversionFactors::space_k
+      << " m"
+      << std::endl;
+  std::cout
+      << "Visual field:      "
+      << swarm_vars.visual_field * ConversionFactors::visual_field_k
+      << " °"
+      << std::endl;
+  std::cout
+      << "Max speed:         "
+      << swarm_vars.max_speed * ConversionFactors::speed_k
+      << " m/s"
       << std::endl;
   std::cout
       << "Separation factor: "
@@ -216,23 +237,17 @@ void initializeParameters(GlobalVariables&   global_vars,
       << "Height factor:     "
       << (swarm_vars.height_factor * ConversionFactors::height_k - 40) * 5
       << std::endl;
-  std::cout
-      << "Sight distance:    "
-      << swarm_vars.sight_distance * ConversionFactors::space_k
-      << std::endl;
-  std::cout
-      << "Visual field:      "
-      << swarm_vars.visual_field * ConversionFactors::visual_field_k
-      << std::endl;
 
   if (global_vars.predator_bool) {
     std::cout
-        << "Attack speed:      "
-        << predator_vars.attack_speed * ConversionFactors::speed_k
-        << std::endl;
-    std::cout
         << "Attack range:      "
         << predator_vars.attack_range * ConversionFactors::space_k
+        << " m"
+        << std::endl;
+    std::cout
+        << "Attack speed:      "
+        << predator_vars.attack_speed * ConversionFactors::speed_k
+        << " m/s"
         << std::endl;
   }
 
@@ -248,12 +263,14 @@ void initializeParameters(GlobalVariables&   global_vars,
     global_vars.wind = Vec3(dis_x(gen), dis_y(gen), dis_z(gen)).normalize()
                      * global_vars.windspeed;
     std::cout
-        << "Wind Speed:        "
+        << "Wind speed:        "
         << global_vars.windspeed * ConversionFactors::speed_k
+        << " m/s"
         << std::endl;
     std::cout
-        << "Wind:              "
+        << "Wind velocity:     "
         << (global_vars.wind * ConversionFactors::speed_k)
+        << " m/s"
         << std::endl;
   }
 }
@@ -267,12 +284,22 @@ void saveStatisticsOnFile(const std::string&       filename,
     file
         << "\nsize              = "
         << swarm_vars.size
+        << " boids"
         << "\nwingspan          = "
         << swarm_vars.wingspan * ConversionFactors::space_k
-        << "\nmax speed         = "
-        << swarm_vars.max_speed * ConversionFactors::speed_k
+        << " m"
         << "\nmin distance      = "
         << swarm_vars.min_distance * ConversionFactors::space_k
+        << " m"
+        << "\nsight distance    = "
+        << swarm_vars.sight_distance * ConversionFactors::space_k
+        << " m"
+        << "\nvisual field      = "
+        << swarm_vars.visual_field * ConversionFactors::visual_field_k
+        << " °"
+        << "\nmax speed         = "
+        << swarm_vars.max_speed * ConversionFactors::speed_k
+        << " m/s"
         << "\nseparation factor = "
         << (swarm_vars.separation_factor * ConversionFactors::separation_k - 40)
                * 5
@@ -285,26 +312,26 @@ void saveStatisticsOnFile(const std::string&       filename,
         << (swarm_vars.fear_factor * ConversionFactors::fear_k - 40) * 5
         << "\nheight factor     = "
         << (swarm_vars.height_factor * ConversionFactors::height_k - 40) * 5
-        << "\nsight distance    = "
-        << swarm_vars.sight_distance * ConversionFactors::space_k
-        << "\nvisual field      = "
-        << swarm_vars.visual_field * ConversionFactors::visual_field_k
         << "\npredator          = "
         << global_vars.predator_bool;
     if (global_vars.predator_bool) {
       file
+          << "\nattack range      = "
+          << predator_vars.attack_range * ConversionFactors::space_k
+          << " m"
           << "\nattack speed      = "
           << predator_vars.attack_speed * ConversionFactors::speed_k
-          << "\nattack range      = "
-          << predator_vars.attack_range * ConversionFactors::space_k;
+          << " m/s";
     }
     file << "\nwind              = " << global_vars.wind_bool;
     if (global_vars.wind_bool) {
       file
           << "\nwind speed        = "
           << global_vars.windspeed * ConversionFactors::speed_k
-          << "\nwind vector       = "
-          << (global_vars.wind * ConversionFactors::speed_k);
+          << " m/s"
+          << "\nwind velocity     = "
+          << (global_vars.wind * ConversionFactors::speed_k)
+          << " m/s";
     }
     file
         << "\ntoroidal          = "
