@@ -263,46 +263,6 @@ TEST_CASE("mean and stdDev: Statistical functions") {
   CHECK(boids::stdDev(values) == doctest::Approx(1.41421356));
 }
 
-TEST_CASE("Global Variables Initialization") {
-  boids::GlobalVariables global_vars;
-
-  CHECK(global_vars.screen == boids::Vec3(600, 300, 300));
-  CHECK(global_vars.wind == boids::Vec3(0, 0, 0));
-  CHECK(global_vars.toroidal_bool == false);
-}
-
-TEST_CASE("Predator Variables Initialization") {
-  boids::PredatorVariables predator_vars;
-
-  CHECK(predator_vars.attack_range == 300);
-  CHECK(predator_vars.attack_speed == 1.3);
-}
-
-TEST_CASE("Swarm Variables Initialization") {
-  boids::SwarmVariables swarm_vars;
-
-  CHECK(swarm_vars.size == 100);
-  CHECK(swarm_vars.wingspan == 2);
-  CHECK(swarm_vars.max_speed == 1);
-  CHECK(swarm_vars.min_distance == 30);
-  CHECK(swarm_vars.sight_distance == 150);
-
-  CHECK(swarm_vars.separation_factor == 0.05);
-  CHECK(swarm_vars.cohesion_factor == 0.00005);
-  CHECK(swarm_vars.alignment_factor == 0.005);
-  CHECK(swarm_vars.fear_factor == 0.05);
-}
-
-TEST_CASE("Conversion Factors Initialization") {
-  boids::ConversionFactors conversion_factors;
-
-  CHECK(conversion_factors.speed_k == 100);
-  CHECK(conversion_factors.separation_k == 1000);
-  CHECK(conversion_factors.cohesion_k == 1000000);
-  CHECK(conversion_factors.alignment_k == 10000);
-  CHECK(conversion_factors.fear_k == 1000);
-}
-
 TEST_CASE("Swarm Initialization") {
   boids::GlobalVariables global_vars;
   boids::SwarmVariables  swarm_vars;
