@@ -21,7 +21,7 @@ struct PredatorVariables {
 struct SwarmVariables {
   int size = 100;
 
-  double wingspan       = 2;
+  double wingspan       = 3;
   double max_speed      = 1;
   double min_distance   = 20;
   double sight_distance = 150;
