@@ -23,7 +23,7 @@ struct SwarmVariables {
 
   double wingspan       = 2;
   double max_speed      = 1;
-  double min_distance   = 10;
+  double min_distance   = 20;
   double sight_distance = 150;
   double visual_field   = M_PI * 2 / 3;
 

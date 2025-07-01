@@ -155,15 +155,15 @@ void initializeParameters(GlobalVariables&   global_vars,
         "alignment factor", LimitValues::factors_lower,
         LimitValues::factors_upper, "", ConversionFactors::alignment_k, 1);
 
-    swarm_vars.fear_factor = getParameterFromUser(
-        "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
-        "", ConversionFactors::fear_k, 1);
-
     swarm_vars.height_factor = getParameterFromUser(
         "height factor", LimitValues::factors_lower, LimitValues::factors_upper,
         "", ConversionFactors::height_k, 1);
 
     if (global_vars.predator_bool) {
+      swarm_vars.fear_factor = getParameterFromUser(
+          "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
+          "", ConversionFactors::fear_k, 1);
+
       predator_vars.attack_range = getParameterFromUser(
           "predator attack range", LimitValues::attack_range_lower,
           LimitValues::attack_range_upper, "m", ConversionFactors::space_k);
@@ -230,15 +230,15 @@ void initializeParameters(GlobalVariables&   global_vars,
       << (swarm_vars.alignment_factor * ConversionFactors::alignment_k - 40) * 5
       << std::endl;
   std::cout
-      << "Fear factor:       "
-      << (swarm_vars.fear_factor * ConversionFactors::fear_k - 40) * 5
-      << std::endl;
-  std::cout
       << "Height factor:     "
       << (swarm_vars.height_factor * ConversionFactors::height_k - 40) * 5
       << std::endl;
 
   if (global_vars.predator_bool) {
+    std::cout
+        << "Fear factor:       "
+        << (swarm_vars.fear_factor * ConversionFactors::fear_k - 40) * 5
+        << std::endl;
     std::cout
         << "Attack range:      "
         << predator_vars.attack_range * ConversionFactors::space_k
@@ -308,14 +308,14 @@ void saveStatisticsOnFile(const std::string&       filename,
         << "\nalignment factor  = "
         << (swarm_vars.alignment_factor * ConversionFactors::alignment_k - 40)
                * 5
-        << "\nfear factor       = "
-        << (swarm_vars.fear_factor * ConversionFactors::fear_k - 40) * 5
         << "\nheight factor     = "
         << (swarm_vars.height_factor * ConversionFactors::height_k - 40) * 5
         << "\npredator          = "
         << global_vars.predator_bool;
     if (global_vars.predator_bool) {
       file
+          << "\nfear factor       = "
+          << (swarm_vars.fear_factor * ConversionFactors::fear_k - 40) * 5
           << "\nattack range      = "
           << predator_vars.attack_range * ConversionFactors::space_k
           << " m"
