@@ -53,8 +53,9 @@ static T getParameterFromUser(const std::string& parameter, T lower, T upper,
   }
 }
 
-static void casualBoidsParameters(GlobalVariables& global_vars, PredatorVariables& predator_vars,
-                             SwarmVariables& swarm_vars) {
+static void casualBoidsParameters(GlobalVariables&   global_vars,
+                                  PredatorVariables& predator_vars,
+                                  SwarmVariables&    swarm_vars) {
   std::random_device rd;
   std::mt19937       gen(rd());
 
@@ -88,10 +89,15 @@ static void casualBoidsParameters(GlobalVariables& global_vars, PredatorVariable
                                           LimitValues::attack_range_upper);
     predator_vars.attack_range = dis8(gen) / ConversionFactors::space_k;
   }
+
+  if (global_vars.wind_bool) {
+    std::uniform_real_distribution<> dis5(LimitValues::windspeed_lower,
+                                          LimitValues::windspeed_upper);
+    global_vars.windspeed = dis5(gen) / ConversionFactors::speed_k;
+  }
 }
 
-static void casualSimulationParameters(GlobalVariables&   global_vars,
-                            SwarmVariables&    swarm_vars) {
+static void casualSimulationParameters(SwarmVariables& swarm_vars) {
   std::random_device rd;
   std::mt19937       gen(rd());
 
@@ -105,13 +111,6 @@ static void casualSimulationParameters(GlobalVariables&   global_vars,
       (dis4(gen) / 5 + 40) / ConversionFactors::alignment_k;
   swarm_vars.fear_factor   = (dis4(gen) / 5 + 40) / ConversionFactors::fear_k;
   swarm_vars.height_factor = (dis4(gen) / 5 + 40) / ConversionFactors::height_k;
-
-  if (global_vars.wind_bool) {
-    std::uniform_real_distribution<> dis5(LimitValues::windspeed_lower,
-                                          LimitValues::windspeed_upper);
-    global_vars.windspeed = dis5(gen) / ConversionFactors::speed_k;
-  }
-
 }
 
 void initializeParameters(GlobalVariables&   global_vars,
@@ -148,12 +147,29 @@ void initializeParameters(GlobalVariables&   global_vars,
     swarm_vars.max_speed = getParameterFromUser(
         "maximum speed", LimitValues::speed_lower, LimitValues::speed_upper,
         "m/s", ConversionFactors::speed_k);
-    } else {
-      if (isYes("Casual boids parameters generation?")) { 
-        casualBoidsParameters(global_vars, predator_vars, swarm_vars);
-      }
+
+    if (global_vars.predator_bool) {
+      predator_vars.attack_range = getParameterFromUser(
+          "predator attack range", LimitValues::attack_range_lower,
+          LimitValues::attack_range_upper, "m", ConversionFactors::space_k);
+
+      predator_vars.attack_speed = getParameterFromUser(
+          "predator attack speed",
+          swarm_vars.max_speed * ConversionFactors::speed_k,
+          LimitValues::speed_upper, "m/s", ConversionFactors::speed_k);
     }
-    if (isYes("Insert simulation parameters manually?")) {
+
+    if (global_vars.wind_bool) {
+      global_vars.windspeed = getParameterFromUser(
+          "wind speed", LimitValues::windspeed_lower,
+          LimitValues::windspeed_upper, "m/s", ConversionFactors::speed_k);
+    }
+  } else {
+    if (isYes("Casual boids parameters generation?")) {
+      casualBoidsParameters(global_vars, predator_vars, swarm_vars);
+    }
+  }
+  if (isYes("Insert simulation parameters manually?")) {
     swarm_vars.separation_factor = getParameterFromUser(
         "separation factor", LimitValues::factors_lower,
         LimitValues::factors_upper, "", ConversionFactors::separation_k, 1);
@@ -174,25 +190,10 @@ void initializeParameters(GlobalVariables&   global_vars,
       swarm_vars.fear_factor = getParameterFromUser(
           "Fear factor", LimitValues::factors_lower, LimitValues::factors_upper,
           "", ConversionFactors::fear_k, 1);
-
-      predator_vars.attack_range = getParameterFromUser(
-          "predator attack range", LimitValues::attack_range_lower,
-          LimitValues::attack_range_upper, "m", ConversionFactors::space_k);
-
-      predator_vars.attack_speed = getParameterFromUser(
-          "predator attack speed",
-          swarm_vars.max_speed * ConversionFactors::speed_k,
-          LimitValues::speed_upper, "m/s", ConversionFactors::speed_k);
-    }
-
-    if (global_vars.wind_bool) {
-      global_vars.windspeed = getParameterFromUser(
-          "wind speed", LimitValues::windspeed_lower,
-          LimitValues::windspeed_upper, "m/s", ConversionFactors::speed_k);
     }
   } else {
     if (isYes("Casual parameters geneation?")) {
-      casualSimulationParameters(global_vars, swarm_vars);
+      casualSimulationParameters(swarm_vars);
     }
   }
 
