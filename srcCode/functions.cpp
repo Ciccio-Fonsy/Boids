@@ -53,9 +53,8 @@ static T getParameterFromUser(const std::string& parameter, T lower, T upper,
   }
 }
 
-static void casualParameters(GlobalVariables&   global_vars,
-                             PredatorVariables& predator_vars,
-                             SwarmVariables&    swarm_vars) {
+static void casualBoidsParameters(GlobalVariables& global_vars, PredatorVariables& predator_vars,
+                             SwarmVariables& swarm_vars) {
   std::random_device rd;
   std::mt19937       gen(rd());
 
@@ -75,6 +74,27 @@ static void casualParameters(GlobalVariables&   global_vars,
                                         LimitValues::visual_field_upper);
   swarm_vars.visual_field = dis3(gen) / ConversionFactors::visual_field_k;
 
+  std::uniform_real_distribution<> dis6(LimitValues::speed_lower,
+                                        LimitValues::speed_upper);
+  swarm_vars.max_speed = dis6(gen) / ConversionFactors::speed_k;
+
+  if (global_vars.predator_bool) {
+    std::uniform_real_distribution<> dis7(swarm_vars.max_speed
+                                              * ConversionFactors::speed_k,
+                                          LimitValues::speed_upper);
+    predator_vars.attack_speed = dis7(gen) / ConversionFactors::speed_k;
+
+    std::uniform_real_distribution<> dis8(LimitValues::attack_range_lower,
+                                          LimitValues::attack_range_upper);
+    predator_vars.attack_range = dis8(gen) / ConversionFactors::space_k;
+  }
+}
+
+static void casualSimulationParameters(GlobalVariables&   global_vars,
+                            SwarmVariables&    swarm_vars) {
+  std::random_device rd;
+  std::mt19937       gen(rd());
+
   std::uniform_real_distribution<> dis4(LimitValues::factors_lower,
                                         LimitValues::factors_upper);
   swarm_vars.separation_factor =
@@ -92,20 +112,6 @@ static void casualParameters(GlobalVariables&   global_vars,
     global_vars.windspeed = dis5(gen) / ConversionFactors::speed_k;
   }
 
-  std::uniform_real_distribution<> dis6(LimitValues::speed_lower,
-                                        LimitValues::speed_upper);
-  swarm_vars.max_speed = dis6(gen) / ConversionFactors::speed_k;
-
-  if (global_vars.predator_bool) {
-    std::uniform_real_distribution<> dis7(swarm_vars.max_speed
-                                              * ConversionFactors::speed_k,
-                                          LimitValues::speed_upper);
-    predator_vars.attack_speed = dis7(gen) / ConversionFactors::speed_k;
-
-    std::uniform_real_distribution<> dis8(LimitValues::attack_range_lower,
-                                          LimitValues::attack_range_upper);
-    predator_vars.attack_range = dis8(gen) / ConversionFactors::space_k;
-  }
 }
 
 void initializeParameters(GlobalVariables&   global_vars,
@@ -121,7 +127,7 @@ void initializeParameters(GlobalVariables&   global_vars,
   global_vars.toroidal_bool =
       isYes("Enable toroidal space? (Recommended with wind enabled)");
 
-  if (isYes("Insert parameters manually?")) {
+  if (isYes("Insert boid parameters manually?")) {
     swarm_vars.wingspan = getParameterFromUser(
         "wingspan", LimitValues::wingspan_lower, LimitValues::wingspan_upper,
         "m", ConversionFactors::space_k);
@@ -142,7 +148,12 @@ void initializeParameters(GlobalVariables&   global_vars,
     swarm_vars.max_speed = getParameterFromUser(
         "maximum speed", LimitValues::speed_lower, LimitValues::speed_upper,
         "m/s", ConversionFactors::speed_k);
-
+    } else {
+      if (isYes("Casual boids parameters generation?")) { 
+        casualBoidsParameters(global_vars, predator_vars, swarm_vars);
+      }
+    }
+    if (isYes("Insert simulation parameters manually?")) {
     swarm_vars.separation_factor = getParameterFromUser(
         "separation factor", LimitValues::factors_lower,
         LimitValues::factors_upper, "", ConversionFactors::separation_k, 1);
@@ -181,7 +192,7 @@ void initializeParameters(GlobalVariables&   global_vars,
     }
   } else {
     if (isYes("Casual parameters geneation?")) {
-      casualParameters(global_vars, predator_vars, swarm_vars);
+      casualSimulationParameters(global_vars, swarm_vars);
     }
   }
 
