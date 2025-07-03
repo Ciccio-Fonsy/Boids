@@ -287,7 +287,7 @@ void initializeParameters(GlobalVariables&   global_vars,
   }
 }
 
-void saveStatisticsOnFile(const std::string&       filename,
+void saveParametersOnFile(const std::string&       filename,
                           const GlobalVariables&   global_vars,
                           const PredatorVariables& predator_vars,
                           const SwarmVariables&    swarm_vars) {
