@@ -20,7 +20,7 @@ int main() {
   boids::SwarmVariables    swarm_vars;
 
   boids::initializeParameters(global_vars, predator_vars, swarm_vars);
-  boids::saveStatisticsOnFile("boids_save.txt", global_vars, predator_vars,
+  boids::saveParametersOnFile("boids_save.txt", global_vars, predator_vars,
                               swarm_vars);
 
   sf::RenderWindow window_top;
