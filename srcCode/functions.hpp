@@ -28,7 +28,7 @@ void handleEvents(sf::RenderWindow& window);
 void drawBoids(const Predator* predator, const Swarm& swarm,
                sf::RenderWindow& window, int plane, sf::CircleShape& boid_shape,
                sf::CircleShape& predator_shape);
-void saveStatisticsOnFile(const std::string&       filename,
+void saveParametersOnFile(const std::string&       filename,
                           const GlobalVariables&   global_vars,
                           const PredatorVariables& predator_vars,
                           const SwarmVariables&    swarm_vars);
