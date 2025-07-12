@@ -12,16 +12,16 @@
 namespace boids {
 void Predator::init() {
   std::random_device               rd;
-  std::mt19937                     gen(rd());
+  std::mt19937                     gen(rd()); //generatore di numeri casuali
   std::uniform_real_distribution<> ds(0, 1.0);
   std::uniform_real_distribution<> dv(-1.0, 1.0);
 
-  const double x = ds(gen) * screen_.x_;
+  const double x = ds(gen) * screen_.x_; //genero un num casuale tra 0 e 1
   const double y = ds(gen) * screen_.y_;
 
   set_position(Vec3(x, y, 0));
 
-  const double max_deviation = attack_speed_ / std::sqrt(3);
+  const double max_deviation = attack_speed_ / std::sqrt(3); //mi rende meno probabile che abbia velocità maggiori di v_max
 
   const double vx = dv(gen) * max_deviation;
   const double vy = dv(gen) * max_deviation;
@@ -34,11 +34,20 @@ void Predator::init() {
   }
 }
 
-const Prey* Predator::findPrey(const Swarm& swarm) const {
+const Prey* Predator::findPrey(const Swarm& swarm) const { //punta alla preda più vicina: posso vedere la posizione momento per momento
   const Prey* nearest_prey     = nullptr;
-  double      nearest_distance = screen_.norm();
+  double      nearest_distance = screen_.norm(); //è il vettore più grande che posso avere
 
-  for (int i = 0; i < swarm.size(); ++i) {
+  for (const Prey& p : swarm) {
+     double dist = p.position().distance(toroidal_, position(), screen_);
+    if (dist < nearest_distance && dist <= attack_range_) {
+      nearest_distance = dist;
+      nearest_prey     = &p;
+    }
+  }
+  return nearest_prey;
+}
+  /*for (int i = 0; i < swarm.size(); ++i) { 
     const Prey&  current_prey = swarm[i];
     const double dist =
         current_prey.position().distance(toroidal_, position(), screen_);
@@ -48,7 +57,7 @@ const Prey* Predator::findPrey(const Swarm& swarm) const {
     }
   }
   return nearest_prey;
-}
+}*/
 
 void Predator::attack(Swarm& swarm) {
   const Prey* prey = findPrey(swarm);
@@ -61,14 +70,13 @@ void Predator::attack(Swarm& swarm) {
 }
 
 Vec3 Predator::height() const {
-  Vec3   correction;
+  Vec3   correction; //cost defult vuoto
   double dh     = preferred_height_ - position().z_;
   double v_norm = velocity().norm();
 
-  if (v_norm == 0 || dh * velocity().z_ / std::abs(dh) / v_norm <= 0.5) {
-    correction.z_ = dh;
+  if (v_norm == 0 || dh * velocity().z_ / std::abs(dh) / v_norm <= 0.5) { // se il prod scalare tra i versore ha un angolo maggiore di 60 gradi: cos60=0.5
+    correction.z_ = dh; //applico una correzione ulteriore per farloa avvicinare più velocemente->non risaliva abbastanza velocemente
   }
-
   return correction * height_factor_;
 }
 
@@ -117,7 +125,7 @@ void Predator::updatePredator(Swarm& swarm) {
     ++cooldown_;
 
     updateBoidVelocity(wind_, height() + circle(screen_.norm() / 4),
-                       attack_speed_ / 2);
+                       attack_speed_ / 2); //velocità di passeggio
   }
   stall(wind_, attack_speed_);
   updateBoid(wind_, wind_, attack_speed_);
