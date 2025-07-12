@@ -43,29 +43,29 @@ void Swarm::bounce(Prey& b) {
   const Vec3& b_velocity = b.velocity();
 
   for (Prey& other_prey : preys_) {
-    if (other_prey != b && isWithinRange(other_prey, b, 2 * wingspan_)) {
+    if (other_prey != b && isWithinRange(other_prey, b, 2 * wingspan_)) { 
       const Vec3& other_position = other_prey.position();
       const Vec3& other_velocity = other_prey.velocity();
 
       if (b_position == other_position) {
-        b.set_position(b_position + Vec3(0, 0, wingspan_ / 10));
+        b.set_position(b_position + Vec3(0, 0, wingspan_ / 10)); //se sono sovrapposti i spodto di poco per far continuare il programma
       }
 
       const Vec3 separation_vector =
-          other_position.vecDistance(toroidal_, b_position, screen_);
+          other_position.vecDistance(toroidal_, b_position, screen_); //distanza tra i pray
       const Vec3 relative_velocity = b_velocity - other_velocity;
-      const bool approaching = separation_vector.dot(relative_velocity) > 0;
+      const bool approaching = separation_vector.dot(relative_velocity) > 0; //e il prodotto scalare, e quindi il coseno, è positivo: si stanno avvicinando
 
       if (approaching) {
-        const Vec3 collision_normal = separation_vector.normalize();
+        const Vec3 collision_normal = separation_vector.normalize(); //versore separazione boids
         const Vec3 velocity_b_after =
             b_velocity
-            - collision_normal * (relative_velocity.dot(collision_normal));
+            - collision_normal * (relative_velocity.dot(collision_normal)); //componente della velocità lungo la normale di collisione, urto totalmente anelstico
         const Vec3 velocity_other_after =
             other_velocity
-            + collision_normal * (relative_velocity.dot(collision_normal));
+            + collision_normal * (relative_velocity.dot(collision_normal)); //uguale per other, è anelastico perchè è coinvolto anche il separation factor
 
-        b.set_velocity(velocity_b_after * 0.1);
+        b.set_velocity(velocity_b_after * 0.1); //rallentano molto, storditi
         other_prey.set_velocity(velocity_other_after * 0.1);
       }
     }
@@ -74,19 +74,19 @@ void Swarm::bounce(Prey& b) {
 
 Vec3 Swarm::separation(const Prey& b) const {
   const Vec3& b_position = b.position();
-  Vec3        c;
+  Vec3        c; //vettore su cui sto lavorando
 
   for (const Prey& other_prey : preys_) {
     const Vec3& other_position = other_prey.position();
 
     if (other_prey != b
         && isWithinRange(b, other_prey, min_distance_)
-        && other_position != b_position
+        && other_position != b_position //è sempre diversa perchè update swarm prima chiama bounce
         && isWithinField(b, other_prey)) {
       const Vec3 separation =
           other_position.vecDistance(toroidal_, b_position, screen_);
-      c -= separation.normalize() / separation.norm();
-    }
+      c -= separation.normalize() / separation.norm(); //somma di le direzioni di spearazione con modulo invarsamente proporzionale alla norma
+    } //più evidente se ci sono tanti boids in una direzione
   }
 
   return c * separation_factor_;
@@ -111,9 +111,10 @@ Vec3 Swarm::cohesion(const Prey& b) const {
           }
 
           perceived_center[j] =
-              (count * perceived_center[j] + position[j]) / (count + 1);
+              (count * perceived_center[j] + position[j]) / (count + 1); //media pesata rispetto a quanti boids si riferisce il percived center(devo sapere sempre dov'è CM) 
           perceived_center[j] =
-              std::fmod(perceived_center[j] + screen_[j], screen_[j]);
+              std::fmod(perceived_center[j], screen_[j]); //se il centro di massa è fuori dai limiti me lo sposta dentro (ho tolto un + sceen)
+                                                          //(forse potevamo usare altrove, bordo di boid)
         }
 
         perceived_center[2] += position[2];
@@ -128,16 +129,16 @@ Vec3 Swarm::cohesion(const Prey& b) const {
   if (count == 0) { return Vec3(0, 0, 0); }
 
   if (toroidal_) {
-    perceived_center[2] /= count;
+    perceived_center[2] /= count; //solo sulla z avevo la somma diretta
   } else {
     perceived_center /= count;
   }
 
-  return perceived_center.vecDistance(toroidal_, b.position(), screen_)
+  return perceived_center.vecDistance(toroidal_, b.position(), screen_) //non è normalzzata
        * cohesion_factor_;
 }
 
-Vec3 Swarm::alignment(const Prey& b) const {
+Vec3 Swarm::alignment(const Prey& b) const { //guara tutte le prede nel campo visivo e mi restituisce la media delle differenze di velocità
   Vec3 pv;
   int  count = 0;
 
@@ -156,7 +157,7 @@ Vec3 Swarm::alignment(const Prey& b) const {
   return (pv - b.velocity()) * alignment_factor_;
 }
 
-Vec3 Swarm::height(const Prey& b) const {
+Vec3 Swarm::height(const Prey& b) const { //entra in gioco solo se si allontana dall'altezza preferita
   Vec3   correction;
   double dh = preferred_height_ - b.position().z_;
 
@@ -172,12 +173,12 @@ Vec3 Swarm::fear(const Prey& b) const {
       b.position().vecDistance(toroidal_, predator_->position(), screen_);
   const double distance_norm = distance_to_predator.norm();
 
-  if (distance_norm == 0) {
+  if (distance_norm == 0) { //caso che non si verifica
     evade_vector = b.velocity().normalize() * max_speed_;
-  } else if (distance_norm <= sight_distance_) {
-    const Vec3   flee_direction = distance_to_predator.normalize();
+  } else if (distance_norm <= sight_distance_) { //(is whithin range)
+    const Vec3   flee_direction = distance_to_predator.normalize(); //distance from predator
     const double evade_strength =
-        (sight_distance_ - distance_norm) / sight_distance_;
+        (sight_distance_ - distance_norm) / sight_distance_; //percentiale della velocità massima che dipende da quanto sono lontani
 
     evade_vector = flee_direction * max_speed_ * evade_strength;
   }
@@ -247,13 +248,13 @@ Swarm::Swarm(const GlobalVariables& global_vars,
 
 void Swarm::updateSwarm() {
   preys_.erase(
-      std::remove_if(
+      std::remove_if( //mi sposta tutti gli elementi eliminabili alla fine del vec e mi passa un itaratore al primo elemento eliminabile
           preys_.begin(), preys_.end(),
-          [this](Prey& prey) {
+          [this](Prey& prey) { //lamda prende lo stormo per reference e o modifica
             if (predator_ && isWithinRange(*predator_, prey, wingspan_)) {
               predator_->resetCooldown();
               return true; // Mark this prey for removal
-            } else {
+            } else { //se non la devo eliminare aggiorno la sua posizione secondo i criteri
               const Vec3 v1 = separation(prey);
               const Vec3 v2 = cohesion(prey);
               const Vec3 v3 = alignment(prey);
@@ -275,6 +276,6 @@ void Swarm::updateSwarm() {
           }),
       preys_.end());
 
-  size_ = static_cast<int>(preys_.size());
+  size_ = static_cast<int>(preys_.size()); //aggiusto la dim del vettore
 }
 } // namespace boids
