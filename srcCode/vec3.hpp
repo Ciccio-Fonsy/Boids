@@ -146,7 +146,9 @@ inline double& Vec3::operator[](int i) {
 
 inline Vec3 operator*(double scalar, const Vec3& v) { return v * scalar; }
 
-inline std::ostream& operator<<(std::ostream& os, const Vec3& v) {
+inline std::ostream& operator<<(std::ostream& os, const Vec3& v) {   //una qualsiasi forma di output: passare ostream significa che 
+                                                                    //a sinistra ho una stringa da srtampare a cui aggiungo vec3
+                                                                    //mi restituisce quella stringa a vui ha aggiunto vec3
   os << "(" << v.x_ << ", " << v.y_ << ", " << v.z_ << ")";
   return os;
 }
