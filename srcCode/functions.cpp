@@ -10,13 +10,14 @@
 #include <SFML/Window.hpp>
 
 #include <algorithm>
-#include <cctype>
-#include <fstream>
+//#include <cctype> inutile
+#include <fstream> //file
+#include <iomanip> //gestisce la formattazione del file
 #include <iostream>
 #include <random>
 
 namespace boids {
-static bool isYes(const std::string& prompt) {
+static bool isYes(const std::string& prompt) { //viene vista solo all'interno di questa translation unit
   std::string input;
 
   std::cout << prompt << " [y/N]: ";
@@ -46,7 +47,7 @@ static T getParameterFromUser(const std::string& parameter, T lower, T upper,
   std::cin >> value;
   if (value < lower || value > upper) {
     throw std::out_of_range("This value is not acceptable");
-  } else if (factor) {
+  } else if (factor) { //me lo riporta ad una valore vicino al valore medio
     return (value / 5 + 40) / conversion_factor;
   } else {
     return value / conversion_factor;
@@ -263,7 +264,7 @@ void initializeParameters(GlobalVariables&   global_vars,
         << std::endl;
   }
 
-  if (global_vars.wind_bool) {
+  if (global_vars.wind_bool) { //generatore casuale direzione del vento
     std::random_device               rd;
     std::mt19937                     gen(rd());
     std::uniform_real_distribution<> dis_x(-LimitValues::wind_horizontal,
@@ -291,7 +292,8 @@ void saveParametersOnFile(const std::string&       filename,
                           const GlobalVariables&   global_vars,
                           const PredatorVariables& predator_vars,
                           const SwarmVariables&    swarm_vars) {
-  std::ofstream file(filename, std::ios::app);
+  std::ofstream file(filename, std::ios::app);  //crea uno stream di stampa su file, che si chiama file e che mi va a stampare in in filemane
+                                                //(std::ios::app apre in modalitòà append) trunc se volessi eliminarle
   if (file.is_open()) {
     file
         << "\nsize              = "
@@ -356,30 +358,30 @@ void saveParametersOnFile(const std::string&       filename,
   }
 }
 
-void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) {
+void drawWindows(sf::RenderWindow& window_xy, sf::RenderWindow& window_xz) { //sto passando 2 fineste render window create vuote nel main
   const sf::VideoMode& desktop_mode = sf::VideoMode::getDesktopMode();
 
   unsigned int screen_width  = desktop_mode.width;
   unsigned int screen_height = desktop_mode.height;
 
-  unsigned int padding        = 12;
-  unsigned int app_bar_height = 40;
+  unsigned int padding        = 12; //
+  unsigned int app_bar_height = 40; //tengono conto della barra delle applicazioni e della finestra di linux (misurate da noi)
 
   unsigned int window_width = (screen_width / 2) - padding;
   unsigned int window_height =
       (screen_height / 2) - 2 * padding - app_bar_height;
 
-  window_xy.create(sf::VideoMode(window_width, window_height), "Top view");
+  window_xy.create(sf::VideoMode(window_width, window_height), "Top view"); //viene disegnata con queste misure e questo nome
   window_xz.create(sf::VideoMode(window_width, window_height), "Side view");
 
-  window_xy.setPosition(
-      sf::Vector2i(0, static_cast<int>(window_height + 3 * padding)));
+  window_xy.setPosition( //mi posiziona la finestra nello schermo
+      sf::Vector2i(0, static_cast<int>(window_height + 3 * padding))); //vettore a 2 dim fatto da interi
   window_xz.setPosition(sf::Vector2i(0, 0));
 }
 
-void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
+void initializeShapes(double wingspan, sf::CircleShape& boid_shape, //prende la forma del boid e del predatore e gli dice quanto è grande e il colore
                       sf::CircleShape& predator_shape) {
-  float wingspanf = static_cast<float>(wingspan);
+  float wingspanf = static_cast<float>(wingspan); //converto in un float
 
   boid_shape.setRadius(wingspanf);
   boid_shape.setFillColor(sf::Color::Black);
@@ -388,7 +390,7 @@ void initializeShapes(double wingspan, sf::CircleShape& boid_shape,
   predator_shape.setFillColor(sf::Color::Red);
 }
 
-void handleEvents(sf::RenderWindow& window) {
+void handleEvents(sf::RenderWindow& window) { //mi fa girare il programma finchè le finestre sono aperte
   sf::Event event;
   while (window.pollEvent(event)) {
     if (event.type == sf::Event::Closed) {
@@ -408,10 +410,10 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
 
   double wingspan = swarm.wingspan();
 
-  std::for_each(swarm.begin(), swarm.end(), [&](const Prey& prey) {
+  std::for_each(swarm.begin(), swarm.end(), [&](const Prey& prey) { //da inizio a fine stormo prendi delle prede e fagli questa cosa
     sf::Vector2<double> position;
 
-    switch (plane) {
+    switch (plane) { //farlo contemporaneamente su due finestre ralleta l'esecuzione
     case 0:
       position.x = prey.position().x_ / screen.x_ * width - wingspan;
       position.y = prey.position().y_ / screen.y_ * height - wingspan;
@@ -450,17 +452,17 @@ void drawBoids(const Predator* predator, const Swarm& swarm,
   }
 }
 
-static void printStatistics(const Swarm& swarm, int t,
+static void printStatistics(const Swarm& swarm, int t, //stampa su file
                             const std::string& filename) {
   std::vector<double> distances;
   std::vector<double> velocities;
 
-  for (int i = 0; i < swarm.size(); ++i) {
+  for (int i = 0; i < swarm.size(); ++i) { //non posso fare pray:swarm ma così mi garantisce che siano sempre diversi i boid per fare due for annidati
     velocities.push_back(swarm[i].velocity().norm()
                          * ConversionFactors::speed_k);
     for (int j = i + 1; j < swarm.size(); ++j) {
       distances.push_back(swarm[i].position().distance(
-          swarm.toroidal(), swarm[j].position(), swarm.screen()));
+          swarm.toroidal(), swarm[j].position(), swarm.screen()) * ConversionFactors::space_k); //ci eravamo dimenticati uno space conversion
     }
   }
 
@@ -475,7 +477,7 @@ static void printStatistics(const Swarm& swarm, int t,
 
   if (file.is_open()) {
     file
-        << std::setw(6)
+        << std::setw(6) //formatta i fle così la singola colonna ha una dimensione specifica
         << t
         << std::setw(15)
         << mean_dist
