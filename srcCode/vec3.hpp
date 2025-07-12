@@ -131,7 +131,7 @@ inline double Vec3::operator[](int i) const {
   case 0 : return x_;
   case 1 : return y_;
   case 2 : return z_;
-  default: throw std::out_of_range("Index out of range");
+  default: throw std::out_of_range("Index out of range"); //caso std se non è nessun altro caso
   }
 }
 
