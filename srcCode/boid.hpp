@@ -15,7 +15,7 @@ class Boid {
   Boid(Vec3 position, Vec3 velocity);
 
  public:
-  virtual ~Boid() = default;
+  virtual ~Boid() = default; //distruttore di default
 
   Vec3 position() const;
   Vec3 velocity() const;
@@ -31,7 +31,7 @@ class Boid {
 
   void border(const Vec3& screen, bool toroidal);
 
-  virtual void stall(const Vec3& wind, double max_speed) = 0;
+  virtual void stall(const Vec3& wind, double max_speed) = 0; //funzioni vitruali pure
   virtual void resetCooldown()                           = 0;
 };
 
