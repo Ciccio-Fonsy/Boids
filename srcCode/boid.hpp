@@ -3,7 +3,7 @@
 
 #include "vec3.hpp"
 
-#include <memory>
+//#include <memory> //serve per gli unique pointer (ma nion ci sono)
 
 namespace boids {
 class Boid {
