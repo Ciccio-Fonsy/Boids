@@ -20,25 +20,25 @@ struct Vec3 {
   Vec3&  operator+=(const Vec3& other);
   Vec3   operator-(const Vec3& other) const;
   Vec3&  operator-=(const Vec3& other);
-  Vec3   operator*(double scalar) const;
+  Vec3   operator*(double scalar) const; //vec*n
   Vec3&  operator*=(double scalar);
   Vec3   operator/(double scalar) const;
   Vec3&  operator/=(double scalar);
   double norm() const;
   Vec3   normalize() const;
   Vec3&  normalizeAssign();
-  double dot(const Vec3& other) const;
-  Vec3   cross(const Vec3& other) const;
-  Vec3   vecDistance(bool toroidal, const Vec3& other, const Vec3& width) const;
-  double distance(bool toroidal, const Vec3& other, const Vec3& width) const;
+  double dot(const Vec3& other) const; //prodotto scalare
+  Vec3   cross(const Vec3& other) const; //prodotto vettoriale
+  Vec3   vecDistance(bool toroidal, const Vec3& other, const Vec3& width) const; //distanza vettoriale con possibilitàò toriodale
+  double distance(bool toroidal, const Vec3& other, const Vec3& width) const; //distanza scalare con possibilità toroidale
   double operator[](int i) const;
   double& operator[](int i);
 
-  friend Vec3          operator*(double scalar, const Vec3& v);
-  friend std::ostream& operator<<(std::ostream& os, const Vec3& v);
+  friend Vec3          operator*(double scalar, const Vec3& v); //per completezza se no n*vec3 non è definito
+  friend std::ostream& operator<<(std::ostream& os, const Vec3& v); //sostituisce converte in una stringa quyando chiedi di stampare un vettore
 };
 
-inline Vec3::Vec3()
+inline Vec3::Vec3() //costruttore di default
     : x_()
     , y_()
     , z_() {}
