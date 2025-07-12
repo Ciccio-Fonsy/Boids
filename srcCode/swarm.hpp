@@ -24,13 +24,14 @@ class Swarm {
   const double      alignment_factor_;
   const double      fear_factor_;
   const double      height_factor_;
+  Boid*             predator_;
+  
   const Vec3        screen_;
   const Vec3        wind_;
   const bool        toroidal_;
-  Boid*             predator_;
 
-  bool isWithinRange(const Boid& b1, const Boid& b2, double range) const;
-  bool isWithinField(const Boid& b1, const Boid& b2) const;
+  bool isWithinRange(const Boid& b1, const Boid& b2, double range) const; //distanza
+  bool isWithinField(const Boid& b1, const Boid& b2) const; //angolo
 
   void init();
   void bounce(Prey& b);
@@ -98,7 +99,7 @@ inline const Prey& Swarm::operator[](int i) const {
   return preys_[static_cast<std::size_t>(i)];
 }
 
-inline std::vector<Prey>::iterator Swarm::begin() { return preys_.begin(); }
+inline std::vector<Prey>::iterator Swarm::begin() { return preys_.begin(); } //iteratori definiti sulo stormo come sew fosse un vettore di pray
 inline std::vector<Prey>::iterator Swarm::end() { return preys_.end(); }
 
 inline std::vector<Prey>::const_iterator Swarm::begin() const {
