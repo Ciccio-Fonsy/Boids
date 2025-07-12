@@ -126,7 +126,8 @@ inline Vec3 Vec3::cross(const Vec3& other) const {
               x_ * other.y_ - y_ * other.x_);
 }
 
-inline double Vec3::operator[](int i) const {
+inline double Vec3::operator[](int i) const { //ce ne sono due perchè in questo modo in cui non serve midificare la costante
+                                              //posso passarla by value e ridurre il consumo di memoria
   switch (i) {
   case 0 : return x_;
   case 1 : return y_;
