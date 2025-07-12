@@ -10,7 +10,7 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
-#include <memory>
+#include <memory> //serve per gli unique ptr
 
 // for e algoritmi lambda
 
@@ -37,33 +37,33 @@ int main() {
     predator = std::make_unique<boids::Predator>(global_vars, predator_vars);
   }
 
-  boids::Swarm swarm(global_vars, swarm_vars, predator.get());
+  boids::Swarm swarm(global_vars, swarm_vars, predator.get()); //momento clue della simulazione
 
   int t = 0;
 
   const int   print_period      = 100;
-  const float target_frame_time = 1.0f / 60.0f;
+  const float target_frame_time = 1.0f / 60.0f; //60 frame al secondo
 
   while (window_top.isOpen() && window_side.isOpen() && swarm.size() > 0) {
     sf::Clock clock;
 
-    boids::handleEvents(window_top);
+    boids::handleEvents(window_top);//guardo se è stata chiusa qualche finestra
     boids::handleEvents(window_side);
 
-    window_top.clear(sf::Color(124, 252, 0));
-    boids::drawBoids(predator.get(), swarm, window_top, 0, boid_shape,
+    window_top.clear(sf::Color(124, 252, 0)); //puliscli la finestra con questo colore
+    boids::drawBoids(predator.get(), swarm, window_top, 0, boid_shape, 
                      predator_shape);
     window_top.display();
 
     window_side.clear(sf::Color(135, 206, 235));
-    boids::drawBoids(predator.get(), swarm, window_side, 1, boid_shape,
+    boids::drawBoids(predator.get(), swarm, window_side, 1, boid_shape, //disegno le finestre una per volta
                      predator_shape);
-    window_side.display();
+    window_side.display(); //disegna le modifivhe che hai fatto
 
     boids::updateSimulation(predator.get(), swarm, t, print_period,
                             "boids_save.txt");
 
-    float frame_time = clock.getElapsedTime().asSeconds();
+    float frame_time = clock.getElapsedTime().asSeconds(); //tempo che è passato in secondi dall'inizio dell'secuzione di questo clock
     if (frame_time < target_frame_time) {
       sf::sleep(sf::seconds(target_frame_time - frame_time));
     }
