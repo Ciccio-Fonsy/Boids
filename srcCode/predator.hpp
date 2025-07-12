@@ -13,17 +13,17 @@ class Predator : public Boid {
   const double attack_speed_;
   const double preferred_height_;
   const double height_factor_;
-  const Vec3   screen_;
-  const Vec3   wind_;
-  const bool   toroidal_;
-  int          cooldown_;
+  const Vec3   screen_; //li dischiaro come attrubuti per semplificare la sintassi ma nel costruttore possono essere passato sono come struct e non singolarmente
+  const Vec3   wind_; //
+  const bool   toroidal_; //
+  int          cooldown_; //
 
   void        init();
   const Prey* findPrey(const Swarm& swarm) const;
   void        attack(Swarm& swarm);
   Vec3        height() const;
   Vec3        circle(double r) const;
-  void        stall(const Vec3& wind, double max_speed);
+  void        stall(const Vec3& wind, double max_speed); //come per pray con cost divese
 
  public:
   Predator();
@@ -34,7 +34,7 @@ class Predator : public Boid {
   double      attack_speed() const;
   double      preferred_height() const;
   double      height_factor() const;
-  const Vec3& screen() const;
+  const Vec3& screen() const; //sono di controllo: servono in fase di test e debuggung per evitare che swarm e predator abbiano var diverse
   const Vec3& wind() const;
   bool        toroidal() const;
   int         cooldown() const;
@@ -59,9 +59,10 @@ inline bool Predator::toroidal() const { return toroidal_; }
 
 inline int Predator::cooldown() const { return cooldown_; }
 
+
 inline void Predator::resetCooldown() { cooldown_ = 0; }
 
-inline void Predator::stall(const Vec3& wind, double max_speed) {
+inline void Predator::stall(const Vec3& wind, double max_speed) { //uguale a pray ma il predatore può volare a velocità più basse
   if ((velocity() - wind).norm() <= 0.2 * max_speed) {
     updateBoidVelocity(
         wind,
